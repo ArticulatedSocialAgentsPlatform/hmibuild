@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Core" default="run">
+   <description>JavaProjects core build file</description>
+  
+  
+
+   <!-- Read build properties. Redundant when called from HmiBuild/build.xml, but needed for standalone versions -->
+   <property name="properties.file" value="build.properties"/>
+   <property file="${properties.file}" /> 
+   <available file="${properties.file}" property="properties.file.available" />
+   
+  
+   
+   
+   <property name="private.properties.dir" value="privateprops" />
+   
+   <!-- The main.class.file file keeps track of the run.main.class property, (re)defining the main class for "run" -->
+   <property name="main.class.file" value="${private.properties.dir}/main.class"/>
+   <property file="${main.class.file}" />
+   <available file="${main.class.file}" property="main.class.file.available" />
+   
+   
+   <!-- The module.name is used for javadoc, jar files etec.                                                              -->
+   <!-- module.name can be set explicitly, but else we use ant.project.name as module name.                               -->
+   <!-- Note that ant.project.name is the name set by the top-most build file, so usually not the name of this build file -->
+   <property name="module.name"           value="${ant.project.name}"/>
+          
+   <!-- Names of main project directories -->   
+   <property name="src.dir"               value="src"      />
+   <property name="resource.dir"          value="resource" /> 
+   <property name="lib.dir"               value="lib"      />
+   <property name="build.dir"             value="build"    />
+   <property name="build.classes.dir"     value="${build.dir}/classes" />
+   <property name="dist.dir"              value="dist"  />
+    
+   <!-- Settings for "compiling with javac" -->
+   <property name="javac.include"         value="**/*.java"/>
+   <property name="javac.exclude"         value=""/>
+   <property name="javac.deprecation"     value="true"/>
+   <property name="javac.version"         value="1.7"/>
+   <property name="javac.source"          value="${javac.version}"/>
+   <property name="javac.target"          value="${javac.version}"/>
+   <property name="javac.compilerargs"    value=""/>      
+   <property name="includeAntRuntime"     value="false"/> <!-- set to true when using the ant API, for instance in the Hmi/HmiAnt package -->
+   
+   <path id="javac-sourcepath">
+      <pathelement path="${src.dir}"/>
+   </path>  
+      
+   <fileset id="lib.fileset" dir=".">
+      <include name="${lib.dir}/**/*.jar"   />
+      <include name="${lib.local}/**/*.jar" />
+   </fileset>
+    
+   <path id="javac-classpath">
+       <pathelement location="${build.classes.dir}"/>
+       <fileset refid="lib.fileset"/>
+   </path> 
+
+   <property name="resource.path"  value="" />
+ 
+   <available file="${src.dir}" property="src.dir.present"/> <!-- requires (?) ant 1.8 -->
+  
+   <target name="help" description="Help for building and running projects">
+   <echo> -- Building/Running/Testing --
+    ant              Default target is: ${ant.project.default-target}
+    clean            Deletes the build and dist directories
+    compile          Compiles all files in the project
+    build            clean, then compile
+    main             Show and set the main class for run
+    run              Executes the run.main class; compiles if necessary.
+    jar              Create a jar version of the project
+    junit            Run all JUnit tests where the classname ends in 'Test'
+    junitreport      Run junit, and create an HTML JUnit report 
+    checkstyle       Check Java style
+    findbugs         Find potential Java bugs
+    findbugsreport   Find potential Java bugs, produce an HTML findbugs report</echo> 
+    </target>
+   
+   
+   <target name="build" depends="clean, compile" description="clean, compile"/>  
+ 
+   <target name="clean" description="Removes the build directory">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+   </target>
+   <target name="eclipseproject" description="create eclipse project files">
+	<py-run script="${shared.ant.dir}/eclipse/createEclipseProject.py">
+		   <arg value="--sharedroot=${shared.project.root}"/>
+		   <arg value="--sharedresource=${shared.resources}"/>
+	           <arg value="--basedir=${basedir}"/>		   
+		   <arg value="--asapsharedresource=${asap.resources}"/>
+	</py-run>
+   </target>	
+
+   <target name="eclipsesourceproject" description="create eclipse project files">
+	<py-run script="${shared.ant.dir}/eclipse/createEclipseProject.py">
+		   <arg value="--sharedroot=${shared.project.root}"/>
+		   <arg value="--sharedresource=${shared.resources}"/>
+		   <arg value="--basedir=${basedir}"/>
+	           <arg value="--asapsharedresource=${asap.resources}"/>
+		   <arg value="--sourcesetup"/>
+	</py-run>
+   </target>
+
+   <target name="compile" description="Compile java file(s)" if="${src.dir.present}"> 
+      <property name="files" value="${javac.include}"/>
+      <!--echo message="files=${files}" /-->
+      <mkdir dir="${build.classes.dir}"/>
+      <javac srcdir="${src.dir}" 
+             destdir="${build.classes.dir}" 
+             includeAntRuntime="${includeAntRuntime}"
+             debug="true"
+             deprecation="on"
+             source="${javac.source}"
+             target="${javac.target}"
+      >                
+          <classpath refid="javac-classpath"/>
+          <sourcepath refid="javac-sourcepath"/>
+          <include name="**/${files}"/>
+          <exclude name="${javac.exclude}"/>
+          <compilerarg value="-Xlint:unchecked" />
+      </javac> 
+   </target>   
+
+   <fileset id="resource.fileset" dir=".">
+      <include name="${resource.dir}/**/*.jar"/>
+      <include name="${resource.dir}/**/*.zip"/>
+   </fileset>
+    
+   <!-- Settings for running java executables -->
+   <path id="run-classpath">
+      <path refid="javac-classpath"/>
+      <fileset refid="resource.fileset"/> <!-- note this *does* include jars/zips in resource, whereas the next pathelement does *not* -->
+      <pathelement location="${resource.dir}"/>
+      <pathelement path="${resource.path}"/>  
+      <pathelement location="src"/>    
+   </path>  
+            
+   <!-- if run.jvmargs is set, it will be used by Netbeans and this build file; -->
+   <!-- if run.jvmargline is set, it is used here, but is ignored by Netbeans   -->
+   <property name="run.jvmargline"        value=""/>       
+   <property name="run.jvmargs"           value="${run.jvmargline}"/>
+   <!-- some extra arguments to be included for testing (like: -XX:-UseSplitVerifier)  -->
+   <property name="test.jvmargs"           value=""/>
+   <!-- Usually forking is good/safer, non forking responds faster. forking is necessary for setting java runtime parameters-->
+   <property name="run.fork"              value="true"/> <!-- set to true if arguments are used -->
+   <property name="run.spawn"             value="false"/>
+   <property name="run.library.path"      value="${lib.dir};${lib.local}"/>
+   
+   <!--property name="run.main.class" value"UNDEFINED" /-->
+   <target name="run" depends="compile" description="Runs the main program for this project, compiles if necessary">   
+      <!--property name="run.main.class" value="${default.run.main.class}"/-->
+      <!--property name="myclasspath" refid="run-classpath"/-->   
+      <!--echo message="run-classpath=${myclasspath}"/-->
+      <fail message=":${line.separator}${line.separator}No main class defined. ${line.separator}Use 'ant main' to set a main class" unless="run.main.class"/> 
+      <java classname="${run.main.class}" fork="${run.fork}" spawn="${run.spawn}" >      
+      	    
+          <classpath refid="run-classpath"/>
+          <jvmarg line="${run.jvmargs}"/>
+          <arg line="${run.argline}"/>
+          <!-- when a build.properties line like -Djava.library.path=lib;${env.windir}/system32 is used, the following is ignored: -->
+          <sysproperty key="java.library.path" path="${run.library.path}"/> 
+          <!-- for some reason this doesn't work with the jvmarg line (although -Djava.library.path=... is allowed on that line ) -->
+          <!-- find all properties starting with -D, remove the -D, and apply as sysproperty: -->
+          <syspropertyset>
+               <propertyref prefix="-D"/>
+               <mapper from="-D*" to="*" type="glob"/>
+          </syspropertyset>
+      </java> 
+   </target>   
+      
+  <!-- if run.main.class is already set (typically by reading the main.class file or the build.properties file)
+       then the next condition will not have any effect. Else, it will set run.main.class, but only
+       when default.run.main.class is set, to some non-empty value -->    
+  <condition property="run.main.class" value="${default.run.main.class}">
+  	 <and>
+  	    <isset property="default.run.main.class"/>
+  	    <not><equals arg1="${default.run.main.class}" arg2="" /></not>
+  	 </and>
+  </condition>    
+      
+  <target name="tes">
+  	 <echo message="run.main.class: ${run.main.class}"/>
+  </target>  
+      
+   <target name="-init.main.class.file" unless="main.class.file.available">   
+      <mkdir dir="${private.properties.dir}"/>
+      <echo file="${main.class.file}" message="run.main.class=none"/>
+      <echo message="main.class file added to project${line.separator} "/>
+   </target> 
+      
+   <target name="main" depends="-init.main.class.file" description="Show and Set the main class for &quot;run&quot;">
+      <echo message="Current main class: ${run.main.class}${line.separator} "/>
+      <input
+         message="Give (fully qualified) main class:${line.separator}}&lt;Return&gt; : keep current "
+         addproperty="new.main.class"
+         defaultvalue="${run.main.class}"
+      />
+      <replaceregexp file="${main.class.file}"  match="^run.main.class.*"  replace="run.main.class=${new.main.class}" byline="true"  />
+   </target>   
+   
+  
+   <!--target name="checkmain"  unless="run.main.class" description="Check for main class">
+       <antcall target="-init.main.class.file" />
+       <input
+         message="Give the main class (including package name)? ${line.separator}"
+         addproperty="run.main.class"
+       />
+       <replaceregexp file="${main.class.file}"  match="^run.main.class.*"  replace="run.main.class=${run.main.class}" byline="true"  /> 
+       <echo message="${main.class.file} updated; use 'ant main' to (re)set the main class"/>
+   </target-->   
+   
+  
+      
+   <!-- Settings for "javadoc" -->
+   <property name="docs.dir"              value="docs"     />
+   <property name="javadoc.dir"           location="${docs.dir}/${module.name}"/>
+   <property name="javadoc.doctitle"      value="${module.name} API Documentation"/>
+   <property name="javadoc.overview"      value="javadoc-overview.html"/>
+   <property name="javadoc.noindex"       value="false"/>
+   <property name="javadoc.nonavbar"      value="false"/>
+   <property name="javadoc.notree"        value="false"/>
+   <property name="javadoc.private"       value="false"/>
+   <property name="javadoc.splitindex"    value="false"/>
+   <property name="javadoc.use"           value="true"/>
+   <property name="javadoc.author"        value="true"/>
+   <property name="javadoc.version"       value="true"/>
+   <property name="javadoc.windowtitle"   value="${module.name}"/>
+   <property name="javadoc.link"          value="http://java.sun.com/javase/6/docs/api/"/>
+   <property name="javadoc.linksource"    value="yes"/>
+   <property name="javadoc.packages"      value="*"/>
+   
+   <target name="doc" description="Generates javadoc documentation">      
+      <javadoc 
+         source="${javac.source}"        
+         sourcepath="${src.dir}"  
+         destdir="${javadoc.dir}" 
+         packagenames="${javadoc.packages}"
+         doctitle="${javadoc.doctitle}"
+         verbose="false">
+      <classpath refid="javac-classpath"/>
+      </javadoc>
+   </target>
+  
+  
+   <!-- settings for "jar" -->
+   <property name="manifest.file"         value="manifest.mf"/>
+
+   <property name="jar.excludes" value=""/>
+   <property name="jar.classes"  value="**/*.class"/>
+   <patternset id="jar.classes">
+     <include name="${jar.classes}"/>
+     <exclude name="jar.excludes"/>
+   </patternset>  
+   
+   <property name="jar.resources" value="**/*"/> <!-- .svn .cvs etc are already excluded by default -->
+   <patternset id="jar.resources"> 
+     <include name="${jar.resources}"/>
+     <exclude name="jar.excludes"/>
+   </patternset>  
+ 
+   <available file="${manifest.file}" property="manifest.file.present"/>
+ 
+   <target name="createmanifest" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
+      <tstamp>   
+          <format property="MANIFEST_TIME" pattern="MMMM dd yyyy  hh:mm aa" locale="en" />
+      </tstamp>
+      <property name="organisation" value=""/>
+     <echo file="${manifest.file}">Manifest-Version: 1.0
+Main-Class: main
+       
+Name: ${ant.project.name}
+Specification-Title:    ${ant.project.name}
+Specification-Version:  0.1
+Specification-Vendor:   ${organisation}
+Implementation-Title:   ${ant.project.name}
+Implementation-Version: ${MANIFEST_TIME}
+Implementation-Vendor:  ${organisation}</echo>
+   </target>
+
+
+ 
+   <!--target name="-jarversion" if="specification.version">
+       <property name="jar.version" value="-${specification.version}"/> <!- - set only if specification.version defined - ->
+   </target-->
+ 
+   <target name="jar" depends="createmanifest, compile" description="Creates a jar file containing the project's class files and resources">
+      <mkdir dir="${dist.dir}"/>  
+      <delete>
+         <fileset dir="${dist.dir}" includes="${module.name}*.jar*"/>
+      </delete>    
+      <property name="jar.version.postfix"   value=""/>                   <!-- fall back, when no versioning is being used -->
+      <property name="jarfile.basename"      value="${module.name}${jar.version.postfix}.jar"/>   
+      <property name="jarfile"               location="${dist.dir}/${jarfile.basename}"/>  
+      <property name="mf.file"               value="${manifest.file}"/>   <!-- fallback, unless set already by calling target -->
+      <tstamp>   
+          <format property="MANIFEST_TIME" pattern="MMMM dd yyyy  hh:mm aa" locale="en" />
+      </tstamp>
+      <replaceregexp file="${mf.file}"
+                      match="(.*?Implementation-Version:)(.*)"
+                      replace="\1 ${MANIFEST_TIME}"
+                      byline="true"
+      />    
+      <jar destfile="${jarfile}" 
+           manifest="${mf.file}"
+           filesetmanifest="mergewithoutmain"
+           index="true">
+           <fileset dir="${build.classes.dir}" erroronmissingdir="false">
+              <patternset refid="jar.classes"/>
+           </fileset>
+           <fileset dir="${resource.dir}" erroronmissingdir="false">
+              <patternset refid="jar.resources"/>
+           </fileset>
+      </jar>
+   </target>
+  
+  
+   <!-- Settings for JUnit testing -->
+   <property name="test.dir"               value="test"  />
+   <property name="test.src.dir"           value="${test.dir}/src/" />
+   <property name="test.lib.dir"           value="${test.dir}/lib/" />
+   <property name="test.resource.dir"      value="${test.dir}/resource/" />
+   <property name="test.report.dir"        value="${test.dir}/report" />
+   <property name="build.test.classes.dir" location="${build.dir}/test/classes" />
+   <property name="build.test.results.dir" location="${build.dir}/test/results" />
+   <!--property name="junit.include"          value="**/*Test.class"/-->
+   <!--
+   <property name="junit.include"          value="**/*.class"/>
+   <property name="junit.exclude"          value=""/>
+   -->
+   <property name="junit.include"          value="**/*Test.class"/>
+   <property name="junit.exclude"          value="**/Abstract*.class"/>
+   
+   <property name="test.library.path"      value="${test.lib.dir};${lib.dir};${test.lib.local}"/>
+   <!--
+   <path id="test.library.path">
+      <pathelement location="${lib.dir}"/>
+      <pathelement location="${test.lib.dir}"/>    
+   </path>  
+   -->
+   
+   <fileset dir="." id="test.lib.fileset">
+      <include name="${test.lib.dir}/**/*.jar"/>
+      <include name="${test.lib.local}/**/*.jar"/>
+   </fileset>
+ 
+   <path id="javac-test-sourcepath">
+      <pathelement path="${test.src.dir}"/>
+   </path>            
+   
+   <path id="javac-test-classpath">
+      <path refid="javac-classpath"/>
+      <fileset refid="test.lib.fileset"/>
+      <!--pathelement location="${libs.junit.classpath}"/-->
+   </path> 
+   
+   <path id="junit-test-run-classpath">
+      <path refid="javac-test-classpath"/>
+      <pathelement location="${build.test.classes.dir}"/>
+      <pathelement location="${resource.dir}"/>
+      <pathelement location="${test.resource.dir}"/>
+      <pathelement path="${resource.path}"/> 
+      <pathelement path="${test.resource.path}"/>   
+   </path>  
+  
+   <target name="compile-tests" depends="compile" if="test.src.dir.available">       
+      <property name="test.files" value="${javac.include}"/>
+      <mkdir dir="${build.test.classes.dir}"/>
+      <mkdir dir="${test.src.dir}"/>
+      <javac srcdir="${test.src.dir}" 
+             destdir="${build.test.classes.dir}" 
+             includeAntRuntime="${includeAntRuntime}"
+             debug="true"
+             deprecation="on"
+             source="${javac.source}"
+             target="${javac.target}"             
+      >                
+          <classpath refid="javac-test-classpath"/>
+          <sourcepath refid="javac-test-sourcepath"/>
+          <include name="**/${test.files}"/>
+          <exclude name="${javac.exclude}"/>
+          <compilerarg value="-Xlint" />
+      </javac> 
+   </target>   
+  
+  <available file="${test.src.dir}" type="dir" property="test.src.dir.available"/>
+ 
+  
+   <target name="-junit" depends="compile-tests" if="test.src.dir.available" >
+      <delete dir="${build.test.results.dir}" failonerror="false" quiet="true"/>
+      <mkdir dir="${build.test.results.dir}"/>
+      <junit printsummary="false" 
+           haltonfailure="false"
+           fork="yes"  forkmode="perTest"  timeout="1000000"
+           errorProperty="test.failed"
+           failureProperty="test.failed">
+      
+         <classpath refid="junit-test-run-classpath"/>
+         <jvmarg line="${run.jvmargs} ${test.jvmargs}"/>
+         <!--arg line="${run.argline}"/-->
+         <sysproperty key="shared.project.root" path="${shared.project.root}"/> 
+         <sysproperty key="java.library.path" path="${test.library.path}"/> 
+         <formatter type="brief" usefile="false"/>
+         <formatter type="xml"/>
+         <batchtest todir="${build.test.results.dir}" >
+            <fileset dir="${build.test.classes.dir}" >
+               <include name="${junit.include}"/>
+               <exclude name="${junit.exclude}"/>
+               <exclude name="**/*$*.class"/>               
+            </fileset>
+         </batchtest>
+      </junit>
+       
+      
+   </target>
+   
+   <target name="junit" depends="-junit" description="Run all JUnit tests" >
+      <fail if="test.failed">
+         JUnit test(s) failed.
+      </fail>
+   </target>
+   
+   <target name="junitnofail" depends="-junit" description="Run all JUnit tests, do not fail on test failure"/>      
+   
+   <target name="junitreport" depends="-junit" description="Run all JUnit tests and create an HTML report" if="test.src.dir.available">
+      <delete dir="${test.report.dir}" failonerror="false"/>
+      <mkdir dir="${test.report.dir}"/>
+      <junitreport todir="${build.test.results.dir}" >
+         <fileset dir="${build.test.results.dir}">
+            <include name="TEST-*.xml"/>
+         </fileset>
+         <report format="frames" todir="${test.report.dir}"/>
+      </junitreport>
+      <!--fail if="test.failed">
+         JUnit test(s) failed.
+      </fail-->
+   </target>
+   
+   <property name="alternate.build.file" value="build.alternate"/>
+   <available property="alternate.available" file="${alternate.build.file}"/>
+   
+   <target name="alternate" description="switch to alternate build file (build.alternate)">
+       <fail message="No alternate build file found" unless="alternate.available"/>
+       <echo message="swap build files build.xml and ${alternate.build.file}..."/>
+       <move file="${alternate.build.file}" tofile="build.tmp" overwrite="true"/>
+       <move file="build.xml" tofile="${alternate.build.file}" />
+       <move file="build.tmp" tofile="build.xml"  />
+   </target>
+    
+</project>
+
+  
+
+     
+
+  
+   
+

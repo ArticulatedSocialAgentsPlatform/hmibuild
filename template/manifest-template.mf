@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Main-Class: @MAIN.CLASS@
+
+Name: @PACKAGE.PATH@
+Specification-Title:    @PROJECT.NAME@
+Specification-Version:  0.1
+Specification-Vendor:   @VENDOR@
+Implementation-Title:   @PROJECT.NAME@
+Implementation-Version: October 30 2007  12:45 PM
+Implementation-Vendor:  @VENDOR@

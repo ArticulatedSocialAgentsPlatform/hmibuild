@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Testing"   xmlns:ac="antlib:net.sf.antcontrib"  xmlns:cs="antlib:com.puppycrawl.tools.checkstyle"   >
+
+   <description>
+      build targets for testing
+   </description>
+  
+   <typedef resource="com/puppycrawl/tools/checkstyle/antlib.xml" 
+            uri="antlib:com.puppycrawl.tools.checkstyle" 
+            classpath= "${shared.ant.dir}/checkstyle/checkstyle-5.3-all.jar" 
+   />                                     
+   
+   <typedef name="findbugs" 
+      classpath= "${shared.ant.dir}/findbugs-2.0.0/lib/findbugs-ant.jar"
+      classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
+   />
+  
+  <typedef name="javancss" 
+      classpath= "${shared.ant.dir}/javancss2ant/lib/javancss.jar"
+      classname="javancss.JavancssAntTask"
+   />
+  
+  <typedef name="cpd" 
+      classpath= "${shared.ant.dir}/pmd/lib/pmd-4.2.5.jar"
+      classname="net.sourceforge.pmd.cpd.CPDTask" 
+   />
+  
+   <target name="help" description="Help for testing">
+      <echo>
+ -- Testing --
+    test:                          Equivalent to junit
+    test -Dtest.class=class:       Run the JUnit test for the specified class
+      </echo> 
+   </target>  
+
+   <available file="${test.dir}" type="dir" property="test.dir.available"/>
+ 
+   
+   
+   <target name="testdir" description="Check for/copy test directory">
+      <ac:if>
+         <not> ${test.dir.available} </not>
+      <ac:then>
+         <echo message="No test directory found, copying template..."/>
+         <property name="organization" value="HMI"/>
+         <copy todir="test">
+           <fileset dir="${shared.template.dir}/testdir-template" excludes="ivy.xml"/>
+            
+            
+             <!--filterset>
+               <filter token="MODULE" value="${ant.project.name}"/>
+               <!- -filter token="ORG" value="${organization}"/- ->
+            </filterset-->
+         </copy>
+      </ac:then>
+      </ac:if> 
+   </target>
+
+   <target name="test"  description="Run JUnit test(s)" if="${test.dir.available}">
+      <ac:if>
+         <isset property="test.class"/> 
+      <ac:then>
+         <antcall target="testClass"/>
+      </ac:then>
+      <ac:else>
+         <antcall target="junit"/>
+      </ac:else>
+      </ac:if>
+   </target>   
+  
+   
+  
+   <!-- description="JUnit test a single class test.class" -->
+   <target name="testClass"  >
+      <!-- remove Test and/or .java postfix, if present-->
+      <ac:propertyregex property="test.base.class"
+              input="${test.class}"
+              regexp="(.*?)(Test)?(\.java)?"
+              replace="\1"  
+      />
+      <!-- set the files property, for compiling the java class -->
+      <property name="files" value="${test.base.class}.java" />
+      <property name="test.files" value="${test.base.class}Test.java" />
+      <antcall target="-testClass"/>
+   </target>
+   
+   <target name="-testClass" depends="compile-tests" >
+       
+      <junit printsummary="false" 
+           haltonfailure="false"
+           fork="yes"  forkmode="perTest" timeout="100000"
+           errorProperty="test.failed"
+           failureProperty="test.failed">
+         <classpath refid="junit-test-run-classpath"/>
+         <sysproperty key="shared.project.root" path="${shared.project.root}"/> 
+         <jvmarg line="${run.jvmargs}"/>
+         <!--arg line="${run.argline}"/-->
+         <formatter type="brief" usefile="false"/>
+         <batchtest todir="${build.test.results.dir}">
+            <fileset dir="${build.test.classes.dir}" >
+               <include name="**/${test.base.class}Test.class"/>
+            </fileset>
+         </batchtest>    
+      </junit>
+      <fail if="test.failed" message="JUnit test for ${test.base.class} failed." />
+   </target>    
+ 
+
+ <property name="junittest-template"    location="${shared.template.dir}/JunitTest-template.java" /> 
+
+ <target name="-decomposefilename">
+    <!-- example: for a java.file= C:\TestProject\HmiUtil\src\hmi\util\FilterSet.java we have:            -->
+    <!-- full.name = hmi/util/FilterSet  package.path = hmi/util  package = hmi.util class.name=FilterSet -->
+    <fail unless="java.file" message="No java.file specified." />
+    <ac:propertyregex property="long.name"
+              input="${java.file}"
+              regexp="\\"
+              override="true"
+              replace="/"
+    />  
+    <ac:propertyregex property="full.name"
+              input="${long.name}"
+              regexp=".*/src/(.*)\.java"
+              select="\1"
+    />  
+    <ac:propertyregex property="package.path"
+              input="${full.name}"
+              regexp="(.*)/[^/]+$"
+              select="\1"
+    /> 
+    <ac:propertyregex property="package"
+              input="${package.path}"
+              regexp="/"
+              replace="."
+    />   
+    <ac:propertyregex property="class.name"
+              input="${full.name}"
+              regexp=".*/([^/]+)$"
+              select="\1"
+    />  
+ </target>
+
+
+ <target name="addtest" depends="-decomposefilename" >
+    <property name="testclass.name" value="${class.name}Test"/> 
+    <property name="testclass.file" value="${test.src.dir}${package.path}/${class.name}Test.java"/> 
+  
+    <available file="${testclass.file}" property="testfile.exists"/>
+    <fail if="testfile.exists">
+        addtest: ${testclass.file} already exists.
+    </fail>
+     
+    <copy file="${junittest-template}"  tofile="${testclass.file}" >  
+       <filterset>
+         <filter token="PACKAGE"    value="${package}" />
+         <filter token="CLASSNAME"  value="${class.name}" />
+         <filter token="TESTCLASSNAME"  value="${testclass.name}" />
+       </filterset>
+    </copy>
+ </target>
+
+ <target name="checkstyle" description="check Java style">
+      <!--cs:checkstyle config="${shared.ant.dir}/checkstyle/hmi_checks_lite.xml"--> 
+      <ac:if>
+      <available file="${test.src.dir}" type="dir" />
+     <ac:then>
+      
+      <cs:checkstyle config="${shared.ant.dir}/checkstyle/hmi_checks_verylite.xml"> 
+	      <fileset dir="${src.dir}" includes="**/*.java"/>
+	      <fileset dir="${test.src.dir}" includes="**/*.java"/>	      
+     </cs:checkstyle>
+     </ac:then>
+     <ac:else>
+     <cs:checkstyle config="${shared.ant.dir}/checkstyle/hmi_checks_verylite.xml"> 
+	      <fileset dir="${src.dir}" includes="**/*.java"/>	      
+     </cs:checkstyle>
+     </ac:else>
+     </ac:if>
+ </target>   
+ 
+ <target name="cpd">
+   <ac:if>
+      <available file="${test.src.dir}" type="dir" />
+     <ac:then>
+   	<cpd minimumTokenCount="100" format="xml" encoding="UTF-8" outputFile="build/cpd.xml"
+   	ignoreLiterals="true" ignoreIdentifiers="true">
+        <fileset dir="${src.dir}">
+            <include name="**/*.java"/>
+        </fileset>
+	<fileset dir="${test.dir}/src">
+            <include name="**/*.java"/>
+        </fileset>
+    </cpd>
+    </ac:then>
+     <ac:else>
+       <cpd minimumTokenCount="100" format="xml" encoding="UTF-8" outputFile="build/cpd.xml"
+       ignoreLiterals="true" ignoreIdentifiers="true">
+        <fileset dir="${src.dir}">
+            <include name="**/*.java"/>
+        </fileset>
+        </cpd>	
+     </ac:else>
+     </ac:if>
+ </target>
+  
+ <target name="cpdreport" depends="cpd">
+	  <xslt in="build/cpd.xml" style="${shared.ant.dir}/pmd/etc/xslt/cpdhtml.xslt" 	  
+	  out="cpd.html" />
+ </target>
+ 
+ <target name="checkstylexml" description="check Java style">
+      <!--cs:checkstyle config="${shared.ant.dir}/checkstyle/hmi_checks_lite.xml"--> 
+      <ac:if>
+      <available file="${test.src.dir}" type="dir" />
+     <ac:then>
+      <cs:checkstyle failOnViolation="false" config="${shared.ant.dir}/checkstyle/hmi_checks_verylite.xml"> 
+	      <fileset dir="${src.dir}" includes="**/*"/>	      
+         	  <fileset dir="${test.src.dir}" includes="**/*"/>
+	      	
+	      
+          <formatter type="xml" toFile="build/checkstyle_errors.xml"/>
+     </cs:checkstyle>
+     </ac:then>
+     <ac:else>
+     <cs:checkstyle failOnViolation="false" config="${shared.ant.dir}/checkstyle/hmi_checks_verylite.xml"> 
+	      <fileset dir="${src.dir}" includes="**/*"/>	      
+          <formatter type="xml" toFile="build/checkstyle_errors.xml"/>
+     </cs:checkstyle>
+     </ac:else>
+      </ac:if>      		
+     
+ </target>  
+ 
+ <property name="findbugs.dir" value="${shared.ant.dir}/findbugs-2.0.0" />
+ 
+
+
+  <target name="findbugsreport" depends="compile" description="find bugs, produce an HTML report">
+    <findbugs home="${findbugs.dir}"
+              output="html"              
+              outputFile="${test.dir}/findbugs.html" jvmargs="-Xmx512M"
+              reportLevel="high"
+              >
+      <!--auxClasspath path="${basedir}/lib/Regex.jar" /-->
+      <sourcePath path="${src.dir}" />
+      <sourcePath path="${test.dir}/src" />
+      <class location="${build.dir}" />      
+    </findbugs>
+  </target>
+
+	<target name="findbugsxml" depends="compile" description="find bugs, produce an XML report">
+    <findbugs home="${findbugs.dir}"
+              output="xml"
+              outputFile="${test.dir}/findbugs.xml" jvmargs="-Xmx512M"              
+              >
+      <!--auxClasspath path="${basedir}/lib/Regex.jar" /-->
+      <sourcePath path="${src.dir}" />
+      <sourcePath path="${test.dir}/src" />
+      <class location="${build.dir}" />
+    </findbugs>
+  </target>
+  
+  <target name="findbugs" depends="compile" description="find bugs">
+    <findbugs home="${findbugs.dir}"
+              output="text" jvmargs="-Xmx512M"
+              reportLevel="high"
+              >
+      <!--auxClasspath path="${basedir}/lib/Regex.jar" /-->
+      <sourcePath path="${src.dir}" />
+      <sourcePath path="${test.dir}/src" />
+      <class location="${build.dir}" />
+    </findbugs>
+  </target>
+  
+  <target name="javancss" description="javancss">
+  <javancss srcdir="${src.dir}"
+            generateReport="true"
+            format="xml"
+             outputfile="${build.classes.dir}/javancss_metrics.xml"
+            abortOnFail="false"
+            />
+  </target>
+  
+  <property name="coverage.dir" value="${build.classes.dir}/coverage" />
+  <property name="instrumented.dir" value="${test.dir}/inst/"/> 
+  <property name="emma.dir" value="${shared.ant.dir}/emma/lib"/> 	
+ 	<path id="emma.lib">
+     	<pathelement location="${emma.dir}/emma.jar" />
+    	<pathelement location="${emma.dir}/emma_ant.jar" />
+ 	</path>   
+ 	<taskdef resource="emma_ant.properties" classpathref="emma.lib" />
+	
+	<target name="initemma" >
+    <mkdir dir="${instrumented.dir}" />
+    <path id="run.classpath" >
+      <pathelement location="${build.classes.dir}" />
+    </path>
+  </target>
+
+	<target name="emmajunit" depends="initemma" description="runs junit tests">
+		<emma>
+		<instr instrpathref="run.classpath"
+             destdir="${instrumented.dir}"	
+             metadatafile="${coverage.dir}/metadata.emma"
+             merge="true"
+		/>
+		</emma>
+			
+			<delete dir="${build.test.results.dir}" failonerror="false" quiet="true"/>
+      <mkdir dir="${build.test.results.dir}"/>
+      <junit printsummary="false" 
+           haltonfailure="false"
+           fork="yes"  forkmode="perBatch"  timeout="1000000"
+           errorProperty="test.failed"
+           failureProperty="test.failed">
+      	<classpath>
+       		<pathelement location="${instrumented.dir}" />
+        	<path refid="run.classpath" />
+        	<path refid="emma.lib" />
+        	<path refid="junit-test-run-classpath"/>
+      	</classpath> 
+         <jvmarg value="-Demma.coverage.out.file=${coverage.dir}/coverage.emma" />
+      	 <jvmarg value="-Demma.coverage.out.merge=true" />
+         <jvmarg line="${run.jvmargs}"/>
+         <!--arg line="${run.argline}"/-->
+         <sysproperty key="shared.project.root" path="${shared.project.root}"/> 
+         <sysproperty key="java.library.path" path="${test.library.path}"/> 
+         <formatter type="brief" usefile="false"/>
+         <formatter type="xml"/>
+         <batchtest todir="${build.test.results.dir}" >
+            <fileset dir="${build.test.classes.dir}" >
+               <include name="${junit.include}"/>
+               <exclude name="${junit.exclude}"/>
+               <exclude name="**/*$*.class"/>               
+            </fileset>
+         </batchtest>
+      </junit>
+		<emma>
+			<report sourcepath="${src.dir}" >
+        <fileset dir="${coverage.dir}" >
+          <include name="*.emma" />
+        </fileset>
+        <html outfile="${coverage.dir}/coverage.html"/>
+      </report>
+		</emma>
+
+	</target>
+  
+	<!--
+	<property name="instrumented.dir" value="${test.dir}/inst/"/> 	
+	<emma enabled="true">
+     <instr instrpath="${build.classes.dir}" destdir="${instrumented.dir}" metadatafile="${coverage.dir}/metadata.emma" merge="true">
+         <filter excludes="au.com.jenisys.view.*"/>
+     </instr>
+ 	</emma>
+ 	-->
+</project>
+
+  
+
+
+
+
+  
+   
+

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Demo"  
+         xmlns:ac="antlib:net.sf.antcontrib"  
+  >
+   <description>Create a standalone executable "demo" version</description>
+
+   <property name="demo.classes" value="**/*.class"/>
+   <patternset id="demo-jar.classes">
+     <include name="${demo.classes}"/>
+   </patternset>  
+  
+   <property name="demo.lib.jar.pattern" value="**/*.jar"/>
+   <patternset id="demo-jar.lib">
+     <include name="${demo.lib.jar.pattern}"/>
+     <exclude name="**/junit*.jar"/>
+   </patternset>  
+ 
+   <target name="help" description="Help for Demo and Webstart versions">
+      <echo>
+ -- Demos and Webstart --
+    demo:     Create a standalone "demo" version in the dist directory, including lib files and (selected) resources. 
+      </echo> 
+   </target>  
+
+  
+  
+  <target name="demo" depends="compile, -demo-name" description="Creates a standalone executable jar file">
+      <mkdir dir="${dist.dir}"/>
+      <copy file="${manifest.file}" tofile="demo.mf"/>
+      <tstamp>   
+          <format property="MANIFEST_TIME" pattern="MMMM dd yyyy  hh:mm aa" locale="en" />
+      </tstamp>
+      <replaceregexp file="demo.mf"
+                      match="(.*?Implementation-Version:)(.*)"
+                      replace="\1 ${MANIFEST_TIME}"
+                      byline="true"
+      />    
+      <replaceregexp file="demo.mf"
+                      match="(.*?Main-Class:)(.*)"
+                      replace="\1  ${demo.main.class}"
+                      byline="true"
+      />  
+      <echo message="manifest demo.main.class=${demo.main.class}"/>
+      <delete file="${demojarfile.path}" />
+      <jar destfile="${demojarfile.path}"
+         manifest="demo.mf"
+         filesetmanifest="mergewithoutmain"
+         index="true"
+         update="false"
+      >    
+         <fileset dir="${build.classes.dir}">
+            <patternset refid="demo-jar.classes"/>
+         </fileset>
+         <fileset dir="${resource.dir}" erroronmissingdir="false">
+            <patternset refid="jar.resources"/>
+         </fileset>
+         <fileset dir=".">
+            <include name="${lib.dir}/**/*"/>
+            <exclude name="**/*.jar"/>
+         </fileset>
+      </jar> 
+      <delete file="demo.mf"/>
+      <ac:if>
+         <available file="${lib.dir}"/>
+      <ac:then>
+      <ac:foreach  param="libfile" target="-add-lib" inheritall="true">
+         <path>  
+            <fileset dir="${lib.dir}">  
+               <patternset refid="demo-jar.lib"/> 
+            </fileset>
+         </path> 
+      </ac:foreach>
+      </ac:then>
+      </ac:if>
+      
+      <ac:if>
+         <isset property="demo.external.resources" />
+      <ac:then>
+         <ac:if>
+            <equals arg1="${resource.path}" arg2=""/>
+         <ac:then>
+             <echo message="demo.external.resources set (${demo.external.resources}), but resource.path is empty"/>
+         </ac:then>
+         <ac:else>
+            <echo message="resource.path=${resource.path}"/>
+            <ac:propertyregex property="res.path"
+                    input="${resource.path}"
+                    regexp="[ ]*[,;][ ]*"
+                    replace=","
+                    casesensitive="true" 
+                    global="true"
+                    defaultValue="${resource.path}"
+            />   
+            <ac:foreach  param="res.dir" target="-add-resource" list="${res.path}" inheritall="true"/>
+         </ac:else>
+         </ac:if>
+      </ac:then>
+      </ac:if>
+   </target> 
+
+   <target name="-demo-name">
+      <property name="demo.main.class" value="${run.main.class}"/>
+       <ac:propertyregex property="demojarfile"
+              input="${demo.main.class}"
+              regexp=".*\.([^\.]+)$"
+              select="\1.jar"
+              override="false"
+      />     
+      <property name="demojarfile"         value="${ant.project.name}-demo.jar"/> <!-- fallback -->
+      <property name="demojarfile.path"    value="${dist.dir}/${demojarfile}"/>
+      <echo message="demojarfile: ${demojarfile.path}" />
+   </target>    
+
+
+   <target name="-add-lib" >
+      <echo message="Adding ${libfile}..." />
+      <jar destfile="${demojarfile.path}"
+           filesetmanifest="skip"
+           update="true"
+       >      
+          <zipfileset src="${libfile}" />
+       </jar>
+   </target>
+  
+   <target name="-add-resource" >
+      <echo message="Searching for resources ${demo.external.resources} in ${res.dir} ..." />
+      <jar destfile="${demojarfile.path}"
+           filesetmanifest="skip"
+           update="true"
+       >      
+          <fileset dir="${res.dir}" includes="${demo.external.resources}"/> 
+       </jar>
+   </target>
+  
+ 
+
+   
+ 
+   
+</project>
+
+  
+
+
+
+
+  
+   
+

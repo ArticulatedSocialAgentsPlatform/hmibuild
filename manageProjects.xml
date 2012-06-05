@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ManageJavaProjects" default="newProject" basedir=".">
+
+ <property environment ="env" />       <!-- allows for properties like ${env.windir} --> 
+
+ <!-- shared.project.root is usually set already, but just a fallback with the most likely location for most projects: -->
+ <property name="shared.project.root"   location="../.."  />
+ <property name="shared.project.dir"    location="${shared.project.root}/HmiShared" />  
+  <property name="shared.build.dir"    location="${shared.project.root}/HmiBuild" />  
+
+
+ <property name="shared.projectdir.basename" value="HmiShared"/>  
+
+ <target name="info" >
+      
+      <echo message="ant newproject: creates a new Java project, including build file and build.properties file, by asking questions"/>
+      <echo message="default answers, chosen by a simple return, are between brackets, like [mypackage]"/>
+      <echo message=""/>
+      <echo message="Questions:"/>
+      <echo message="Project directory?:           Relative path specifying the directory for the new project. Example: Hmi/HmiUtil"/>
+      <echo message="package name?:                Full package name, for example: hmi.util"/>
+      <echo message="module name?:                 Name used (as base namme) for jar files, repository name etc. Example: HmiUtil"/>
+      <echo message="main class?:                  Full name of class to be run by default. Example: hmi.util.Info"/>
+      <echo message="Project Description?:         Description within the project's ant build.xml file."/>
+      <echo message="Default target?:              What is the default ant target for this project. Example: run"/>
+      <echo message="Repository for publishing?:   The relative path to the repository directory where this project will publish jar files."/>
+      <echo message="Organization for publishing?: When specified, a sub directory within the repository. Example: Hmi"/>
+      <echo message="Use shared project build-impl file?: Say yes"/>
+   </target>
+ 
+ <target name="-userDialog" >
+    <!-- echo message="shared.project.dir=${shared.project.dir}"/--> 
+    <input
+           message="${line.separator}Project directory (relative to the Shared Project Root directory ${shared.project.root})?"
+           addproperty="new.project.dir"
+     />
+     <condition property="legal-dir">
+           <matches pattern="^[a-zA-Z][a-zA-Z0-9-_/]*$" string="${new.project.dir}"/>
+     </condition>     
+     <fail unless="legal-dir" message="Illegal directory: ${new.project.dir} (Use a-zA-Z0-9-_/ chars only)"   />
+     
+     <echo file="configure.tmp" message="${new.project.dir}"/>   
+     <replaceregexp file="configure.tmp"   match="/$"  replace=""    byline="true"     flags="g"   />   
+     <replaceregexp file="configure.tmp"   match="[^/][^/]*"  replace=".."    byline="true"     flags="g"   />
+     <!--replaceregexp file="configure.tmp"   match="$"  replace="/${shared.projectdir.basename}"    byline="true"     flags="g"   /-->
+     <loadfile property="newproject.shared.project.root"  srcFile="configure.tmp"/>
+     <delete file="configure.tmp"/> 
+     
+     <property name="guess.shared.projectdir.basename" value="${shared.projectdir.basename}"/> 
+        
+     <!--input
+         message="${line.separator} HmiShared directory?"
+         addproperty="new.shared.projectdir.basename"
+         defaultvalue="${guess.shared.projectdir.basename}"       
+     /-->
+     <!-- property name="shared.project.dir" value="${new.shared.project.dir}" /-->
+     
+     <property name="project.dir" value="${shared.project.root}/${new.project.dir}/" />
+     <basename property="project.name"     file="${project.dir}"/>
+     <property name="build-file"           value="${project.dir}build.xml" /> 
+     <property name="project.dir.src"      value="${project.dir}src/"      />
+     <property name="project.dir.test"     value="${project.dir}test/"     />
+     <property name="project.dir.lib"      value="${project.dir}lib/"      />
+     <property name="project.dir.docs"     value="${project.dir}docs/"     />
+     <property name="project.dir.resource" value="${project.dir}resource/" />
+     <property name="project.dir.ant"      value="${project.dir}ant/"      />
+     
+     <!-- try to read a Netbeans property file; if it exists, props like build.dir will be set -->
+     <property file="${project.dir}/nbproject/project.properties"/> 
+     
+   
+     <available file="${project.dir}" type="dir" property="existingProject"/>    
+     <available file="${project.dir}nbproject/" type="dir" property="netbeansProject"/>
+    
+     <available file="${project.dir}manifest.mf" property="manifest.available"/>
+ 
+     <!-- We must have either no existing build.xml, or else it must be a netbeans generated build.xml -->
+     <condition property="legalBuildFile">
+           <or>
+              <not> <available file="${project.dir}build.xml"/> </not>
+              <available file="${project.dir}nbproject/" />
+           </or>
+     </condition>
+     <fail message="Project buildfile (${project.dir}build.xml) already exists" unless="legalBuildFile"/>
+     
+     
+     <input
+         message="${line.separator}Package name?"
+         addproperty="package.name"         
+      />
+      <condition property="legal-package">
+           <matches pattern="^[a-zA-Z][a-zA-Z-_.]*$" string="${package.name}"/>
+      </condition>
+      <fail message="Illegal package name: ${package.name}"   unless="legal-package"/>
+     
+     <!-- set this, unless already read from existing (e.g. netbeans) property file. -->
+     <property name="main.class" value="${package.name}.Info" />
+     
+     <!-- determine package path from package name -->
+      <echo file="configure.tmp" message="${package.name}/"/>      
+      <replaceregexp file="configure.tmp"   match="[.]"  replace="/"  byline="true"  flags="g"   />
+      <loadfile property="package.path"  srcFile="configure.tmp"/>
+      <property name="package.path" value="/"/>
+      <!-- replaceregexp file="configure.tmp"   match="[/]"  replace=""  byline="true"  flags="g"   />
+      <loadfile property="guess.module.name"  srcFile="configure.tmp"/-->
+      <property name="guess.module.name" value="${project.name}"/>
+      <delete file="configure.tmp"/>
+     
+     <input
+         message="${line.separator}Module name (for jar files)?"
+         addproperty="module.name"
+         defaultvalue="${guess.module.name}"
+     />    
+    
+     <input
+         message="${line.separator}Main class?"
+         addproperty="new.main.class"
+         defaultvalue="${main.class}"      
+     /> 
+     
+     <property name="default.description" value="Builds ${project.name}"/>
+     <input
+         message="${line.separator}Project Description?"
+         addproperty="project.description"
+         defaultvalue="${default.description}"
+     />   
+     
+     <input
+         message="${line.separator}Default target?"
+         addproperty="project.default"
+         validargs="build,run,compile,jar,demo"
+         defaultvalue="run"
+     />    
+        
+     <property name="publish.repository" value="Shared/repository"/>   
+     <input
+         message="${line.separator}Repository for publishing?"
+         addproperty="new.publish.repository"
+         defaultvalue="${publish.repository}"      
+     />    
+     
+      <property name="organization" value=" "/>   
+      <input
+         message="${line.separator}Organization for publishing?"
+         addproperty="new.organization"
+         defaultvalue="${organization}"      
+      />      
+        
+     <input
+       message="Use shared project build-impl file?"
+       validargs="y,n"
+       defaultvalue="y"
+       addproperty="useGeneric"
+     />
+     <condition property="use.generic.buildfile">
+       <equals arg1="y" arg2="${useGeneric}"/>
+     </condition>     
+ </target>
+ 
+ <!-- target name ="-createDirs" unless="existingProject"-->        
+ <target name ="-createDirs">  
+ <!-- creates project dirs and subdirs -->
+ <echo message="subdirs-existing Project? ${existingProject}"/>   
+     <mkdir dir="${project.dir}"          />
+     <mkdir dir="${project.dir.src}"      />
+     <mkdir dir="${project.dir.test}"     />
+     <mkdir dir="${project.dir.lib}"      />
+     <mkdir dir="${project.dir.docs}"     />
+     <mkdir dir="${project.dir.resource}" />
+ </target>  
+ 
+ 
+ 
+
+ 
+ <target name="-adaptNetbeansBuildFile" if="netbeansProject">
+ <echo message="netbeansProject=${netbeansProject}" />
+    <echo message="Netbeans Directory detected" />
+    <loadfile property="insertText"   srcFile="ant/netbeans-build-insert.xml"/>
+    <replaceregexp file="${build-file}"
+                   match="^(\s*&lt;\s*import\s*file\s*=\s*&quot;nbproject/build-impl.xml&quot;\s*/&gt;)(.*)"
+                   replace="${insertText}"
+                   byline="true"
+    />
+    <!--import file="nbproject/build-impl.xml"/-->
+ </target>       
+ 
+ 
+ <target name="-replaceBuildFile" if="netbeansProject" >
+    <echo message="Replace Netbeans build file" />
+    <move file="${build-file}" tofile="${build-file}.backup" failonerror="false" />
+    <echo message="Copy netbeans compatible build file" />
+    <property name="build-template" value="ant/template/build-template-netbeans.xml"   />            
+    <copy file="${build-template}"  tofile="${build-file}"           >       
+       <filterset>
+         <filter token="PROJECT.NAME"         value="${project.name}" />
+         <filter token="PROJECT.DESCRIPTION"  value="${project.description}" />
+         <filter token="PROJECT.DEFAULT"      value="${project.default}" />
+         <filter token="SHARED.PROJECT.DIR"   value="${new.shared.project.dir}" />
+       </filterset>
+    </copy>
+ </target>
+ 
+ 
+ <target name="-createBuildFile" unless="netbeansProject" >
+    <property name="build-template" value="${shared.build.dir}/template/build-template.xml"   />            
+    <copy file="${build-template}"  tofile="${build-file}"           >  
+       <filterset>
+         <filter token="PROJECT.NAME"         value="${project.name}" />
+         <filter token="PROJECT.DESCRIPTION"  value="${project.description}" />
+         <filter token="PROJECT.DEFAULT"      value="${project.default}" />
+         <filter token="SHAREDPROJECTROOT"    value="${newproject.shared.project.root}" />
+         <filter token="SHAREDPROJECTDIR"      value="${shared.projectdir.basename}" />
+       </filterset>
+    </copy>
+ </target>
+ 
+ <!--target name="-createNBBuildFile"  >
+    <property name="build-template" value="${shared.project.dir}/ant/template/build-template-netbeans.xml"   />            
+    <copy file="${build-template}"  tofile="${build-file}"           >  
+       <filterset>
+         <filter token="PROJECT.NAME"         value="${project.name}" />
+         <filter token="PROJECT.DESCRIPTION"  value="${project.description}" />
+         <filter token="PROJECT.DEFAULT"      value="${project.default}" />
+         <filter token="SHARED.PROJECT.DIR"   value="${new.shared.project.dir}" />
+       </filterset>
+    </copy>
+ </target-->
+ 
+ 
+ <target name="-createBuildImplFile" unless="use.generic.buildfile" >
+    <property name="build-impl-template" value="${shared.build.dir}/template/build-impl.xml"    />
+    <property name="build-impl-file" value="${project.dir.ant}build-impl.xml" />
+    <copy file="${build-impl-template}" tofile="${build-impl-file}" />
+    <replaceregexp file="${build-impl-file}"
+                   match="^(\s*&lt;\s*project\s* name=&quot;)(.*?)&quot;"
+                   replace="\1${project.name}-impl&quot;"
+                   byline="true"
+    />
+    <replaceregexp file="${build-impl-file}"
+                   match="^(\s*&lt;\s*project.* default=&quot;)(.*?)&quot;"
+                   replace="\1${project.default}&quot;"
+                   byline="true"
+    />
+    <replaceregexp file="${build-impl-file}"
+                   match="^(\s*&lt;\s*project.* basedir=&quot;)(.*?)&quot;"
+                   replace="\1..&quot;"
+                   byline="true"
+    />    
+ </target>
+ 
+ <!--target name="-linkToGenericBuildFile" if="use.generic.buildfile" >
+    <echo message="Link to generic buildfile" />
+    <replaceregexp file="${build-file}"
+                   match="^(\s*&lt;\s*property\s* name=&quot;build.impl.base&quot;\s*value=).*"
+                   replace="\1&quot;${shared.project.dir}ant/&quot; /&gt;"
+                   byline="true"
+    />
+    <property name="build.impl"       value="ant/build-impl.xml"/>
+ </target-->
+ 
+ 
+ 
+ <target name= "-createPropertiesFile">
+    <property name="properties-template" value="${shared.build.dir}/template/build-properties-template"/>
+    <property name="properties-file" value="${project.dir}build.properties"/>    
+    <property name="project.basedir" value="." />
+    <copy file="${properties-template}" tofile="${properties-file}">
+       <filterset>
+         <filter token="PROJECT.NAME"         value="${project.name}" />
+         <filter token="MAIN.CLASS"           value="${new.main.class}"   />
+         <filter token="MODULE.NAME"          value="${module.name}" />
+         <filter token="PACKAGE"              value="${package.name}" />
+         <filter token="ORGANIZATION"         value="${new.organization}" />
+         <filter token="PUBLISHREPOSITORY"    value="${new.publish.repository}" />
+       </filterset>
+    </copy>
+ </target>
+  
+ 
+       
+<target name="-createPackage">
+  
+      <property name="info-template" value="${shared.build.dir}/template/Info-template.java"/>
+   
+      <mkdir dir="${project.dir.src}${package.path}" />
+      <property name="info-file" value="${project.dir.src}${package.path}Info.java" />
+      <copy file="${info-template}" tofile="${info-file}"> 
+         <filterset>
+         <filter token="PACKAGE" value="${package.name}" />
+         </filterset>
+      </copy>
+      <!-- echo  message="manifest.available =${manifest.available}"/-->
+ </target>              
+       
+ <!-- target name="-createManifest" unless="manifest.available"-->       
+ <target name="-createManifest" >
+ <echo message="Create manifest..."/>
+   <property name="manifest-template" value="${shared.build.dir}/template/manifest-template.mf"/>
+   <property name="new.manifest.file" value="${project.dir}manifest.mf"/>
+   <property name="manifest.vendor" value="HMI"/>
+   <move file="${new.manifest.file}" tofile="${new.manifest.file}.backup" failonerror="false"/>
+   <echo message="Create manifest... from ${manifest-template} to ${new.manifest.file}"/>
+      <copy file="${manifest-template}" tofile="${new.manifest.file}"> 
+         <filterset>
+         <filter token="MAIN.CLASS" value="${new.main.class}" />
+         <filter token="PACKAGE.PATH" value="${package.path}" />
+         <filter token="PROJECT.NAME" value="${project.name}" />
+         <filter token="VENDOR" value="${manifest.vendor}" />
+         </filterset>
+      </copy>
+ </target>      
+        
+ 
+ <target name="newproject" depends=" -userDialog, 
+                                     -createDirs,
+                                     -createBuildFile,  -replaceBuildFile,
+                                     -createBuildImplFile,
+                                     -createPropertiesFile,
+                                     -createPackage,
+                                     -createManifest"
+                                     description="Creates a new ant-based Java project" > 
+      
+ </target>  
+ 
+ 
+ <!--target name="nbProject" depends=" -userDialog, 
+                                     -createDirs,
+                                     -createNBBuildFile,
+                                     -createBuildImplFile,
+                                     -createPropertiesFile,
+                                     -createPackage,
+                                     -createManifest,
+                                     -preNB"
+                                     description="Creates ant-based Java project from an existing Netbeans project" > 
+      
+ </target-->  
+
+<!--target name="-preNB">
+   <move file="${build-file}"  tofile="POSTNB-${build-file}" failonerror="false"  />
+   <move file="${new.manifest.file}" tofile="$POSTNB-{new.manifest.file}" failonerror="false"/>
+   <delete file="${project.dir}build"/>
+   <delete file="${project.dir}dist"/>
+</target-->
+
+
+ <!--target name="home" description="show ant.home">
+    <echo message="ant.home=${ant.home}"/>
+ </target-->
+ 
+</project>
+
+  
+
+
+
+
+  
+   
+

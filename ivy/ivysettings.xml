@@ -1,0 +1,236 @@
+<ivysettings>
+   <property name="ivy.checksums" value=""/>
+   
+   
+   <!--property name="alpha.repository"  value="${shared.project.root}/Shared/repository/alphas" /-->
+   
+   <settings defaultResolver="defaultchain" defaultLatestStrategy="latest-revision"/>
+    
+   <caches defaultCacheDir="${user.home}/.ivy2"  useOrigin="true">
+      <cache name="remotecache"  basedir="${user.home}/.ivy2/remotecache"  useOrigin="false"/>
+   </caches>
+ 
+   <!-- resolutionCacheDir = "${shared.project.root}/ivy/resolutionCacheDir" 
+         repositoryCacheDir = "${shared.project.root}/ivy/repositoryCacheDir" useOrigin="true" -->  
+      
+   <!-- possible status values for ivy's, ranked from most stable to least stable -->
+   <!-- For instance, latest.beta also takes release versions into account, but not alpha versions -->   
+   <statuses default="alpha">  
+      <status name="release"     integration="false"/>  
+      <status name="beta"        integration="true"/>
+      <status name="alpha"       integration="true"/>
+   </statuses> 
+ 
+   <!-- ivy patterns denote locations of ivy.xml files on the resolver, artefact patterns are similar, but describe artefacts like jar files -->
+   <property name="ivy.local.default.ivy.pattern"           value="[organisation]/[module]/[revision]/[module]-[revision].[ext]" override="true"/>
+   <property name="ivy.local.default.artifact.pattern"      value="[organisation]/[module]/[revision]/lib/[artifact]-[revision].[ext]" override="true"/>
+   <property name="ivy.local.norevision.artifact.pattern"   value="[organisation]/[module]/[revision]/lib/[artifact].[ext]" override="true"/>
+   
+   <property name="ivy.localos.default.ivy.pattern"         value="[organisation]/[module]/${os}/[revision]/[module]-[revision].[ext]" override="true"/>  
+   <property name="ivy.localos.default.artifact.pattern"    value="[organisation]/[module]/${os}/[revision]/lib/[artifact]-[revision].[ext]" override="true"/>
+   <property name="ivy.localos.norevision.artifact.pattern" value="[organisation]/[module]/${os}/[revision]/lib/[artifact].[ext]" override="true"/>
+   
+   
+   <property name="maven2.default.artifact.pattern"         value="[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" override="true"/>
+   <property name="maven2.root1" value="http://www.ibiblio.org/maven2/"/>
+   <property name="maven2.root2" value="http://repository.jboss.org/maven2/"/> 
+   <!--property name="maven.pattern" value="[organisation]/[module]/[revision]/[module]-[revision].[ext]"/--> 
+ 
+   <property name="user" value="zwiers"/>
+   <property name="password" value="xyz"/>
+   <property name="remote.host" value="ewi1228.ewi.utwente.nl"/>
+  
+   <!-- we require here that various properties have been set, in ant scripts:   
+         external.repository.mode       : should be either "filesystem" or "url"
+         external.repository.filesystem : the file system to be used for the filesystem for the external repo
+         external.repository.url        : the url to be used for the web based version of the external repo
+         
+         hmicore.repository.mode        : should be either "filesystem" or "url"
+         hmicore.repository.filesystem  : the file system to be used for the filesystem for the hmicore repo
+         hmicore.repository.url         : the url to be used for the web based version of the hmicore repo
+         
+    -->
+   <!-- which repositories will actually be used, in the chain resolver (filesystem or url based): -->
+   
+   <property name="external.repository"                 value="external.${external.repository.mode}.repository"/>
+   <property name="external.repository.os"              value="external.${external.repository.mode}.repository.os"/>
+   <property name="hmicore.repository"                  value="hmicore.${hmicore.repository.mode}.repository"/>
+   <property name="hmicore.repository.os"               value="hmicore.${hmicore.repository.mode}.repository.os"/>
+   <property name="asap.repository"                     value="asap.${asap.repository.mode}.repository"/>
+   <property name="asap.repository.os"                  value="asap.${asap.repository.mode}.repository.os"/>
+   <property name="projects.repository"                 value="projects.${projects.repository.mode}.repository"/>
+   <property name="projects.repository.os"              value="projects.${projects.repository.mode}.repository.os"/>
+   <property name="resource.repository"                 value="resource.${resource.repository.mode}.repository"/>
+  
+  
+   <resolvers>
+      
+      <!-- EXTERNAL REPO -->
+      <filesystem name="external.filesystem.repository" > 
+         <ivy pattern="${external.repository.filesystem}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${external.repository.filesystem}/${ivy.local.default.artifact.pattern}" />
+         <artifact pattern="${external.repository.filesystem}/${ivy.local.norevision.artifact.pattern}" />
+      </filesystem>
+      
+      <filesystem name="external.filesystem.repository.os" > 
+         <ivy pattern="${external.repository.filesystem}/${ivy.localos.default.ivy.pattern}" />
+         <artifact pattern="${external.repository.filesystem}/${ivy.localos.default.artifact.pattern}" />
+         <artifact pattern="${external.repository.filesystem}/${ivy.localos.norevision.artifact.pattern}" />
+      </filesystem>
+      
+      
+      <url name="external.url.repository">
+         <ivy pattern="${external.repository.url}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${external.repository.url}/${ivy.local.default.artifact.pattern}" /> 
+         <artifact pattern="${external.repository.url}/${ivy.local.norevision.artifact.pattern}" /> 
+      </url> 
+      
+      <url name="external.url.repository.os">
+         <ivy pattern="${external.repository.url}/${ivy.localos.default.ivy.pattern}" />
+         <artifact pattern="${external.repository.url}/${ivy.localos.default.artifact.pattern}" /> 
+         <artifact pattern="${external.repository.url}/${ivy.localos.norevision.artifact.pattern}" /> 
+      </url> 
+      
+      
+      <!-- HMICORE REPO -->
+      <filesystem name="hmicore.filesystem.repository" > 
+         <ivy pattern="${hmicore.repository.filesystem}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${hmicore.repository.filesystem}/${ivy.local.default.artifact.pattern}" />
+         <artifact pattern="${hmicore.repository.filesystem}/${ivy.local.norevision.artifact.pattern}" />
+      </filesystem>  
+      
+      <filesystem name="hmicore.filesystem.repository.os" > 
+         <ivy pattern="${hmicore.repository.filesystem}/${ivy.localos.default.ivy.pattern}" />
+         <artifact pattern="${hmicore.repository.filesystem}/${ivy.localos.default.artifact.pattern}" />
+         <artifact pattern="${hmicore.repository.filesystem}/${ivy.localos.norevision.artifact.pattern}" />
+      </filesystem>
+      
+      <url name="hmicore.url.repository">
+         <ivy pattern="${hmicore.repository.url}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${hmicore.repository.url}/${ivy.local.default.artifact.pattern}" /> 
+         <artifact pattern="${hmicore.repository.url}/${ivy.local.norevision.artifact.pattern}" /> 
+      </url> 
+      
+      <url name="hmicore.url.repository.os">
+         <ivy pattern="${hmicore.repository.url}/${ivy.localos.default.ivy.pattern}" />
+         <artifact pattern="${hmicore.repository.url}/${ivy.localos.default.artifact.pattern}" /> 
+         <artifact pattern="${hmicore.repository.url}/${ivy.localos.norevision.artifact.pattern}" /> 
+      </url> 
+      
+      
+      <!-- ASAP REPO -->
+      <filesystem name="asap.filesystem.repository" > 
+         <ivy pattern="${asap.repository.filesystem}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${asap.repository.filesystem}/${ivy.local.default.artifact.pattern}" />
+         <artifact pattern="${asap.repository.filesystem}/${ivy.local.norevision.artifact.pattern}" />
+      </filesystem>  
+      
+      <filesystem name="asap.filesystem.repository.os" > 
+         <ivy pattern="${asap.repository.filesystem}/${ivy.localos.default.ivy.pattern}" />
+         <artifact pattern="${asap.repository.filesystem}/${ivy.localos.default.artifact.pattern}" />
+         <artifact pattern="${asap.repository.filesystem}/${ivy.localos.norevision.artifact.pattern}" />
+      </filesystem>
+      
+      <url name="asap.url.repository">
+         <ivy pattern="${asap.repository.url}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${asap.repository.url}/${ivy.local.default.artifact.pattern}" /> 
+         <artifact pattern="${asap.repository.url}/${ivy.local.norevision.artifact.pattern}" /> 
+      </url> 
+      
+      <url name="asap.url.repository.os">
+         <ivy pattern="${asap.repository.url}/${ivy.localos.default.ivy.pattern}" />
+         <artifact pattern="${asap.repository.url}/${ivy.localos.default.artifact.pattern}" /> 
+         <artifact pattern="${asap.repository.url}/${ivy.localos.norevision.artifact.pattern}" /> 
+      </url> 
+      
+      
+      <!-- RESOURCE REPO -->
+      <filesystem name="resource.filesystem.repository" > 
+         <ivy pattern="${resource.repository.filesystem}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${resource.repository.filesystem}/${ivy.local.default.artifact.pattern}" />
+         <artifact pattern="${resource.repository.filesystem}/${ivy.local.norevision.artifact.pattern}" />
+      </filesystem>
+      
+      <url name="resource.url.repository">
+         <ivy pattern="${resource.repository.url}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${resource.repository.url}/${ivy.local.default.artifact.pattern}" /> 
+         <artifact pattern="${resource.repository.url}/${ivy.local.norevision.artifact.pattern}" /> 
+      </url> 
+      
+      
+      
+      <!-- PROJECTS REPO -->
+      <filesystem name="projects.filesystem.repository"> 
+         <ivy pattern="${projects.repository.filesystem}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${projects.repository.filesystem}/${ivy.local.default.artifact.pattern}" />
+         <artifact pattern="${projects.repository.filesystem}/${ivy.local.norevision.artifact.pattern}" />
+      </filesystem>
+      
+      <filesystem name="projects.filesystem.repository.os" > 
+         <ivy pattern="${projects.repository.filesystem}/${ivy.localos.default.ivy.pattern}" />
+         <artifact pattern="${projects.repository.filesystem}/${ivy.localos.default.artifact.pattern}" />
+         <artifact pattern="${projects.repository.filesystem}/${ivy.localos.norevision.artifact.pattern}" />
+      </filesystem>
+     
+      <!-- NO URL BASED VERSION FOR PROJECTS REPO YET -->
+      
+     
+
+      <sftp name="hmicore.sftp.publish" host="hmirepo.ewi.utwente.nl" user="${user.name}" keyFile="${user.keyfile}" >
+         <ivy pattern="/hmirepo/hmicore/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="/hmirepo/hmicore/${ivy.local.default.artifact.pattern}" />        
+      </sftp> 
+      <sftp name="resource.sftp.publish" host="hmirepo.ewi.utwente.nl" user="${user.name}" keyFile="${user.keyfile}" >
+         <ivy pattern="/hmirepo/resource/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="/hmirepo/resource/${ivy.local.default.artifact.pattern}" />        
+      </sftp> 
+
+      <chain name="defaultchain" returnFirst="true">
+    
+         <resolver ref="${external.repository}"/>
+         <resolver ref="${external.repository.os}"/>   
+          
+         <resolver ref="${hmicore.repository}"/>
+         <resolver ref="${hmicore.repository.os}"/>
+         
+         <resolver ref="${asap.repository}"/>
+         <resolver ref="${asap.repository.os}"/>
+                
+         <resolver ref="${projects.repository}"/>
+         <resolver ref="${projects.repository.os}"/>      
+         
+         <resolver ref="${resource.repository}"/>
+         
+      </chain>       
+      
+       
+   
+       
+      <!--sftp name="remote" user="${user}" userPassword="${password}" host="${remote.host}">  
+         <ivy pattern="ivyremote/${ivy.local.default.ivy.pattern}" />  
+         <artifact pattern="ivyremote/${ivy.local.default.artifact.pattern}"/>
+      </sftp>
+      
+      <ibiblio name="maven1"
+         root="${maven2.root1}"
+         pattern="${maven2.default.artifact.pattern}"
+         cache="remotecache"
+         m2compatible="true"
+      />
+      
+      <ibiblio name="maven2"
+         root="${maven2.root2}"
+         pattern="${maven2.default.artifact.pattern}"
+         cache="remotecache"
+         m2compatible="true"
+      />
+      
+      <chain name="maven" returnFirst="true">
+         <resolver ref="maven1"/>
+         <resolver ref="maven2"/>
+      </chain-->       
+      
+   </resolvers>
+  
+</ivysettings>
+

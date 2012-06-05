@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Util"  
+         xmlns:ac="antlib:net.sf.antcontrib"  
+         xmlns:ivy="antlib:org.apache.ivy.ant"
+         xmlns:hmi="antlib:hmi.ant">
+  <!--xmlns:tigris="antlib:org.tigris.subversion.svnant"-->
+   <description>Some common initialization and utils</description>
+   
+   <macrodef name="delegate">
+      <attribute name="target"/>
+      <attribute name="list" default="rebuildList"/>
+      <attribute name="verbose" default="false"/>
+      <sequential>
+         <!--echo message="delegate"/-->
+         <subant target="@{target}" verbose="@{verbose}" inheritall="false">
+           <filelist refid="@{list}"/>
+        </subant>
+      </sequential>
+   </macrodef>
+   
+   
+  
+  
+  
+    <target name ="-init.dirs">  
+       <mkdir dir="${src.dir}"      />
+       <mkdir dir="${lib.dir}"      />
+       <mkdir dir="${test.dir}"      />
+    </target>  
+  
+  
+   <target name="-init.build.properties" unless="properties.file.available">
+       <echo message="Init ${properties.file}"/>
+       <copy file="${shared.template.dir}/build.properties-template" tofile="${properties.file}"/>
+   </target>
+ 
+   
+   <target name="init" depends="-init.main.class.file,-init.build.properties, -init.dirs">
+      
+   </target>
+  
+ 
+   <target name="main" depends="-init.main.class.file" description="Show and Set the main class for &quot;run&quot;">
+       <hmi:findmain mainclassprop="main.class.prop" mainpref="Info" mainlistprop="main.list">
+          <fileset dir="${src.dir}" includes="**/*.java"/>
+       </hmi:findmain>
+       <property name="run.main.class" value="${main.class.prop}"/>
+       <echo message="Current main class: ${run.main.class}${line.separator} "/>
+       <input
+         message="New main class? ${line.separator}&lt;Return&gt; : keep ${run.main.class} ${line.separator}Choice:"
+         addproperty="new.main.class"
+         validargs="${main.list}"
+         defaultvalue="${run.main.class}"
+       />
+       <replaceregexp file="${main.class.file}"  match="^run.main.class.*"  replace="run.main.class=${new.main.class}" byline="true"  /> 
+   </target>
+   
+   
+  
+   
+   
+   <!--target name="checkmain"  unless="run.main.class" description="Check for main class">
+       <antcall target="-init.main.class.file" />
+       <hmi:findmain mainclassprop="main.class.prop" mainpref="Info" mainlistprop="main.list">
+          <fileset dir="${src.dir}" includes="**/*.java"/>
+       </hmi:findmain>
+       <property name="default.main.class" value="${main.class.prop}"/>
+         
+       <input
+         message="Give the main class (including package name)? ${line.separator}Default:  ${default.main.class} ${line.separator}Choice:"
+         addproperty="run.main.class"
+         validargs="${main.list}"
+         defaultvalue="${default.main.class}"
+      />
+      <replaceregexp file="${main.class.file}"  match="^run.main.class.*"  replace="run.main.class=${run.main.class}" byline="true"  /> 
+   </target-->   
+      
+   
+   
+  <!-- *************************************************************** --><!--   Set-Up of SVN-ANT classpath                                   -->
+  <!-- *************************************************************** -->  
+   <!--path id="svnant.classpath"> 
+      <fileset dir="${shared.ant.dir}/svnant">     
+         <include name="**/*.jar" /> 
+      </fileset>
+   </path>
+  
+   <typedef resource="org/tigris/subversion/svnant/svnantlib.xml" uri="antlib:org.tigris.subversion.svnant" classpathref="svnant.classpath" /-->
+   
+  
+   
+   <typedef resource="hmi/ant/antlib.xml" uri="antlib:hmi.ant">
+      <classpath>
+         <fileset dir="${shared.ant.dir}">
+            <include name="HmiAnt-*.jar"/>
+         </fileset>    
+      </classpath>
+   </typedef>  
+   
+   
+   <!--target name="tool-availability"> 
+      <available resource="org/tigris/subversion/svnant/svnantlib.xml"      classpathref="svnant.classpath"      property="available.svnant" />  
+      <echo message="SVN-ANT is available = ${available.svnant}"/>
+   </target-->
+   
+   
+  
+  
+   
+   <!--target name="svnupdate"  description="svn update">
+      <echo message="svnupdate for ${user.name}" />
+       <input message="password for ${user.name}?"   addproperty="user.password">
+          <handler classname="org.apache.tools.ant.input.SecureInputHandler" />
+       </input>
+
+       <tigris:svn javahl="false" svnkit="true" username="${user.name}" password="${user.password}"> 
+          <update dir="."/>
+       </tigris:svn>
+    </target-->
+    
+    
+    <!--target name="svnup"  description="svn update">
+       <tigris:svn javahl="false" svnkit="false"  >  <!- - cannot use svnkit here, in order to (re)use the authenication info from Documents and Settings/<user>/Application Data/Subversion/auth - ->
+          <update dir="."/>
+       </tigris:svn>
+    </target-->
+    
+    <!--target name="svnu"  description="svn update">
+      <echo message="svnupdate for ${user.name}" />
+       <input message="password for ${user.name}?"   addproperty="user.password">
+          <handler classname="org.apache.tools.ant.input.SecureInputHandler" />
+       </input>
+       
+       <tigris:svn javahl="false" svnkit="false" username="${user.name}" password="${user.password}"> <!- - password will (usually) be cached by svn - ->
+          <update dir="."/>
+       </tigris:svn>
+    </target-->
+   
+   <!--target name="svninfo"  description="svn info">
+      <echo message="svninfo" />
+       <tigris:svn javahl="false" svnkit="false"> 
+          <info target="."/>
+       </tigris:svn>
+    </target-->
+   
+   
+   <ac:if>
+      <os family="windows"/>
+   <ac:then>
+      <ac:var name="os32" value="win32"/>
+      <ac:var name="os64" value="win64"/>
+   </ac:then>
+   </ac:if>
+   
+   <ac:if>
+      <os family="unix"/>
+   <ac:then>
+      <ac:var name="os32" value="linux32"/>
+      <ac:var name="os64" value="linux64"/>
+   </ac:then>
+   </ac:if>
+   
+   <ac:if>
+      <os family="mac"/>
+   <ac:then>
+      <ac:var name="os32" value="mac32"/>
+      <ac:var name="os64" value="mac64"/>
+   </ac:then>
+   </ac:if>
+   
+   
+   <ac:if>
+      <or> <os arch="x86"/> <os arch="i386"/> </or>
+   <ac:then>
+      <!-- echo message="32bits arch"/-->
+      <ac:var name="bits" value="32"/>
+   </ac:then>
+   <ac:else> <ac:if>
+                <or> <os arch="amd64"/>  <os arch="x86_64"/>  </or>
+             <ac:then>
+               <!-- echo message="64bits arch"/-->
+               <ac:var name="bits" value="64"/>
+             </ac:then>
+             <ac:else>
+                <echo message="unknown arch"/>
+                <ac:var name="bits" value="32"/>
+             </ac:else>
+             </ac:if>
+             
+   </ac:else>
+   </ac:if>
+   
+   <ac:if>
+      <equals arg1="${bits}" arg2="32" />
+   <ac:then>
+      <ac:var name="os" value="${os32}" />
+   </ac:then>
+   <ac:else>
+      <ac:var name="os" value="${os64}" />
+   </ac:else>
+   </ac:if>
+   
+         
+
+</project>
+
+  
+
+
+
+
+  
+   
+

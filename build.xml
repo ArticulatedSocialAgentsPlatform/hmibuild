@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JavaProjects" xmlns:ac="antlib:net.sf.antcontrib" >
+   <description>JavaProjects Root build file</description>
+   
+   <!-- Can't live without antcontrib  -->
+   <typedef resource="net/sf/antcontrib/antlib.xml" 
+            uri="antlib:net.sf.antcontrib" 
+            classpath= "${ant.file.JavaProjects}/../ant-contrib-1.0b3.jar" 
+   />  
+   
+   <typedef resource="pyAntTasks.properties">
+       <classpath>
+           <pathelement location="${ant.file.JavaProjects}/../pyAntTasks-1.3.3.jar"/>
+       </classpath>
+   </typedef>
+   
+   <!-- First we set the shared project root directory "shared.project.root" -->
+   <!-- We derive it from the location of this build file together with      -->
+   <!-- the relative path to our shared ant directory:                       -->
+   <property name="relative.shared.ant.dir" value="HmiBuild"/>
+
+   <!-- First turn \ into / -->
+   <ac:propertyregex property="ant.file.path"
+              input="${ant.file.JavaProjects}"
+              regexp="[\\/]"
+              replace="/"
+              global="true"
+   />
+   <!-- Set shared.project.root to the part of ant.file.path before ${relative.shared.ant.dir} -->
+   <ac:propertyregex property="shared.project.root"
+              input="${ant.file.path}"
+              regexp="/${relative.shared.ant.dir}.*"
+              replace=""
+              casesensitive="true" 
+              override="false"
+              global="true"
+   />
+   
+   <property environment="env"/>
+   
+   <!-- read a user specific properties file, if available -->
+   <property name="user.properties.dir" value="${user.home}" />
+   <property name="user.properties.file" value="${user.properties.dir}/hmi.build.properties"/>
+   <available file="${user.properties.file}" property="user.properties.file.available" />
+   <echo message="user.properties.file= ${user.properties.file}"/>
+   <property file="${user.properties.file}" /> 
+   <property name="user.keyfile" value="${user.home}/.ssh/id_rsa"/>
+   
+   
+    <target name="tu" >
+       <echo message="user.home= ${user.home} user.name=${user.name} private key location = ${user.keyfile} userprops=${user.properties.file.available}"/>
+    </target>
+   
+   <!-- Next we define a number of "shared" places:-->
+   <!-- shared.project.dir is a place that includes items like the shared repository -->
+   <property name="projects.dir.name" value="Projects"/>
+   <property name="projects.dir" value="${shared.project.root}/${projects.dir.name}"/>
+   <property name="projects.repository" value="${projects.dir}/repository"/>
+   
+   <!-- shared.resources is a place that includes items like the Humanoid resources -->
+   <property name="shared.resources.dir.name" value="HmiResource"/>
+   <property name="shared.resources" value="${shared.project.root}/${shared.resources.dir.name}"/>
+   
+   <!-- asap.resources is a place that includes items like the Humanoid resources for asap-->
+   <property name="asap.resources.dir.name" value="asapresource"/>
+   <property name="asap.resources" value="${shared.project.root}/${asap.resources.dir.name}"/>
+   
+    <!-- hmi.shared.project.dir is a place that includes items like the hmi repository. (as well as the HMI source code) -->
+   <property name="hmi.shared.dir.name" value="HmiShared"/>
+   <property name="hmi.shared.dir" value="${shared.project.root}/${hmi.shared.dir.name}"/>
+   
+   <property name="hmi.build.dir.name" value="HmiBuild"/>
+   <property name="hmi.build.dir" value="${shared.project.root}/${hmi.build.dir.name}"/>
+   
+   
+   <property name="asap.shared.dir.name" value="asapshared"/>
+   <property name="asap.shared.dir" value="${shared.project.root}/${asap.shared.dir.name}"/>
+  
+   
+   <!-- shared.ant.dir is the place where this build file resides, and acts as the anchor for other build files, templates, ivy directories-->
+   <property name="shared.ant.dir" value="${shared.project.root}/${relative.shared.ant.dir}"/>
+   <property name="shared.template.dir" value="${shared.ant.dir}/template"/>
+   
+   <!-- if ant.project name is not set explicitly, we derive it from the project directory -->
+   <ac:propertyregex property="ant.project.name"
+              input="${ant.file}"
+              regexp="(.*[\\/])([^\\/]+)[\\/][^\\/]+"
+              replace="\2"
+              global="true"
+   />
+   
+   <!-- The project directory is also obtained/guessed from the ant file location -->
+   <ac:propertyregex property="project.dir"
+              input="${ant.file}"
+              regexp="(.*)[\\/][^\\/]+"
+              replace="\1"
+              global="true"
+   />
+  
+   <!-- SETTINGS FOR THE IVY REPOSITORIES  -->
+   <!-- GLOBAL SETTINGS: -->
+   <!-- The root of several (hmi) filesystem based repositories: -->
+   <property name="hmi.repository.filesystem.root"      value="${hmi.shared.dir}/repository"/>
+   <property name="asap.repository.filesystem.root"      value="${asap.shared.dir}/repository"/>
+   
+   <!-- The base URL of similar, url based, repositories: -->
+   <property name="hmi.repository.url.base"             value="http://hmirepo.ewi.utwente.nl"/>
+   <!-- Master switch for using either "filesystem" or (web based) "url" resolvers: -->
+   <property name="repository.mode"                     value="url"/>         <!-- either "filesystem" or "url" -->
+   <!--property name="repository.mode"                     value="filesystem"/-->         <!-- either "filesystem" or "url" -->
+   
+   
+   <!-- EXTERNAL REPO -->
+   <!-- Mode switch, for overriding "repository.mode" for "external" repository: --> 
+   <property name="external.repository.mode"            value="${repository.mode}"/> <!-- either "filesystem" or "url" -->
+   <!-- The actual locations of the  external repository filesystem and url: -->
+   <property name="external.repository.filesystem"      value="${hmi.repository.filesystem.root}/external"/>
+   <property name="external.repository.url"             value="${hmi.repository.url.base}/external"/>
+  
+   
+   <!-- HMICORE REPO -->
+   <!-- Mode switch, for overriding "repository.mode" for "hmicore" repository: --> 
+   <property name="hmicore.repository.mode"             value="${repository.mode}"/> <!-- either "filesystem" or "url" -->
+   <!-- The actual locations of the  hmicore repository: -->
+   <property name="hmicore.repository.filesystem"      value="${hmi.repository.filesystem.root}/hmicore"/>
+   <property name="hmicore.repository.url"             value="${hmi.repository.url.base}/hmicore"/>
+   
+   <!-- RESOURCE REPO -->
+   <!-- Mode switch, for overriding "repository.mode" for "resource" repository: --> 
+   <property name="resource.repository.mode"             value="${repository.mode}"/> <!-- either "filesystem" or "url" -->
+   <!-- The property used within the ant/ivy/ivysettings.xml file: -->
+   <property name="resource.repository"                  value="resource.${resource.repository.mode}.repository"/>
+   
+   
+   <!-- ASAP REPO -->
+   <!-- Mode switch, for overriding "repository.mode" for "asap" repository: --> 
+   <!--property name="asap.repository.mode"                value="${repository.mode}"/--> <!-- either "filesystem" or "url" -->
+   <property name="asap.repository.mode"                value="filesystem"/> <!-- either "filesystem" or "url" -->
+   
+   <!-- The actual locations of the  asap repository: -->
+   <property name="asap.repository.filesystem"          value="${asap.repository.filesystem.root}"/>
+   <property name="asap.repository.url"                 value="${asap.repository.url.base}"/>
+   
+   
+   <!-- RESOURCE REPO -->
+   <!-- Mode switch, for overriding "repository.mode" for "resource" repository: --> 
+   <property name="resource.repository.mode"            value="${repository.mode}"/> <!-- either "filesystem" or "url" -->
+   <!-- The actual locations of the  resource repository: -->
+   <property name="resource.repository.filesystem"      value="${hmi.repository.filesystem.root}/resource"/>
+   <property name="resource.repository.url"             value="${hmi.repository.url.base}/resource"/>
+   
+   
+   <!-- PROJECTS REPO -->
+   <!-- Mode switch, for overriding "repository.mode" for "projects" repository: --> 
+   <property name="projects.repository.mode"            value="filesystem"/> <!--NB -->
+   <!-- The actual locations of the  resource repository: -->
+   <property name="projects.repository.filesystem"      value="${projects.dir}/repository"/>
+   <!-- NO URL BASED RESOLVER YET FOR PROJECTS-->
+   
+   <!-- END IVY REPOSITORIES SECTION -->
+    
+   <!-- We read the project's ant build properties file.                                -->
+   <!-- One can use properties defined above, like hmi.repository or shared.repository, -->
+   <!-- inside this properties file. (That's why we read it at this place)              -->
+   <property name="properties.file" value="build.properties"/>
+   <property file="${properties.file}" /> 
+   
+   <!--available file="${manifest.file}" property="manifest.file.present"/-->
+   
+   <!-- next we load the "real" build files. They can be redefined, -->
+   <!-- for instance within the properties file, by setting build.impl and/or build.customize-->
+   <property name="build.impl" value="build-Core.xml"/>
+   <import file="${build.impl}" /> 
+   
+   <import file="build-Util.xml"/>
+   <import file="build-Buildfile.xml" />
+   <import file="build-Testing.xml" />
+   <import file="build-Versioning.xml" />
+   <!-- overwrite jar taget from Core -->
+   <target name="createmanifest" description="Creates a manifest file with ivy info" unless="${manifest.file.present}"> 
+      <antcall target="-ivy.manifest"/>
+   </target>
+   <target name="jar" depends="versioned.jar" description="Creates a versioned jar"/> 
+   <target name="main" depends="Util.main" description="Show/Set main class"/> 
+   <!--target name="checkmain" depends="Util.checkmain" description="Check for main class"/--> 
+   <import file="build-UltraEdit.xml" />
+   <import file="build-Rebuilding.xml" />
+   <import file="build-Ivy.xml" />
+   <import file="build-Demo.xml" />
+   <import file="build-Webstart.xml" />
+   
+   <target name="helphelp">
+    <echo> -- Help commands --
+    Core.help        Help for building, running, testing programs
+    Ivy.help         Help for version management
+    Demo.help        Help for creating demo versions
+    Buildfile.help   Help for managing build files </echo> 
+   </target> 
+   
+   <target name="help" depends="helphelp, Core.help, Ivy.help" description="Basic help"/>
+ 
+</project>
+
+  
+
+
+
+
+  
+   
+

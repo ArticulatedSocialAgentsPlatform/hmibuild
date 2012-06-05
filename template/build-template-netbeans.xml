@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="@PROJECT.NAME@" default="run" basedir=".">
+   <description>@PROJECT.DESCRIPTION@</description>
+   
+   <!-- This top-level build.xml file defines and loads some ant properties,                   -->
+   <!-- and then a build implementation file, as well as some (optional) customization files.  -->
+  
+   <!-- First read the (optional) SHARED properties file.                     -->
+   <!-- Note that it influences both Netbeans and the project-impl build file -->
+   <property file="build.properties" />   
+  
+   <!-- Define the shared project dir: -->
+   <property name="shared.project.dir"    location="@SHARED.PROJECT.DIR@" />
+    
+   <!-- Possible locations for build implementation file: -->
+   <property name="netbeans-impl"   location="nbproject/build-impl.xml" />
+   <property name="project-impl"    location="${shared.build.dir}/build-impl.xml" />
+      
+   <!-- Two more (optional) additional build customization files can be defined. -->
+   <!-- They are used both for Netbeans and project-impl builds:                 -->
+   <property name="shared-custom"   location="${shared.build.dir}/build-customize.xml"  />   
+   <property name="project-custom"  location="build-customize.xml" />
+      
+   <!-- The netbeans implementation can be disabled: -->  
+   <property name= "enable-netbeans"  value="true" />
+   
+   <!-- Now define which build implementation will actually be used -->
+   <!-- Use netbeans-impl if it is available and enabled:           -->
+   <condition property="build.impl" value="${netbeans-impl}">  
+      <and>
+         <available file="${netbeans-impl}"/>
+         <equals arg1="${enable-netbeans}" arg2="true" casesensitive="false" trim="true"/>
+      </and>
+   </condition>
+   
+   <!-- If Netbeans is not enabled or not available, point build.impl to ${project-impl}: -->
+   <property name="build.impl"      location="${project-impl}" />
+  
+   <import file="${build.impl}"     optional="false"/>   
+   
+   <!-- Allow for an optional build customization  -->
+   <import file="${shared-custom}"  optional="true"/>   
+   <import file="${project-custom}" optional="true"/>   
+    
+</project>

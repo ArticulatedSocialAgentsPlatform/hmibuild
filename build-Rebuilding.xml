@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Rebuilding"  
+         xmlns:ac="antlib:net.sf.antcontrib" >
+
+   <description>Rebuilding, using local alpha versions</description>
+
+   <target name="help" description="Help for rebuilding">
+      <echo>
+ -- Rebuilding --
+    alpha:         create an alpha jar file in the dist directory.
+    ca:            get alpha version for  projects from the rebuild.list, then build alpha
+    compilelist:   recursive version of ca, rebuilding all projects on rebuild.list
+      </echo> 
+   </target>    
+  
+   
+   <target name="alpha" depends="createmanifest" description="produces an alpha jar version in the dist directory">   
+      <delete dir="${dist.dir}"/>    
+      <property name="mf.file" value="alpha-manifest.mf" />      
+      <copy file="${manifest.file}" toFile="alpha-manifest.mf" overwrite="true"/>
+      <antcall target="-newmanifest"> <param name="new.type" value="alphaVersion"/> </antcall>
+      <antcall target="versioned.jar"> </antcall>
+      <delete file="alpha-manifest.mf" quiet="true"/>
+   </target>
+  
+  
+ 
+   <target name="-gba" >
+      <echo message=" =====================  Rebuild alpha for: ${module.name} ===================== " />
+      <antcall target="clean"/>
+      <antcall target="getalphas"/>
+      <antcall target="alpha"/>
+   </target>
+  
+   <target name="ca" description="get alphas, compile and build new alpha">
+      <antcall target="getalphas"/>
+      <antcall target="alpha"/>
+   </target>
+
+  
+ 
+    <target name="getalphas" description="Copy alpha versions for rebuild list"> 
+       <ac:for  param="projectdir" list="${rebuild.list}" trim="true" keepgoing="true">
+         <sequential>
+            <!--echo message="ctes param=@{projectdir}"/-->    
+            <ac:if> 
+               <available file="${shared.project.root}/@{projectdir}/dist" type="dir" />  
+            <ac:then>
+               <!--echo message="ctes param=@{projectdir}/dist dir found"/-->  
+               <ac:for  param="distitem" >
+                  <path>
+                    <fileset dir="${shared.project.root}/@{projectdir}/dist">
+                       <include name="**/*.jar"/>
+                       <exclude name="**/*.xml"/>
+                     </fileset>
+                  </path> 
+                  <sequential>
+                     <!--echo message="item: @{distitem}"/-->
+                     <ac:propertyregex property="basename"
+                                       input="@{distitem}"
+                                       regexp=".*[\\/]"
+                                       replace=""
+                                       override="true"
+                     />
+                     <!--echo message="basename: ${basename}" /-->
+                     <ac:if>
+                        <not>
+                           <uptodate srcfile="@{distitem}" targetfile="${lib.dir}/${basename}"/>
+                        </not>
+                     <ac:then>
+                        <ac:propertyregex property="unversionedprefix"
+                                          input="${basename}" 
+                                          regexp="-[0-9].*"
+                                          replace=""
+                                          override="true"
+                        />
+                         <delete>
+                            <fileset dir="${lib.dir}" includes="${unversionedprefix}*"/>
+                         </delete>
+                        
+                        <echo message="update ${basename}" level="info"/>
+                        
+                        
+                        <copy file="@{distitem}" todir="${lib.dir}" overwrite="false" preservelastmodified="true" verbose="false"/>
+                     </ac:then>
+                     </ac:if>
+                  </sequential>
+               </ac:for>
+            </ac:then>
+            </ac:if>
+         </sequential>
+      </ac:for>
+   </target>
+   
+   <!--target name="rebuild"  depends=" -init.rebuild.list" description="rebuild project including projects on the rebuild-list" >    
+        <filelist id="rebuildList" dir="${shared.project.root}" files="${rebuild.list}" />
+        <echo message="REBUILD ${module.name}"/> 
+        <property name="project.config" value="${default.project.config}"/>
+        <subant target="config" verbose="false" inheritall="false">
+           <property name="config" value="alpha"/>
+           <filelist refid="rebuildList"/>
+        </subant>
+        <subant target="rba" verbose="false" inheritall="false">
+           <filelist refid="rebuildList"/>
+        </subant>
+   </target-->
+ 
+   <target name="compilelist"   description="clean, getalphas, compile, and produce alpha jar, for all projects found on rebuild.list">  
+      <echo message="REBUILDING ${module.name}"/> 
+      <ac:if>
+         <and>
+            <isset property="rebuild.list"/>
+            <not><equals arg1="${rebuild.list}" arg2="" /></not>
+         </and>
+      <ac:then>
+         <filelist id="rebuildList" dir="${shared.project.root}" files="${rebuild.list}" /> 
+         <delegate target="-gba" list="rebuildList" verbose="false"/>
+      </ac:then>
+      </ac:if>
+      <antcall target="-gba"/>
+   </target>
+ 
+ 
+</project>
+
+  
+
+
+
+  
+   
+

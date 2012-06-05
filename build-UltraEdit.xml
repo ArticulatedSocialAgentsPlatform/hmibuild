@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="UltraEdit"   xmlns:ac="antlib:net.sf.antcontrib" >
+
+   <description>
+      Customization for tools like UltraEdit.
+      It defines targets that typically need some property set from within UltraEdit "Advanced Tools"
+      like: -Dnew.main.file=%f (for ueSetmain)
+   </description>
+  
+  
+    <!-- Updates the main class, using the ant.properties file value                 -->
+    <!-- it depends on property new.main.class, typically set from UltraEdit command -->
+   <target name="ueSetmain" depends="-init.main.class.file">
+      <fail unless="new.main.file" message="specify new.main.class"/>
+      <echo message="new.main.file=${new.main.file}"/>
+      <ac:propertyregex property="full.name"
+              input="${new.main.file}"
+              regexp=".*[/\\]src[/\\](.*)\.java"
+              select="\1"
+      />  
+      <ac:propertyregex property="full.name"
+              input="${full.name}"
+              regexp="[/\\]"
+              override="true"
+              replace="."
+      />  
+      <!--echo message="Main Class: ${full.name}" /-->
+      <replaceregexp file="${main.class.file}"
+                     match="(^run.main.class[ ]*=)[ ]*.*"
+                     replace="\1${full.name}"
+                     byline="true"
+      />  
+   </target>
+
+ 
+ <property name="editor0" value="Uedit32.exe"/>
+
+ <property name="editor1" value="C:\Program Files (x86)\UltraEdit\Uedit32.exe"/>
+ <property name="editor2" value="C:\Program Files\UltraEdit\Uedit32.exe"/>
+ <property name="editor" value="ue.bat"/>
+  
+ <target name="switchTest">
+    <ac:propertyregex property="long.name"
+              input="${java.file}"
+              regexp="\\"
+              override="true"
+              replace="/"
+    />  
+    <!--echo message="long.name=${long.name}"/-->
+    <ac:if>
+      <contains string="${long.name}" substring="Test.java" casesensitive="true"/>
+    <ac:then>  
+       <ac:propertyregex property="test.tmp"
+                 input="${long.name}"
+                 regexp="test/src"
+                 override="true"
+                 replace="src"
+       />  
+       <ac:propertyregex property="edit.file"
+                 input="${test.tmp}"
+                 regexp="(.*)Test\.java"
+                 replace="\1.java"
+       />  
+     </ac:then>
+    <ac:else>
+       <ac:propertyregex property="test.tmp"
+                 input="${long.name}"
+                 regexp="src"
+                 override="true"
+                 replace="test/src"
+       />  
+       <ac:propertyregex property="edit.file"
+                 input="${test.tmp}"
+                 regexp="(.*)\.java"
+                 replace="\1Test.java"
+       />  
+    </ac:else>
+    </ac:if>
+    <!--echo message="edit.file=${test.file}"/-->
+    <exec executable="${editor0}" spawn="true" searchpath="true">  <!-- spawn results in faster return from ant -->
+       <arg value="${edit.file}"/>
+    </exec>
+ </target>  
+   
+   <target name="run-nocompile" description="Runs the main program for this project, without compiling anything">    
+      <fail message="No run.main.class defined" unless="run.main.class"/> 
+      <java classname="${run.main.class}" fork="${run.fork}" spawn="${run.spawn}" >             
+          <classpath refid="run-classpath"/>
+          <jvmarg line="${run.jvmargs}"/>
+          <arg line="${run.argline}"/>
+          <!-- when a build.properties line like -Djava.library.path=lib;${env.windir}/system32 is used, the following is ignored: -->
+          <sysproperty key="java.library.path" path="${run.library.path}"/> 
+          <!-- for some reason this doesn't work with the jvmarg line (although -Djava.library.path=... is allowed on that line ) -->
+          <!-- find all properties starting with -D, remove the -D, and apply as sysproperty: -->
+          <syspropertyset>
+               <propertyref prefix="-D"/>
+               <mapper from="-D*" to="*" type="glob"/>
+          </syspropertyset>
+      </java> 
+   </target>   
+   
+    <target name="showmain"  description="Show the main class for &quot;run&quot;">
+      <echo message="${run.main.class} "/>
+    </target>
+
+</project>
+
+  
+
+
+
+
+  
+   
+

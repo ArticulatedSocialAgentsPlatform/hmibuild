@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="@PROJECT.NAME@" default="run" basedir=".">
+   <description>@PROJECT.DESCRIPTION@</description>
+   
+   <!-- This top-level build.xml file loads some ant properties from build.properties,       -->
+   <!-- then loads a build implementation file, as well as (optional) customization file(s). -->
+  
+   <property file="build.properties" />   
+  
+   <property name="shared.project.root" location="@SHAREDPROJECTROOT@"  />
+   
+   <import file="${shared.project.root}/@SHAREDPROJECTDIR@/ant/build-impl.xml" />        <!-- the shared minimal build implementation -->
+   <import file="${shared.project.root}/@SHAREDPROJECTDIR@/ant/build-customize.xml" />   <!-- shared optional customization           -->
+   <!-- import file="build-customize.xml" optional="true" /-->                  <!-- optional project-specific customization -->
+   
+</project>
+
+         
+ 
+
+  
+
+
+
+
+  
+   
+

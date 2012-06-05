@@ -1,0 +1,4 @@
+<configurations defaultconfmapping="default->default;test->test" defaultconf="default">
+   <conf name="default"  description="Default dependencies for compile/run"/>
+   <conf name="test"     description="Additional dependencies for testing"/>
+</configurations>

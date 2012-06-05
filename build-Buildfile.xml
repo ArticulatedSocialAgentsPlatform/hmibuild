@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Buildfile" >
+
+
+
+ 
+   <target name="help" description="Help for managing build files">
+      <echo>
+ -- Build file management --
+    freeze:     Create a standalone version of the project by replacing the current build file 
+                by a standalone core build file.
+                The existing build.xml file is renamed into "build.alternate"
+                This is usefull for making a project independent from the Hmi build framework, 
+                and can be used for "finalized/frozen" projects, or for standalone student projects.
+    alternate:  "swaps" the current build.xml and build.alternate files. 
+                Useful for switching between two different build systems,
+                like the Netbeans build and the ant build, 
+                or for testing the standalone version created by means of "ant freeze".
+      </echo> 
+   </target>  
+ 
+ 
+   <property name="alternate.build.file" value="build.alternate"/>
+   <available property="alternate.available" file="${alternate.build.file}"/>
+   
+  
+ 
+   <target name="freeze" description="Replaces current local build file by standalone core build file">
+      <fail message="Existing ${alternate.build.file} found" if="alternate.available"/>
+      <move file="build.xml" tofile="${alternate.build.file}" failonerror="false" />
+      <copy file="${shared.ant.dir}/build-Core.xml" tofile="build.xml" overwrite="false">
+         <!--filterset>
+            <filter token="MAIN_CLASS"         value="${run.main.class}" />
+         </filterset-->
+      </copy>
+      <replaceregexp file="build.xml" match="(&lt;project[ ]+name=&quot;)(.*?)&quot;"  replace="\1${ant.project.name}&quot;" byline="true" flags="g"   />   
+   </target>
+    
+ 
+</project>
+
+  
+
+
+
+
+  
+   
+

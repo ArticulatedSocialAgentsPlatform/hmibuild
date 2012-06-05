@@ -1,0 +1,28 @@
+# Ant properties file for project @PROJECT.NAME@
+# Main class for run target:
+run.main.class=@MAIN.CLASS@
+# Name of manifest file:    
+manifest.file=manifest.mf
+# jar files are created in ${module.name)-${specification.version}.jar:
+module.name=@MODULE.NAME@
+#The publish attributes determine the repository locations where jar files for this project are published.
+organization=@ORGANIZATION@
+#publish.repository=@PUBLISHREPOSITORY@
+# jvm arguments:   specify one of run.jvmargs (both Netbeans and ant build) or run.jvmargline (ant build only, ignored by Netbeans)
+#run.jvmargline=
+run.jvmargs=-Xms128m -Xmx1024m
+#-D options: (-Djava.library.path=lib is default)
+#-Djava.library.path=lib;C:/${env.windir}/system32
+# list of repositories for jars and resources, used by resolve target:
+repositories=HmiShared/repository, Shared/repository
+# Repository libraries needed by this project (will be obtained via "ant resolve"):
+#dependencies=HMI/HmiUtil, Sun/jogl
+javadoc.packages=@PACKAGE@.*
+# The project resource dir ("resource" is default)
+#resource.dir=resource
+# Repository resources needed by this project: (will be obtained via "ant resolveresources")
+#resources=Humanoids\womanBusiness\0.1
+# Resources that should be included into the project's JAR file:
+#jar.resources=animations/*
+# extra Resources that should be included into the project's DEMO jar file:
+#demo-jar.resources=dae/*, animations/animTest2.xml, textures/Grass.png

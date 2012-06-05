@@ -1,0 +1,727 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Ivy"  
+         xmlns:ac="antlib:net.sf.antcontrib"  
+         xmlns:ivy="antlib:org.apache.ivy.ant"
+         xmlns:hmi="antlib:hmi.ant">
+
+   <description>Resolving and Publishing with Ivy</description>
+  
+   <property name="resolverelease.status.file" value="${private.properties.dir}/resolve-release.status"/>
+   <property file="${resolverelease.status.file}" /> 
+   
+   <!-- Settings for ivy -->
+   <property name="ivy.settings.dir"       location="${hmi.build.dir}/ivy" />
+   <property name="ivy.jar.dir"            location="${hmi.build.dir}/ivy"/>
+   <property name="ivy.file"               value="ivy.xml" />
+   <property name="test.ivy.file"          value="${test.dir}/ivy.xml" />
+   
+   
+ 
+   
+   <property name="resolve.status"         value="release" /> <!-- fallback when not set in resolve-release.status file -->
+   <property name="ivy.retrieve.dir"       value="${lib.dir}" />
+   <property name="ivy.resource.retrieve.dir"  value="ivy.resource" />
+   <property name="resource.ivy.file"      value="${resource.dir}/ivy.xml" />
+   
+ 
+   <!-- publish.resolver is the ivy resolver to be used when publishing a new release of a project. -->
+   <property name="publish.resolver"       value="projects.repository"/> <!-- default fallback, when not set explicitly in build.properties -->
+    
+   <target name="help" description="Help for ivy version management">
+      
+<echo> -- Version Management --
+   
+    resolve                       Update/resolve the contents of lib and test/lib             
+    resolvelib                    Update/resolve just the contents of lib, no ivyclean
+    resolvetestlib                Update/resolve just the contents of test/lib, no ivyclean
+    
+    Publishing can have alpha, beta, or release status, 
+    and uses -major.minor or -major.minor.maintenance version numbers
+   
+    alpharelease:                 Publish with alpha status, new minor version  
+    betarelease:                  Publish with beta status, new minor version   
+    minorreleasecandidate         Publish with beta status, new minor or major version and -rc suffix
+    majorreleasecandidate
+    minorrelease, majorrelease,   Publish with release status, new minor or major number.
+    maintenancerelease            Publish with release status with new maintenenance number. Intended for maintenance of older releases.
+    showlatest                    Show the latest published version
+  
+    ivyclean                      Clean the ivy cache (Also included in resolve)</echo> 
+    </target> 
+         
+ 
+      <path id="ivy.lib.path">
+         <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+         <fileset dir="${ivy.jar.dir}/lib" includes="*.jar"/>
+      </path>
+    
+      <typedef resource="org/apache/ivy/ant/antlib.xml" 
+               uri="antlib:org.apache.ivy.ant" 
+               classpathref="ivy.lib.path"/>     
+      <ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+
+ 
+  
+     
+   <ac:if>
+      <not> <available file="ivy.xml" type="file"/> </not>
+   <ac:then>
+      <echo message="No ivy.xml file found, copying template..."/>
+      <property name="organization" value="HMI"/>
+      <copy file="${ivy.settings.dir}/ivy-template.xml" toFile="ivy.xml">
+         <filterset>
+            <filter token="MODULE" value="${ant.project.name}"/>
+            <filter token="ORG" value="${organization}"/>
+         </filterset>
+      </copy>
+   </ac:then>
+   </ac:if>  
+   
+   
+    
+   <target name="-resolve"> <!-- resolve without <ivyclean/> -->
+      <echo message = "-RESOLVE resolve.status= ${resolve.status}" />
+      <echo message="${line.separator} ========= Resolve testlib for ${module.name}, status=${resolve.status} ========="/>
+      <antcall target="resolvetestlib"/>
+      <echo message="${line.separator} ========= Resolve lib for ${module.name}, status=${resolve.status} ========="/>
+      <antcall target="resolvelib"/> 
+   </target>
+  
+   
+   <target name="resolve"  description="Resolve and retrieve all dependencies">    
+       <antcall target="ivyclean" />
+       <antcall target="-resolve" />
+       <!--antcall target="resolveresource"/-->  
+   </target>
+      
+   <property name="lib.local" value="lib.local" />
+   <property name="test.lib.local" value="lib.local" />
+
+
+   <target name="resolvelib"  description="Resolve and retrieve (just) lib dependencies "> 
+    <echo message = "RESOLVELIB resolve.status= ${resolve.status}" />
+      <ivy:retrieve file="${ivy.file}" pattern="${lib.dir}/[artifact]-[revision].[ext]" sync="true" transitive="true" conf="default" resolveMode="default"  log="default"/>
+      <mkdir dir="${lib.dir}"/> <!-- repair if ivy throws it away -->
+      <unzip dest="${lib.dir}">
+         <fileset dir="${lib.dir}/" includes="*.zip"/>
+         <patternset>
+            <include name="**/*.jar"/>
+            <include name="**/*.dll"/>
+            <include name="**/*.so"/>
+            <include name="**/*.jnilib"/>
+            <include name="**/*.data"/>
+         </patternset>
+         <flattenmapper/>
+      </unzip>
+      <ac:if> 
+         <available file="${lib.local}" type="dir" />
+      <ac:then>
+         <copy todir="${lib.dir}" overwrite="true" >
+       	   <fileset dir="${lib.local}"/>
+         </copy>
+      </ac:then>
+      </ac:if>
+   </target>     
+   
+   
+   <target name="resolvetestlib"  description="Resolve and retrieve (just) test lib dependencies ">  
+      <available file ="${test.dir}" type="dir" property="test.dir.available"/>
+      <echo message="test.dir available: ${test.dir.available}"/>
+      <ac:if>
+         <and>
+            <available file ="${test.dir}" type="dir"/>
+            <not> <available file="${test.ivy.file}" type="file"/> </not>
+         </and>
+      <ac:then>
+         <echo message="Resolve testlib, No ${test.ivy.file} file found, copying template..."/>
+         <property name="organization" value="HMI"/>
+         <copy file="${shared.template.dir}/testdir-template/ivy.xml" toFile="${test.ivy.file}">
+         <filterset>
+            <filter token="MODULE" value="${ant.project.name}"/>
+            <filter token="ORG" value="${organization}"/>
+         </filterset>
+         </copy>
+      </ac:then>
+      </ac:if>  
+      
+      <ac:if>
+            <available file="${test.ivy.file}" type="file"/>
+      <ac:then>
+         <ivy:retrieve file="${test.ivy.file}" pattern="${test.lib.dir}/[artifact]-[revision].[ext]" sync="true" transitive="true" log="default"/>
+         <mkdir dir="${test.lib.dir}"/>
+         <unzip dest="${test.lib.dir}">
+            <fileset dir="${test.lib.dir}/" includes="*.zip"/>
+            <patternset>
+               <include name="**/*.jar"/>
+               <include name="**/*.dll"/>
+               <include name="**/*.so"/>    
+               <include name="**/*.jnilib"/>                 
+            </patternset>
+            <flattenmapper/>
+         </unzip>
+         <ac:if> 
+            <available file="${test.dir}/${test.lib.local}" type="dir" />
+         <ac:then>
+            <copy todir="${test.lib.dir}" overwrite="true" >
+       	       <fileset dir="${test.dir}/${test.lib.local}"/>
+            </copy>
+         </ac:then>
+         </ac:if>
+      </ac:then>
+      </ac:if>
+   </target>     
+   
+   
+   <available file="${resource.ivy.file}" type="file" property="resource.ivy.file.available"/>
+ 
+   <target name="resolveresource"  description="Resolve and retrieve resource dependencies" if="${resource.ivy.file.available}"> 
+   	
+    <ac:if>
+         <not> <available file="${resource.ivy.file}" type="file"/> </not>
+      <ac:then>
+         <!--echo message="No ${resource.ivy.file}"/-->
+      </ac:then>
+      <ac:else>
+         <echo message=" ${resource.ivy.file} file found, retrieving resource data ..."/>
+         <mkdir dir="${ivy.resource.retrieve.dir}"/>
+         
+         
+         <hmi:listresources  resourcedir="${resource.dir}" type="jar" listfile="${resource.dir}/oldresources.list"/>
+         <hmi:copyversionedresources  fromdir="${resource.dir}" todir="${ivy.resource.retrieve.dir}" type="jar" />
+         
+         <ivy:retrieve file="${resource.ivy.file}" pattern="${ivy.resource.retrieve.dir}/[artifact]-[revision].[ext]" sync="true" transitive="true" log="default"/>
+         <hmi:listresources   resourcedir="${ivy.resource.retrieve.dir}"  type="jar" listfile="${resource.dir}/newresources.list"/>
+         <hmi:unpackresources  ivyretrievedir="${ivy.resource.retrieve.dir}" resourcedir="${resource.dir}" oldresources="${resource.dir}/oldresources.list" newresources="${resource.dir}/newresources.list"/>
+         <delete dir="${ivy.resource.retrieve.dir}"/>
+      </ac:else>
+      </ac:if>  
+   </target>     
+
+
+
+
+   <target name="ivyclean"  description="Clean Ivy cache" >
+      <ivy:cleancache />
+   </target>  
+   
+   
+   <target name="ivyreport" description="Create an ivy report for the last resolve action">
+      <ivy:resolve log="quit"/>
+      <ivy:report/>
+   </target>
+  
+  <available file="${test.src.dir}" property="test.src.dir.present"/>
+ 
+ <target name="ivyinfo">
+ 	<ivy:info/>   <!-- retrieves ivy.organisation and ivy.module -->
+       <echo message="info  ivy.organisation=${ivy.organisation}    ivy.module= ${ivy.module}" />
+       
+       <ivy:findrevision organisation="${ivy.organisation}" module="${ivy.module}" revision="latest.integration" />
+       <echo message="findversion ivy.revision= ${ivy.revision}"/>
+ </target>
+ 
+    <target name="getmanifestversion"> <!-- retrieves the current version from the ivy repository, and enters this info in the manifest file -->
+       <!-- create a new manifest file if needed -->
+       <ac:if>
+	      <not>
+	        <available file="${manifest.file}"/>
+	      </not>
+	      <ac:then>
+        	<antcall target="createemptymanifest"/>
+	      </ac:then>
+      </ac:if>
+       
+       <ivy:info/>   <!-- retrieves ivy.organisation and ivy.module -->
+       <echo message="info  ivy.organisation=${ivy.organisation}    ivy.module= ${ivy.module}"/>
+       <ivy:findrevision organisation="${ivy.organisation}" module="${ivy.module}" revision="latest.integration" />
+       <echo message="findversion ivy.revision= ${ivy.revision}"/>
+       <property name="mf.file" value="${manifest.file}" />
+       <setSpecificationVersion spec.version="${ivy.revision}"/>
+       <setImplementationVersion impl.version=""/>
+   </target>
+   
+   
+   
+   <target name="-pub"  depends="clean, versioned.jar"> <!-- do the actual ivy publishing part of a release -->
+      <!--ivy:resolve transitive="false" log="quiet"/-->
+      <property name="specification.version" value="0.0"/> <!-- fallback -->
+      <property name="distdir"               location="${dist.dir}" />
+      <property name="pubresolver"           value="${publish.resolver}" /> 
+      <property name="pub.status"            value="" />   <!-- fallback -->
+      <ivy:info/> <!-- get organisation -->
+      <!--echo message="-pub pubresolver=${pubresolver} passwd=${passwd}"/-->
+		<ivy:publish artifactspattern="${distdir}/[artifact]-[revision].[ext]" 
+		   resolver="${pubresolver}"
+         pubrevision="${specification.version}" 
+         status="${pub.status}"
+         overwrite="true"
+         conf="default"    
+      />
+      <echo message="${line.separator}Publication of ${ant.project.name} version ${specification.version},  Status: ${pub.status}  (${pubresolver})" />
+   </target>
+   
+ 
+ 
+  
+ 
+   <target name="releaseresourcelist" description="Performs a release for all resource projects on release.resource.list" >
+      <ac:if>
+         <not><isset property="release.resource.list"/></not>
+      <ac:then>
+         <fail message="releaseresourcelist: No release.resource.list set"/>
+      </ac:then> 
+      </ac:if> 
+      <ac:if>
+      <not><isset property="release.target"/></not>
+      <ac:then>
+         <fail message="releaseresourcelist: No release.target set"/>
+      </ac:then>      
+      </ac:if> 
+      <antcall target="-checkversionnumber"/>
+      <property name="devnum" value="-1"/> <!-- default, causing autoincrement for dev release numbers -->
+      <echo message="releaseresourcelist (${release.target}) ${release.resource.list}"/>
+      
+      <filelist id="resource.project.dirs" dir="${shared.project.root}" files="${release.resource.list}" />
+      <subant target="${release.target}" verbose="true" inheritall="false">
+         <property name="devnum" value="${devnum}"/>
+         <filelist refid="resource.project.dirs"/>
+      </subant>
+      
+   </target>
+
+   <target name="releaselist" description="Performs a release for all projects on release.list" >
+      <ac:if>
+         <not><isset property="release.list"/></not>
+      <ac:then>
+         <fail message="releaselist: No release.list set"/>
+      </ac:then> 
+      </ac:if> 
+      <ac:if>
+      <not><isset property="release.target"/></not>
+      <ac:then>
+         <fail message="releaselist: No release.target set"/>
+      </ac:then>      
+      </ac:if> 
+      <antcall target="-checkversionnumber"/>
+      <property name="devnum" value="-1"/> <!-- default, causing autoincrement for dev release numbers -->
+      <echo message="releaselist (${release.target}) ${release.list}"/>
+      
+      <filelist id="release.project.dirs" dir="${shared.project.root}" files="${release.list}" />
+      
+      <!-- First resolve all relevant projects, so external dependencies have been resolved correctly  ... -->
+      <antcall target="ivyclean"/>
+      <subant target="-resolve" verbose="false" inheritall="false">
+         <filelist refid="release.project.dirs"/>
+      </subant>
+      <antcall target="-resolve"/>
+      
+      <!-- next, produce the alpha versions, needed to test at the source code level -->
+      <property name="compile.list" value="${release.list}"/>
+      <antcall target="compilelist"/>
+      
+      <!-- Then test them all  ... -->
+      <subant target="junit" verbose="false" inheritall="false">
+         <filelist refid="release.project.dirs"/>
+      </subant>
+      <antcall target="junit"/>
+      
+      <!-- Finally do the actual ivy release  ... -->
+      <!--antcall target="ivyclean"/--> <!-- not sure we need this -->
+      <subant target="${release.target}" verbose="true" inheritall="false">
+         <property name="devnum" value="${devnum}"/>
+         <filelist refid="release.project.dirs"/>
+      </subant>
+      <antcall target="${release.target}"/>
+       
+   </target>
+   
+   
+   <target name="testreleaselist" description="Performs a test release for all projects on release.list, but does not perform the actual publishing" >
+      
+      <filelist id="release.project.dirs" dir="${shared.project.root}" files="${release.list}" />
+      
+      <!-- First resolve all relevant projects, so external dependencies have been resolved correctly  ... -->
+      <antcall target="ivyclean"/>
+      <subant target="-resolve" verbose="false" inheritall="false">
+         <filelist refid="release.project.dirs"/>
+      </subant>
+      <antcall target="-resolve"/>
+      
+      <!-- next, produce the alpha versions, needed to test at the source code level -->
+      <property name="compile.list" value="${release.list}"/>
+      <antcall target="compilelist"/>
+      
+      <!-- Then test them all  ... -->
+      <subant target="junit" verbose="false" inheritall="false">
+         <filelist refid="release.project.dirs"/>
+      </subant>
+      <antcall target="junit"/>
+      
+   </target>
+   
+   
+   <!--target name="st">
+      <input message="Ivy password:" defaultvalue="" addproperty="pw"/>
+ 
+      <sshexec host="hmigit.ewi.utwente.nl"
+	username="zwiers"
+	password="${pw}"
+	command="touch /hmirepo/tch.txt"/>
+   </target-->
+  
+  <!--sshexec host="hmigit.ewi.utwente.nl"-->
+  <!-- <sshexec host="hmics05.ewi.utwente.nl" -->
+  <!--target name="st">
+   <sshexec host="hmics05.ewi.utwente.nl"
+      trust="yes"
+	   username="zwiers"
+	   keyfile="C:/Users/zwiers/.ssh/id_rsa"
+	   command="touch /hmirepo/tch.txt"/>
+   </target-->
+  
+   <target name="devrelease"  description="publishes a dev release, with Ivy &quot;beta&quot; status">
+      <antcall target="resolve">
+         <param name="resolve.status" value="beta"/> <!-- overrides build.properties value -->
+      </antcall>
+      <antcall target="junit"/>
+      <property name="devnum" value="-1"/> <!-- default fallback, causing autoincrement for dev release numbers -->
+      <antcall target="-devrelease"/>
+   </target>
+   
+   <target name="-devrelease" depends="getmanifestversion"> <!-- target for releaselist and devrelease -->
+      <echo message=" ========== DEVRELEASE for ${module.name} ============" />
+      <!-- it might be (for  instance for nbuild) that we have alphas in lib, so we must (again) resolve lib. (testlib is not needed here) -->
+      <antcall target="resolvelib">  <!-- cannot use the full resolve here, because of ivyclean (for some unclear reasons)-->
+        <param name="resolve.status" value="beta"/> <!-- overrides build.properties value -->
+      </antcall>
+      <antcall target="-newmanifest">
+          <param name="new.type" value="devVersion"/>
+          <param name="devnum"   value="${devnum}" />
+      </antcall>
+      <property name="pub.status" value="beta" />
+      <antcall target="-pub"/>
+   </target>
+   
+   <target name="release"  description="publishes a minor release, with Ivy &quot;release&quot; status">
+      <!--input message="Ivy password:" defaultvalue="" addproperty="pw"/-->
+      <antcall target="minorrelease">
+         <!--param name="passwd" value="${pw}"/-->
+      </antcall>
+   </target>
+   
+   <target name="minorrelease"  description="publishes a minor release, with Ivy &quot;release&quot; status">
+      <property name="resolve.status" value="release"/>
+      <antcall target="resolve">
+          <param name="resolve.status" value="release"/> <!-- overrides build.properties value -->
+      </antcall>
+      <antcall target="junit"/>
+      <antcall target="-minorrelease"/>
+   </target>
+   
+   <target name="-minorrelease"  depends="getmanifestversion">    
+      <antcall target="resolvelib"> 
+         <param name="resolve.status" value="release"/> <!-- overrides build.properties value -->
+      </antcall>
+      <antcall target="-newmanifest"> 
+          <param name="new.type" value="minorRelease"/> 
+      </antcall>
+      <property name="pub.status" value="release" />
+      <antcall target="-pub"/>
+   </target>
+   
+   
+   <target name="majorrelease"  description="publishes a major release, with Ivy &quot;release&quot; status">
+      <antcall target="resolve">
+         <param name="resolve.status" value="release"/> <!-- overrides build.properties value -->
+      </antcall>
+      <antcall target="junit"/>
+      <antcall target="-majorrelease"/>
+   </target>
+   
+   <target name="-majorrelease" depends="getmanifestversion">   
+      <antcall target="resolvelib"> 
+         <param name="resolve.status" value="release"/> <!-- overrides build.properties value -->
+      </antcall>  
+      <antcall target="-newmanifest"> <param name="new.type" value="majorRelease"/> </antcall>
+      <property name="pub.status" value="release" />
+      <antcall target="-pub"/>
+   </target>
+   
+   <target name="maintenancerelease" description="publishes a maintenance release version, with Ivy &quot;release&quot; status">
+      <antcall target="resolve">
+        <param name="resolve.status" value="release"/> <!-- overrides build.properties value -->
+      </antcall>
+      <antcall target="junit"/>
+      <antcall target="-maintenancerelease"/>
+   </target>
+    
+   <target name="-maintenancerelease" > <!-- NB no dependence on getmanifestversion: Ensure that the correct manifest -->
+      <antcall target="resolvelib"> 
+         <param name="resolve.status" value="release"/> <!-- overrides build.properties value -->
+      </antcall>      
+      <antcall target="-newmanifest"> <param name="new.type" value="maintenanceVersion"/> </antcall>
+      <property name="pub.status" value="release" />
+      <antcall target="-pub"/>
+   </target>
+   
+ 
+  
+ 
+   <target name="showlatest" description="List latest (alpha/beta/release) version"> 
+      <ivy:info/>
+      <ivy:findrevision organisation="${ivy.organisation}" module="${ivy.module}" revision="latest.alpha"/>
+      <echo/>
+      <echo message="Latest alpha version:   ${ivy.revision}"/>
+       <ivy:findrevision organisation="${ivy.organisation}" module="${ivy.module}" revision="latest.beta"/>
+      <echo message="Latest beta version:    ${ivy.revision}"/>
+      <ivy:findrevision organisation="${ivy.organisation}" module="${ivy.module}" revision="latest.release"/>
+      <echo message="Latest release version: ${ivy.revision}"/>
+   </target>
+ 
+ 
+   <target name="ivylist" depends ="init" description="determines HMI based rebuild.list entries based upon ivy dependencies"> 
+        <ivyrebuildlist />
+   </target>
+
+
+
+   <macrodef name="ivyrebuildlist"> <!-- constructs a rebuild.list from ivy dependencies -->
+      <sequential>
+    
+      <echo message="ivyrebuildlist for ${module.name}..."/> 
+      <ivy:buildlist reference="rebuild.path" ivyfilepath="ivy.xml" onMissingDescriptor="skip" root="${module.name}" onlydirectdep="true">   
+            <fileset dir="${shared.project.root}/Hmi" includes="**/build.xml"/>   
+      </ivy:buildlist>
+      
+      <property name="rebuild-list0" refid="rebuild.path" />
+      <!--echo message="rebuild.path=${rebuild-list0}"/-->
+      <ac:propertyregex property="rebuild-list1"
+              input="${rebuild-list0}"
+              regexp="\\"
+              replace="/"
+              override="true"
+              global="true"
+              casesensitive="false" 
+              defaultValue="${rebuild-list0}"
+      />
+      <ac:propertyregex property="rebuild-list2"
+              input="${rebuild-list1}"
+              regexp="/build.xml"
+              replace=""
+              override="true"
+              global="true"
+              casesensitive="false" 
+              defaultValue="${rebuild-list1}"
+      />
+      <ac:propertyregex property="rebuild-list3"
+              input="${rebuild-list2}"
+              regexp="${shared.project.root}/"
+              replace=""
+              override="true"
+              global="true"
+              casesensitive="false"
+              defaultValue="${rebuild-list2}"
+      />
+      <ac:propertyregex property="rebuild-list4"
+              input="${rebuild-list3}"
+              regexp=";"
+              replace=", "
+              override="true"
+              global="true"
+              casesensitive="false"
+              defaultValue="${rebuild-list3}"
+      />
+      
+      <property name="reb.list" value="${rebuild-list4}"/>
+      <echo message="-----------------------------------------------------------------------" />
+      <echo message="HMI contributions for rebuild.list: "/>
+      <echo message=""/>
+      <echo message="${reb.list} " />
+      <echo message=""/>
+      <echo message="-----------------------------------------------------------------------" />
+      <!--replaceregexp file="${properties.file}"
+               match=".*rebuild.list.*"
+               replace="rebuild.list=${rebuild.list}"
+               byline="true"
+      /-->
+      </sequential>
+    </macrodef>
+
+  
+ 
+   <target name="-init.rebuild.list" unless="rebuild.list">
+      <echo message="Init rebuild.list ...."/> 
+      <!--ivyrebuildlist /-->
+   </target>
+ 
+   <target name="-init.resolve.list">
+      <ac:if>
+         <not><isset property="resolve.list"/></not>
+      <ac:then>
+          <ac:if>
+             <isset property="rebuild.list"/>
+          <ac:then>
+             <property name="resolve.list" value="${rebuild.list}"/>
+          </ac:then>
+          <ac:else>
+             <!--property name="resolve.list" value=""/--> <!-- with an empty list, delegate will print a "warning" that there are no sub builds -->
+          </ac:else> 
+          </ac:if> 
+      </ac:then>      
+      </ac:if> 
+   </target>
+
+
+   <target name="resolvelist"  depends=" -init.resolve.list" description="resolve all projects found on rebuild.list">    
+      <ac:if>
+         <and>
+            <isset property="rebuild.list"/>
+            <not><equals arg1="${rebuild.list}" arg2="" /></not>
+         </and>
+      <ac:then>
+         <echo message="resolving resolve.list projects ..."/> 
+         <filelist id="resolve.project.dirs" dir="${shared.project.root}" files="${rebuild.list}" />
+         <subant target="resolve" verbose="false" inheritall="false">
+            <filelist refid="resolve.project.dirs"/>
+         </subant>
+      </ac:then>
+      <ac:else>
+         <echo message="  --- No resolve.list/rebuild.list projects ---"/> 
+      </ac:else>
+      </ac:if>
+     
+      <antcall target="resolve"/>
+    </target>
+
+
+
+   <available file="${resolverelease.status.file}" property="resolverelease.status.file.available" />
+   
+   <target name="-init.resolverelease.status.file" unless="resolverelease.status.file.available">
+      <property name="resolve.status" value="release" />   
+      <echo file="${resolverelease.status.file}" message="resolve.status=${resolve.status}${line.separator}"/>
+      <echo message="resolverelease.status.file added to project${line.separator} "/>
+   </target> 
+   
+   <target name="resolvestatus" depends ="-init.resolverelease.status.file" description="Shows and (re)sets the resolve status">
+      <ac:if>
+         <isset property="resolve.status"/>
+      <ac:then>
+         <input
+            message="${line.separator}Current resolve.status=&quot;${resolve.status}&quot;${line.separator}${line.separator}Give new status, or &lt;Return&gt; for &quot;no change&quot;:${line.separator}"
+            validargs="beta,release"
+            addproperty="new.resolve.status"
+            defaultvalue="${resolve.status}"
+         />
+          <ac:if>
+            <not><equals arg1="${new.resolve.status}" arg2="${resolve.status}"/></not>
+         <ac:then>
+            <replaceregexp file="${resolverelease.status.file}"  match="^resolve.status.*"  replace="resolve.status=${new.resolve.status}" byline="true"  />
+            <echo message="Resolve status changed to &quot;${new.resolve.status}&quot;" />
+         </ac:then>
+         </ac:if>
+      </ac:then>
+      <ac:else>
+         <input
+            message="${line.separator}No resolve status defined yet in ${resolverelease.status.file}${line.separator}${line.separator}Define status, or &lt;Return&gt; for &quot;none&quot;:${line.separator}"
+            validargs="beta,release"
+            addproperty="new.resolve.status"
+            defaultvalue="release"
+         />
+         <ac:if>
+            <not><equals arg1="none" arg2="${new.resolve.status}"/></not>
+         <ac:then>
+            <replaceregexp file="${resolverelease.status.file}"  match="$"  replace="${line.separator}resolve.status=${new.resolve.status}" byline="false"  />   
+            <echo message="Resolve status set to &quot;${new.resolve.status}&quot;" /> 
+         </ac:then>
+         </ac:if>
+      </ac:else>
+      </ac:if>
+   </target>
+   
+   
+   
+   
+   
+   <target name="releasestatus" depends ="-init.resolverelease.status.file" description="Shows and (re)sets the release status">
+      <ac:if>
+         <isset property="release.status"/>
+      <ac:then>
+         <input
+            message="${line.separator}Current release.status=&quot;${release.status}&quot;${line.separator}${line.separator}Give new status, or &lt;Return&gt; for &quot;no change&quot;:${line.separator}"
+            validargs="alpha,beta,release"
+            addproperty="new.release.status"
+            defaultvalue="${release.status}"
+         />
+          <ac:if>
+            <not><equals arg1="${new.release.status}" arg2="${release.status}"/></not>
+         <ac:then>
+            <replaceregexp file="${resolverelease.status.file}"  match="^release.status.*"  replace="release.status=${new.release.status}" byline="true"  />
+            <echo message="Release status changed to &quot;${new.release.status}&quot;" />
+         </ac:then>
+         </ac:if>
+      </ac:then>
+      <ac:else>
+         <input
+            message="${line.separator}No release status defined yet in ${resolverelease.status.file}${line.separator}${line.separator}Define status, or &lt;Return&gt; for &quot;none&quot;:${line.separator}"
+            validargs="none,alpha,beta,release"
+            addproperty="new.release.status"
+            defaultvalue="none"
+         />
+         <ac:if>
+            <not><equals arg1="none" arg2="${new.release.status}"/></not>
+         <ac:then>
+            <replaceregexp file="${resolverelease.status.file}"  match="$"  replace="${line.separator}release.status=${new.release.status}" byline="false"  />   
+            <echo message="Release status set to &quot;${new.release.status}&quot;" /> 
+         </ac:then>
+         </ac:if>
+      </ac:else>
+      </ac:if>
+   </target>
+   
+
+
+
+
+</project>
+
+
+
+
+
+  
+
+   <!--property name="release.status.file" value="build.properties"/-->
+   <!--target name ="release" description="Release according to current release status">
+      <ac:if>
+         <not><isset property="release.status"/></not>
+      <ac:then>
+         <fail message="${line.separator}${line.separator}No release status set. ${line.separator}${line.separator}Use &quot;releasestatus&quot; to set/redefine a status" unless="release.status"/>
+
+      </ac:then>
+      </ac:if>
+       
+      <echo message="Release, status=${release.status}"/>
+      <ac:switch value="${release.status}">
+      <ac:case value="alpha">
+          <echo message="alpha release" />
+          <antcall target="alpharelease"/>
+      </ac:case>
+      <ac:case value="beta">
+         <echo message="beta release" />
+         <antcall target="betarelease"/>
+      </ac:case>
+      <ac:case value="release">
+         <echo message="minor release" />
+         <antcall target="minorrelease"/>
+      </ac:case>
+      <ac:default>
+        <echo message="Unknown release status: ${release.status}" />
+      </ac:default>
+      </ac:switch>   
+   </target-->
+
+
+  
+   
+

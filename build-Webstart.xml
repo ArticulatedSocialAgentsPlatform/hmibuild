@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Webstart"  
+         xmlns:ac="antlib:net.sf.antcontrib"  
+  >
+   <description>Create a webstart version</description>
+
+
+   <!-- settings for signing webstart jars -->
+   <property name="keystore.file"         value="keystore"/>
+   <property name="keystore.storepass"    value="sesame"/>
+   <property name="keystore.alias"        value="HMI"/>
+
+   <!-- settings for webstart -->
+   <property name="webstart.dir"                value="webstart" />
+   <property name="webstart.jarfile.basename"   value="${ant.project.name}-web.jar"/>
+   <property name="webstart.jarfile"            location="${webstart.dir}/${webstart.jarfile.basename}"/>
+   <property name="webstart.jnlpfile"           value="${ant.project.name}.jnlp" />
+   <property name="webstart.deployment.dir"     value="demos" />
+   <property name="webstart.local.base"         value="H:/public_html" />
+   <property name="webstart.http.base"          value="http://hmi.ewi.utwente.nl/~zwiers" />
+
+
+   <target name="jnlp" description="Creates jnlp file in the webstart directory" >
+       <echo message="project.dir: ${project.dir}"/>
+     <copy file="${shared.template.dir}/webstart-template.jnlp" tofile="${webstart.dir}/${webstart.jnlpfile}">        
+         <filterset>
+           <filter token="JNLPFILE" value="${webstart.jnlpfile}"/>
+           <filter token="TESTCODEBASE" value="file:${project.dir}/${webstart.dir}"/>
+           <filter token="LOCALCODEBASE" value="file:${webstart.local.base}/${webstart.deployment.dir}"/>
+           <filter token="HTTPCODEBASE" value="${webstart.http.base}/${webstart.deployment.dir}"/>
+           <filter token="TITLE" value="${ant.project.name}"/>
+           <filter token="JARFILE" value="${webstart.jarfile.basename}"/>
+           <filter token="MAIN" value="${run.main.class}"/>   
+           <filter token="HOMEPAGE" value="http://hmi.ewi.utwente.nl"/>
+            <filter token="VENDOR" value="UT/Human Media Interaction"/>
+         </filterset>
+      </copy>
+   
+   </target> 
+    
+   <target name="webstart" depends="Core.jar, key" description="creates an unsigned jar file, ready for webstart">       
+      <copy file="${jarfile}" tofile="${webstart.jarfile}" preservelastmodified="true" />
+      <!-- antcall target ="sign"/-->
+   </target> 
+    
+   <target name = "publish" depends = "webstart">
+      <mkdir dir="${webstart.local.base}/${webstart.deployment.dir}"/>
+      <copy todir="${webstart.local.base}/${webstart.deployment.dir}">            
+         <fileset dir="${webstart.dir}"  includes="**/*" />
+      </copy>
+   </target> 
+    
+   <target name="initsign" description="Initialization for the jar task">
+      <available file="${keystore.file}" property="Key.present"/>
+   </target> 
+    
+   <target name="key" depends="initsign" unless="Key.present" description="Generates a key for signing if the key file does not exist">
+      <echo message="genkey keystore: ${keystore.file}"/>
+      <genkey keystore="${keystore.file}" alias="${keystore.alias}" storepass="${keystore.storepass}" >
+        <dname>
+          <param name="CN" value=" "/>
+          <param name="OU" value="HMI"/>
+          <param name="O"  value="University of Twente"/>
+          <param name="C"  value="NL"/>
+        </dname>
+      </genkey>
+   </target>    
+      
+   <target name="sign" depends="key" description="Signs the jar files for this project">
+     <echo message="signing..."/>
+     <signjar  
+        keystore="${keystore.file}" 
+        alias="${keystore.alias}" 
+        storepass="${keystore.storepass}" 
+        lazy="true"  
+     >  
+        <fileset dir="${dist.dir}">
+           <include name="${jarfile.basename}"/>
+        </fileset>        
+     </signjar>
+   </target> 
+    
+   <target name="signwebstart" depends = "key" description="Signs all jar files in the webstart directory">
+     <signjar
+        keystore="${keystore.file}" 
+        alias="${keystore.alias}" 
+        storepass="${keystore.storepass}"
+        lazy="true"
+      >
+         <path>
+            <fileset dir="${webstart.dir}" includes="**/*.jar" />
+         </path>
+     </signjar>
+   </target>
+ 
+   
+ 
+   
+</project>
+
+  
+
+
+
+
+  
+   
+

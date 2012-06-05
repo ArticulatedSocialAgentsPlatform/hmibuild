@@ -1,0 +1,5 @@
+lib/**/*
+ivy.xml
+manifest.mf
+build.properties
+main.class

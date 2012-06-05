@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Versioning"  
+         xmlns:ac="antlib:net.sf.antcontrib"   
+         xmlns:hmi="antlib:hmi.ant"
+         xmlns:ivy="antlib:org.apache.ivy.ant"
+         >
+
+   <description>Packaging targets, like jar</description>
+
+   <target name="help" description="Help for jar versioning">
+      <echo>
+ -- Jarring and versioning --
+    versioned.jar:     create a versioned jar file for the project.
+    jar:               Core.jar produces a jar file without version number attached to the file name, jar itself is equivalent to versioned.jar
+      </echo> 
+   </target>    
+  
+   
+   
+   <target name="versioned.jar" depends="createmanifest">
+      <property name="mf.file" value="${manifest.file}"/> <!-- fallback -->
+      <hmi:getmanifestversion versionprop="manifest.specification.version" manifestfile="${mf.file}"/> 
+      <property name="specification.version" value="${manifest.specification.version}"/>
+      <property name="jar.version.postfix" value="-${specification.version}"/>
+      <antcall target="Core.jar"/>
+   </target>
+
+    <target name="versionedtest.jar" >
+      <property name="mf.file" value="${manifest.file}"/> <!-- fallback -->
+      <hmi:getmanifestversion versionprop="manifest.specification.version" manifestfile="${mf.file}"/> 
+      <property name="specification.version" value="${manifest.specification.version}"/>
+      <property name="jar.version.postfix" value="-${specification.version}"/>
+      <antcall target="Core.jar"/>
+   </target>
+
+
+
+
+   
+
+   <target name="-ivy.manifest" unless="${manifest.file.present}">
+      <ivy:info/>
+      <property name="organisation" value="${ivy.organisation}"/>
+      <antcall target="Core.createmanifest"/>
+
+   </target>
+
+
+
+   <target name="test.jar" depends="compile" description="Creates a jar file containing the project's test class files and resources">
+      <mkdir dir="${dist.dir}"/>  
+      <delete>
+         <fileset dir="${dist.dir}" includes="${module.name}*.jar*"/>
+      </delete>  
+      <property name="mf.file" value="${manifest.file}"/> <!-- fallback -->
+      <hmi:getmanifestversion versionprop="manifest.specification.version" manifestfile="${mf.file}"/> 
+      <property name="specification.version" value="${manifest.specification.version}"/>
+      <property name="jar.version.postfix" value="-${specification.version}"/>
+        
+      <property name="jar.version.postfix"   value=""/>                   <!-- fall back, when no versioning is being used -->
+      <property name="jarfile.basename"      value="${module.name}-test${jar.version.postfix}.jar"/>   
+      <property name="jarfile"               location="${dist.dir}/${jarfile.basename}"/>  
+      <property name="mf.file"               value="${manifest.file}"/>   <!-- fallback, unless set already by calling target -->
+      <tstamp>   
+          <format property="MANIFEST_TIME" pattern="MMMM dd yyyy  hh:mm aa" locale="en" />
+      </tstamp>
+      <replaceregexp file="${mf.file}"
+                      match="(.*?Implementation-Version:)(.*)"
+                      replace="\1 ${MANIFEST_TIME}"
+                      byline="true"
+      />    
+      <jar destfile="${jarfile}" 
+           manifest="${mf.file}"
+           filesetmanifest="mergewithoutmain"
+           index="true">
+           <fileset dir="${build.classes.dir}">
+              <patternset refid="jar.classes"/>
+           </fileset>
+           <fileset dir="${resource.dir}" erroronmissingdir="false">
+              <patternset refid="jar.resources"/>
+           </fileset>
+      </jar>
+   </target>
+
+
+   <macrodef name="setSpecificationVersion">
+      <attribute name="spec.version" default="0.0"/>
+      <sequential>
+         <replaceregexp file="${mf.file}"
+                      match="(Specification-Version:[ ]*)(.*)"
+                      replace="\1@{spec.version}"
+                      byline="true"
+         />
+      </sequential>
+   </macrodef>  
+         
+   <macrodef name="setImplementationVersion">
+      <attribute name="impl.version" default=""/>
+      <sequential>
+         <replaceregexp file="${mf.file}"
+                      match="(.*?Implementation-Version:)(.*)"
+                      replace="\1@{impl.version}"
+                      byline="true"
+         />
+      </sequential>
+   </macrodef>  
+   
+   
+   
+   <target name="mf">
+      <property name="new.type" value="minorRelease"/> 
+      <antcall target="-newmanifest"/>
+   </target>
+
+   <target name="-checkversionnumber">
+      <property name="version" value=""/> <!-- if no version specified, we consider it ok-->
+      <hmi:newversion version="0.0" specificationVersion="${version}" newversionprop="returnednewversion" type="minorRelease" devNum="-1"/>
+      <fail message="Incorrect version number (${version})" unless="returnednewversion"/>
+   </target>
+
+   <target name="-newmanifest">
+   	<ac:if>
+	      <not>
+	        <available file="${manifest.file}"/>
+	      </not>
+	      <ac:then>
+        	<antcall target="createmanifest"/>
+	      </ac:then>
+      </ac:if>
+      <property name="mf.file" value="${manifest.file}" />
+      <property name="devnum" value="-1"/> <!-- fallback, resulting in autoincrement for dev build -->
+      <property name="version" value=""/> 
+      <echo message="-newmanifest version=${version}"/>
+      <hmi:getmanifestversion versionprop="current.specification.version" manifestfile="${mf.file}"/> 
+      <echo message="newmanifest current specification version ${current.specification.version} "/>   
+      <hmi:newversion version="${current.specification.version}" specificationVersion="${version}" newversionprop="new.specification.version" type="${new.type}" devNum="${devnum}"/>
+      <echo message="newmanifest specification version ${new.specification.version} "/>
+      <fail message="new manifest: Incorrect version number (${version})" unless="new.specification.version"/>
+      <setSpecificationVersion spec.version="${new.specification.version}"/>
+   </target>
+
+
+   
+ 
+</project>
+
+  
+
+
+
+
+  
+   
+
