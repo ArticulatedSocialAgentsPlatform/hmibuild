@@ -227,7 +227,7 @@
 	        <available file="${manifest.file}"/>
 	      </not>
 	      <ac:then>
-        	<antcall target="createemptymanifest"/>
+        	<antcall target="createmanifest"/>
 	      </ac:then>
       </ac:if>
        
