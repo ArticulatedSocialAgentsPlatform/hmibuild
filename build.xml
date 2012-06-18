@@ -136,7 +136,7 @@
    <!-- ASAP REPO -->
    <!-- Mode switch, for overriding "repository.mode" for "asap" repository: --> 
    <!--property name="asap.repository.mode"                value="${repository.mode}"/--> <!-- either "filesystem" or "url" -->
-   <property name="asap.repository.mode"                value="url"/> <!-- either "filesystem" or "url" -->
+   <property name="asap.repository.mode"                value="${repository.mode}"/> <!-- either "filesystem" or "url" -->
    
    <!-- The actual locations of the  asap repository: -->
    <property name="asap.repository.filesystem"          value="${asap.repository.filesystem.root}/repository"/>
