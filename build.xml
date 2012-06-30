@@ -42,7 +42,7 @@
    <property name="user.properties.dir" value="${user.home}" />
    <property name="user.properties.file" value="${user.properties.dir}/hmi.build.properties"/>
    <available file="${user.properties.file}" property="user.properties.file.available" />
-   <echo message="user.properties.file= ${user.properties.file}"/>
+   <!--echo message="user.properties.file= ${user.properties.file}"/-->
    <property file="${user.properties.file}" /> 
    <property name="user.keyfile" value="${user.home}/.ssh/id_rsa"/>
    
