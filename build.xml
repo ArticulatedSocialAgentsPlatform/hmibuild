@@ -109,6 +109,7 @@
    <property name="repository.mode"                     value="url"/>         <!-- either "filesystem" or "url" -->
    <!--property name="repository.mode"                     value="filesystem"/-->         <!-- either "filesystem" or "url" -->
    
+   <property name="asap.repository.url.base"             value="http://asap-project.ewi.utwente.nl/repo"/>
    
    <!-- EXTERNAL REPO -->
    <!-- Mode switch, for overriding "repository.mode" for "external" repository: --> 
@@ -134,12 +135,11 @@
    
    <!-- ASAP REPO -->
    <!-- Mode switch, for overriding "repository.mode" for "asap" repository: --> 
-   <!--property name="asap.repository.mode"                value="${repository.mode}"/--> <!-- either "filesystem" or "url" -->
-   <property name="asap.repository.mode"                value="filesystem"/> <!-- either "filesystem" or "url" -->
+   <property name="asap.repository.mode"                value="${repository.mode}"/> <!-- either "filesystem" or "url" -->
    
    <!-- The actual locations of the  asap repository: -->
-   <property name="asap.repository.filesystem"          value="${asap.repository.filesystem.root}"/>
-   <property name="asap.repository.url"                 value="${asap.repository.url.base}"/>
+   <property name="asap.repository.filesystem"          value="${asap.repository.filesystem.root}/repository"/>
+   <property name="asap.repository.url"                 value="${asap.repository.url.base}/repository"/>
    
    
    <!-- RESOURCE REPO -->

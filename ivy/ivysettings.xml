@@ -174,8 +174,15 @@
      
       <!-- NO URL BASED VERSION FOR PROJECTS REPO YET -->
       
-     
-
+     <sftp name="asap.sftp.publish" host="asap-project.ewi.utwente.nl" user="${user.name}" keyFile="${user.keyfile}" >
+         <ivy pattern="/asap-project/repository/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="/asap-project/repository/${ivy.local.default.artifact.pattern}" />        
+      </sftp>
+      <sftp name="asap.resource.sftp.publish" host="asap-project.ewi.utwente.nl" user="${user.name}" keyFile="${user.keyfile}" >
+         <ivy pattern="/asap-project/resource/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="/asap-project/resource/${ivy.local.default.artifact.pattern}" />        
+      </sftp> 
+      
       <sftp name="hmicore.sftp.publish" host="hmirepo.ewi.utwente.nl" user="${user.name}" keyFile="${user.keyfile}" >
          <ivy pattern="/hmirepo/hmicore/${ivy.local.default.ivy.pattern}" />
          <artifact pattern="/hmirepo/hmicore/${ivy.local.default.artifact.pattern}" />        
