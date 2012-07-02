@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="SoaCore" default="compile">
+<project name="Core" default="compile">
    <description>JavaProjects core build file</description>
   <taskdef name="cmake" 
 	  classname="org.iainhull.ant.CmakeBuilder">

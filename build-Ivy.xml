@@ -109,9 +109,10 @@
             <include name="**/*.dll"/>
             <include name="**/*.so"/>
             <include name="**/*.jnilib"/>
+            <include name="**/*.py"/> 
             <include name="**/*.data"/>
          </patternset>
-         <flattenmapper/>
+         <!-- flattenmapper/ commented out by Hendrik and Herwin-->
       </unzip>
       <ac:if> 
          <available file="${lib.local}" type="dir" />
@@ -156,8 +157,9 @@
                <include name="**/*.dll"/>
                <include name="**/*.so"/>    
                <include name="**/*.jnilib"/>                 
+		<include name="**/*.py"/>                         
             </patternset>
-            <flattenmapper/>
+	    <!-- flattenmapper/ commented out by Hendrik and Herwin-->
          </unzip>
          <ac:if> 
             <available file="${test.dir}/${test.lib.local}" type="dir" />

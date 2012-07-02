@@ -61,7 +61,8 @@
    <property name="projects.repository"                 value="projects.${projects.repository.mode}.repository"/>
    <property name="projects.repository.os"              value="projects.${projects.repository.mode}.repository.os"/>
    <property name="resource.repository"                 value="resource.${resource.repository.mode}.repository"/>
-  
+   
+   
   
    <resolvers>
       
@@ -91,6 +92,44 @@
          <artifact pattern="${external.repository.url}/${ivy.localos.norevision.artifact.pattern}" /> 
       </url> 
       
+      <!-- SOA REPO -->
+      
+      <filesystem name="soa.core.repository" >
+         <ivy pattern="${soa.repository.filesystem}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${soa.repository.filesystem}/${ivy.local.default.artifact.pattern}" />
+         <artifact pattern="${soa.repository.filesystem}/${ivy.local.norevision.artifact.pattern}" />
+      </filesystem>
+
+      <filesystem name="soa.core.repository.os" >
+         <ivy pattern="${soa.repository.filesystem}/${ivy.localos.default.ivy.pattern}" />
+         <artifact pattern="${soa.repository.filesystem}/${ivy.localos.default.artifact.pattern}" />
+         <artifact pattern="${soa.repository.filesystem}/${ivy.localos.norevision.artifact.pattern}" />
+      </filesystem>
+	
+      <filesystem name="soa.external.repository" > 
+         <ivy pattern="${soa.external.repository.filesystem}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${soa.external.repository.filesystem}/${ivy.local.default.artifact.pattern}" />
+         <artifact pattern="${soa.external.repository.filesystem}/${ivy.local.norevision.artifact.pattern}" />
+      </filesystem>
+      
+      <filesystem name="soa.external.repository.os" > 
+         <ivy pattern="${soa.external.repository.filesystem}/${ivy.localos.default.ivy.pattern}" />
+         <artifact pattern="${soa.external.repository.filesystem}/${ivy.localos.default.artifact.pattern}" />
+         <artifact pattern="${soa.external.repository.filesystem}/${ivy.localos.norevision.artifact.pattern}" />
+      </filesystem>
+      
+      
+      <filesystem name="soa.resource.repository">
+         <ivy pattern="${soa.resource.repository.filesystem}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${soa.resource.repository.filesystem}/${ivy.local.default.artifact.pattern}" /> 
+         <artifact pattern="${soa.resource.repository.filesystem}/${ivy.local.norevision.artifact.pattern}" /> 
+      </filesystem> 
+      
+      <filesystem name="soa.resource.repository.os">
+         <ivy pattern="${soa.resource.repository.filesystem}/${ivy.localos.default.ivy.pattern}" />
+         <artifact pattern="${soa.resource.repository.filesystem}/${ivy.localos.default.artifact.pattern}" /> 
+         <artifact pattern="${soa.resource.repository.filesystem}/${ivy.localos.norevision.artifact.pattern}" /> 
+      </filesystem> 
       
       <!-- HMICORE REPO -->
       <filesystem name="hmicore.filesystem.repository" > 
@@ -196,7 +235,16 @@
     
          <resolver ref="${external.repository}"/>
          <resolver ref="${external.repository.os}"/>   
-          
+         
+         <resolver ref="soa.external.repository"/>
+         <resolver ref="soa.external.repository.os"/>   
+         
+         <resolver ref="soa.resource.repository"/>
+         <resolver ref="soa.resource.repository.os"/>   
+         
+         <resolver ref="soa.core.repository"/>
+         <resolver ref="soa.core.repository.os"/>
+         
          <resolver ref="${hmicore.repository}"/>
          <resolver ref="${hmicore.repository.os}"/>
          

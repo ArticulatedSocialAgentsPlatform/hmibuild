@@ -46,7 +46,7 @@
    <property file="${user.properties.file}" /> 
    <property name="user.keyfile" value="${user.home}/.ssh/id_rsa"/>
    
-   <property name="language" value="java"/>
+   
    
     <target name="tu" >
        <echo message="user.home= ${user.home} user.name=${user.name} private key location = ${user.keyfile} userprops=${user.properties.file.available}"/>
@@ -69,6 +69,9 @@
     <!-- hmi.shared.project.dir is a place that includes items like the hmi repository. (as well as the HMI source code) -->
    <property name="hmi.shared.dir.name" value="HmiShared"/>
    <property name="hmi.shared.dir" value="${shared.project.root}/${hmi.shared.dir.name}"/>
+   
+   <property name="soa.shared.dir.name" value="soashared"/>
+   <property name="soa.shared.dir" value="${shared.project.root}/${soa.shared.dir.name}"/>
    
    <property name="hmi.build.dir.name" value="HmiBuild"/>
    <property name="hmi.build.dir" value="${shared.project.root}/${hmi.build.dir.name}"/>
@@ -98,11 +101,16 @@
               global="true"
    />
   
+  <!-- default programming language -->
+   <!--property name="language" value="java"/-->
+   
+   
    <!-- SETTINGS FOR THE IVY REPOSITORIES  -->
    <!-- GLOBAL SETTINGS: -->
    <!-- The root of several (hmi) filesystem based repositories: -->
    <property name="hmi.repository.filesystem.root"      value="${hmi.shared.dir}/repository"/>
    <property name="asap.repository.filesystem.root"      value="${asap.shared.dir}/repository"/>
+   <property name="soa.repository.filesystem.root"      value="${soa.shared.dir}/repository"/>
    
    <!-- The base URL of similar, url based, repositories: -->
    <property name="hmi.repository.url.base"             value="http://hmirepo.ewi.utwente.nl"/>
@@ -126,7 +134,12 @@
    <!-- The actual locations of the  hmicore repository: -->
    <property name="hmicore.repository.filesystem"      value="${hmi.repository.filesystem.root}/hmicore/${language}"/>
    <property name="hmicore.repository.url"             value="${hmi.repository.url.base}/hmicore/${language}"/>
-   
+
+   <!-- The actual locations of the  soa repository: -->
+   <property name="soa.repository.filesystem"      value="${soa.repository.filesystem.root}/soacore/${language}"/>
+   <property name="soa.resource.repository.filesystem"  value="${soa.repository.filesystem.root}/resource"/>
+   <property name="soa.external.repository.filesystem"  value="${soa.repository.filesystem.root}/external/${language}"/>
+   	   
    <!-- RESOURCE REPO -->
    <!-- Mode switch, for overriding "repository.mode" for "resource" repository: --> 
    <property name="resource.repository.mode"             value="${repository.mode}"/> <!-- either "filesystem" or "url" -->
@@ -151,12 +164,23 @@
    <property name="resource.repository.url"             value="${hmi.repository.url.base}/resource"/>
    
    
+   
+   
+   
+   
+   
+
+   
+   
    <!-- PROJECTS REPO -->
    <!-- Mode switch, for overriding "repository.mode" for "projects" repository: --> 
    <property name="projects.repository.mode"            value="filesystem"/> <!--NB -->
    <!-- The actual locations of the  resource repository: -->
    <property name="projects.repository.filesystem"      value="${projects.dir}/repository"/>
    <!-- NO URL BASED RESOLVER YET FOR PROJECTS-->
+   
+   
+   
    
    <!-- END IVY REPOSITORIES SECTION -->
     
@@ -189,6 +213,7 @@
    <import file="build-Ivy.xml" />
    <import file="build-Demo.xml" />
    <import file="build-Webstart.xml" />
+   
    
    <target name="helphelp">
     <echo> -- Help commands --
