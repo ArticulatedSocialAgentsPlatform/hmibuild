@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Core" default="run">
+<project name="Core" default="run" xmlns:ac="antlib:net.sf.antcontrib">
    <description>JavaProjects core build file</description>
   
   
@@ -27,6 +27,7 @@
           
    <!-- Names of main project directories -->   
    <property name="src.dir"               value="src"      />
+   <property name="generatedsrc.dir"      value="generatedsrc"      />
    <property name="resource.dir"          value="resource" /> 
    <property name="lib.dir"               value="lib"      />
    <property name="build.dir"             value="build"    />
@@ -83,6 +84,7 @@
    <target name="clean" description="Removes the build directory">
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}"/>
+	<delete dir="${generatedsrc.dir}"/>
    </target>
    <target name="eclipseproject" description="create eclipse project files">
 	<py-run script="${shared.ant.dir}/eclipse/createEclipseProject.py">
@@ -103,7 +105,36 @@
 	</py-run>
    </target>
 
-   <target name="compile" description="Compile java file(s)" if="${src.dir.present}"> 
+	<target name="-compilegenerated" description="Compile generated java file(s)"> 
+	<ac:if>
+        <available file="${generatedsrc.dir}"/>      
+	<then>
+ 	
+
+      <property name="files" value="${javac.include}"/>
+      <mkdir dir="${build.classes.dir}"/>
+      <echo message="compile generate" />
+      <javac srcdir="${generatedsrc.dir}" 
+             destdir="${build.classes.dir}" 
+             includeAntRuntime="${includeAntRuntime}"
+             debug="true"
+             deprecation="on"
+             source="${javac.source}"
+             target="${javac.target}"
+      >                
+          <classpath refid="javac-classpath"/>
+          <sourcepath refid="javac-sourcepath"/>
+          <include name="**/${files}"/>
+          <exclude name="${javac.exclude}"/>
+      </javac>
+      </then> 
+      </ac:if>
+   </target>
+   
+   <!-- default is empty, overwrite when needed -->
+   <target name="-pre-compilation"/>
+   
+   <target name="compile" depends="-pre-compilation, -compilegenerated" description="Compile java file(s)" if="${src.dir.present}"> 
       <property name="files" value="${javac.include}"/>
       <!--echo message="files=${files}" /-->
       <mkdir dir="${build.classes.dir}"/>

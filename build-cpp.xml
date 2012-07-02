@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SoaCore" default="compile">
+   <description>JavaProjects core build file</description>
+  <taskdef name="cmake" 
+	  classname="org.iainhull.ant.CmakeBuilder">
+       <classpath>
+            <pathelement location="${build.dir}" />
+            <pathelement location="${ant.file.SoaJavaProjects}/../cmakeant.jar"/>
+		</classpath>
+	</taskdef>
+  
+   
+   <property name="cmake.base.dir"        value="."      />
+   <property name="src.dir"               value="src"      />
+   <property name="resource.dir"          value="resource" /> 
+   <property name="lib.dir"               value="lib"      />
+   <property name="lib.local.dir"         value="lib.local"      />
+   <property name="build.dir"             value="build"    />
+   <property name="dist.dir"              value="dist"  />
+
+
+   <!-- Read build properties. Redundant when called from HmiShared/ant/build.xml, but needed for standalone versions -->
+   <property name="properties.file" value="build.properties"/>
+   <property file="${properties.file}" /> 
+   <available file="${properties.file}" property="properties.file.available" />
+   
+   <property name="private.properties.dir" value="privateprops" />
+   
+   
+   <!-- The module.name is used for javadoc, jar files etec.                                                              -->
+   <!-- module.name can be set explicitly, but else we use ant.project.name as module name.                               -->
+   <!-- Note that ant.project.name is the name set by the top-most build file, so usually not the name of this build file -->
+   <property name="module.name"           value="${ant.project.name}"/>
+          
+   <!-- Names of main project directories -->   
+   <property name="src.dir"               value="src"      />
+    
+   
+   <available file="${src.dir}" property="src.dir.present"/> <!-- requires (?) ant 1.8 -->
+  
+   <target name="help" description="Help for building and running projects">
+   <echo> -- Building/Running/Testing --
+    ant              Default target is: ${ant.project.default-target}
+    compile          Compiles all files in the project
+    build            clean, then compile
+    </echo> 
+    </target>
+   
+   
+ 
+
+   <target name="clean" description="Removes the build directory">
+        <delete dir="${build.dir}"/>
+   </target>
+   <target name="compile" description="compile"/>  
+
+   <target name="build">
+	   <mkdir dir="${build.dir}"/>
+	   <cmake srcdir="${cmake.base.dir}"
+		  bindir="${build.dir}"
+		  buildtype="Debug" />
+	</target>
+	
+	<target name="jar" depends="build" description="Installs libraries and headers to the dist dir">
+		<delete dir="${dist.dir}" />
+		<mkdir dir="${dist.dir}"/>  
+		<mkdir dir="${dist.dir}/lib"/>  
+		<mkdir dir="${dist.dir}/include"/>  
+		<exec executable="make" dir="${build.dir}">
+			<arg value="install"/>
+			<arg value="DESTDIR=../${dist.dir}"/>
+		</exec>
+   </target>
+
+   <target name="-init.main.class.file" unless="main.class.file.available">   
+        <!-- Needed by UltraEdit extension, but useless for proto! -->
+   </target> 
+
+            
+   <target name="compile-tests" depends="compile">
+      
+   </target>
+
+</project>
+
+  
+
+     
+
+  
+   
+

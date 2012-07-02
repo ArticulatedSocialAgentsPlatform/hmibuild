@@ -46,6 +46,7 @@
    <property file="${user.properties.file}" /> 
    <property name="user.keyfile" value="${user.home}/.ssh/id_rsa"/>
    
+   <property name="language" value="java"/>
    
     <target name="tu" >
        <echo message="user.home= ${user.home} user.name=${user.name} private key location = ${user.keyfile} userprops=${user.properties.file.available}"/>
@@ -115,16 +116,16 @@
    <!-- Mode switch, for overriding "repository.mode" for "external" repository: --> 
    <property name="external.repository.mode"            value="${repository.mode}"/> <!-- either "filesystem" or "url" -->
    <!-- The actual locations of the  external repository filesystem and url: -->
-   <property name="external.repository.filesystem"      value="${hmi.repository.filesystem.root}/external"/>
-   <property name="external.repository.url"             value="${hmi.repository.url.base}/external"/>
+   <property name="external.repository.filesystem"      value="${hmi.repository.filesystem.root}/external/${language}"/>
+   <property name="external.repository.url"             value="${hmi.repository.url.base}/external/${language}"/>
   
    
    <!-- HMICORE REPO -->
    <!-- Mode switch, for overriding "repository.mode" for "hmicore" repository: --> 
    <property name="hmicore.repository.mode"             value="${repository.mode}"/> <!-- either "filesystem" or "url" -->
    <!-- The actual locations of the  hmicore repository: -->
-   <property name="hmicore.repository.filesystem"      value="${hmi.repository.filesystem.root}/hmicore"/>
-   <property name="hmicore.repository.url"             value="${hmi.repository.url.base}/hmicore"/>
+   <property name="hmicore.repository.filesystem"      value="${hmi.repository.filesystem.root}/hmicore/${language}"/>
+   <property name="hmicore.repository.url"             value="${hmi.repository.url.base}/hmicore/${language}"/>
    
    <!-- RESOURCE REPO -->
    <!-- Mode switch, for overriding "repository.mode" for "resource" repository: --> 
@@ -138,8 +139,8 @@
    <property name="asap.repository.mode"                value="${repository.mode}"/> <!-- either "filesystem" or "url" -->
    
    <!-- The actual locations of the  asap repository: -->
-   <property name="asap.repository.filesystem"          value="${asap.repository.filesystem.root}/repository"/>
-   <property name="asap.repository.url"                 value="${asap.repository.url.base}/repository"/>
+   <property name="asap.repository.filesystem"          value="${asap.repository.filesystem.root}/repository/${language}"/>
+   <property name="asap.repository.url"                 value="${asap.repository.url.base}/repository/${language}"/>
    
    
    <!-- RESOURCE REPO -->
@@ -169,7 +170,7 @@
    
    <!-- next we load the "real" build files. They can be redefined, -->
    <!-- for instance within the properties file, by setting build.impl and/or build.customize-->
-   <property name="build.impl" value="build-Core.xml"/>
+   <property name="build.impl" value="build-${language}.xml"/>
    <import file="${build.impl}" /> 
    
    <import file="build-Util.xml"/>

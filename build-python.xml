@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SoaCore" default="run">
+   <description>PythonProjects core build file</description>
+
+   <taskdef 
+       resource="pyAntTasks.properties">
+       <classpath>
+            <pathelement location="${build.dir}" />
+            <pathelement location="${ant.file.SoaJavaProjects}/../pyAntTasks-1.3.3.jar"/>
+        </classpath>
+    </taskdef>
+
+   <!-- Read build properties. Redundant when called from HmiShared/ant/build.xml, but needed for standalone versions -->
+   <property name="properties.file" value="build.properties"/>
+   <property file="${properties.file}" /> 
+   <available file="${properties.file}" property="properties.file.available" />
+   
+   <property name="private.properties.dir" value="privateprops" />
+   
+   <!-- The main.class.file file keeps track of the run.main.class property, (re)defining the main class for "run" -->
+   <property name="main.class.file" value="${private.properties.dir}/main.class"/>
+   <property file="${main.class.file}" />
+   <available file="${main.class.file}" property="main.class.file.available" />
+   
+   
+   <!-- The module.name is used for javadoc, jar files etec.                                                              -->
+   <!-- module.name can be set explicitly, but else we use ant.project.name as module name.                               -->
+   <!-- Note that ant.project.name is the name set by the top-most build file, so usually not the name of this build file -->
+   <property name="module.name"           value="${ant.project.name}"/>
+          
+   <!-- Names of main project directories -->   
+   <property name="src.dir"               value="src"      />
+   <property name="resource.dir"          value="resource" /> 
+   <property name="lib.dir"               value="lib"      />
+   <property name="lib.local.dir"         value="lib.local"      />
+   <property name="build.dir"             value="build"    />
+   <property name="build.classes.dir"     value="${build.dir}/classes" />
+   <property name="dist.dir"              value="dist"  />
+   <property name="dist.file"             value="${dist.dir}/${module.name}.pyzip" />
+
+   <property name="run.py"                value=""  />
+    
+   <property name="python.include"         value="**/*.py"/>
+   <!-- property name="python.version"         value="2.7"/ -->
+   <property name="includeAntRuntime"     value="false"/> <!-- set to true when using the ant API, for instance in the Hmi/HmiAnt package -->
+   
+   <property name="pythonpath"     value="lib" />
+   
+   <property name="resource.path"  value="resources" />
+ 
+   <available file="${src.dir}" property="src.dir.present"/> <!-- requires (?) ant 1.8 -->
+  
+   <target name="help" description="Help for building and running projects">
+   <echo> -- Building/Running/Testing --
+    ant              Default target is: ${ant.project.default-target}
+    clean            Deletes the build and dist directories
+    compile          Compiles all files in the project
+    build            clean, then compile
+    main             Show and set the main class for run
+    run              Executes the run.main class; compiles if necessary.
+    jar              Create a jar version of the project
+    junit            Run all JUnit tests where the classname ends in 'Test'
+    junitreport      Run junit, and create an HTML JUnit report 
+    checkstyle       Check Java style
+    findbugs         Find potential Java bugs
+    findbugsreport   Find potential Java bugs, produce an HTML findbugs report</echo> 
+    </target>
+   
+   
+   <target name="build" depends="clean, compile" description="clean, compile"/>  
+ 
+   <target name="clean" description="Removes the build directory">
+      <delete dir="${build.dir}" failonerror="false"/>
+      <delete dir="${dist.dir}" failonerror="false"/>
+      <delete dir="${test.build.dir}" failonerror="false"/>
+      <delete dir="${test.report.dir}" failonerror="false"/>
+   </target>
+
+   <target name="-build-setup">
+      <mkdir dir="${build.dir}"/>
+      <mkdir dir="${dist.dir}"/>
+      <delete file="${build.dir}/__main__.py" failonerror="false"/>
+   </target>
+   <target name="-pre-compilation">
+       <echo message="No preparations needed for compilation."/>
+      <!-- Preprocessing, such as compiling protocol files. Overwrite in own build.xml -->
+   </target>
+   <target name="-compilation" depends="-build-setup, -pre-compilation">
+      <copy todir="${build.dir}">
+          <fileset dir="${src.dir}">
+              <exclude name="**/*pyc" />
+              <exclude name="**/.*swp" />
+              <exclude name="${pyzip.excludes}" />
+         </fileset>
+      </copy>
+      <py-compile dir="${build.dir}" pythonpath="${build.dir}" optimize="0"/>
+      <!--if> <equals arg1="${run.py}" arg2="" /> <then>
+         <echo message="Package did not specify a run script." />
+      </then> <else>
+        <symlink link="${build.dir}/__main__.py" resource="${run.py}" />
+      </else> </if-->
+   </target>
+
+   <condition property="hasRunScript">
+      <not> <equals arg1="${run.py}" arg2="" /> </not>
+   </condition>
+   <condition property="hasNoRunScript">
+      <equals arg1="${run.py}" arg2="" />
+   </condition>
+   <target name="-link-main" if="hasRunScript">
+       <echo message="Using ${run.py} as __main__.py when the pyzip file is run with python." />
+       <!-- does not work in Windows
+       <symlink link="${basedir}/${build.dir}/__main__.py" resource="${run.py}" />
+       -->
+       <copy  tofile="${basedir}/${build.dir}/__main__.py" file="${basedir}/${build.dir}/${run.py}" />
+   </target>
+   <target name="-dont-link-main" if="hasNoRunScript">
+      <echo message="No run script specified, package will be import-only." />
+   </target>
+
+   <target name="compile" depends="-compilation, -link-main, -dont-link-main">
+      <!-- -->
+  </target>
+  
+   <!--target name="compile" description="Compile python file(s)" if="${src.dir.present}"> 
+      <mkdir dir="${build.dir}"/>
+      <apply executable="cp"> 
+        <srcfile/>
+        <arg line="${build.dir}/">
+        <fileset dir="${src.dir}" includes="**/*.py"/> 
+      </apply>
+      <apply executable="python"> 
+        <srcfile/>
+        <arg line="${build.dir}/">
+        <fileset dir="${src.dir}" includes="**/*.py"/> 
+      </apply>
+   </target -->
+
+   <target name="-gather-pyzips">
+   </target>
+   
+   <target name="run" depends="jar">
+       <py-run script="${dist.file}" pythonpath="${lib.dir}:${lib.local.dir}" optimize="0">
+         <!-- arg value="bla" -->
+      </py-run>
+   </target>
+
+
+   <!--property name="run.main.class" value"UNDEFINED" /-->
+   <!--target name="run" depends="compile" description="Runs the main program for this project, compiles if necessary">   
+      <fail message=":${line.separator}${line.separator}No main class defined. ${line.separator}Use 'ant main' to set a main class" unless="run.main.class"/> 
+      <exec executable="python">
+         <arg value="${run.py}"/>
+          <sysproperty key="java.library.path" path="${run.library.path}"/> 
+          <syspropertyset>
+               <propertyref prefix="-D"/>
+               <mapper from="-D*" to="*" type="glob"/>
+          </syspropertyset>
+      </exec>
+   </target -->   
+
+   <!-- #############
+        RYT:
+        targets "tes" and "main" removed for the mean time
+        ###### -->
+   <condition property="run.main.class" value="${default.run.main.class}">
+      <and>
+         <isset property="default.run.main.class"/>
+         <not><equals arg1="${default.run.main.class}" arg2="" /></not>
+      </and>
+   </condition>
+
+   <target name="tes">
+      <echo message="run.py: ${run.py}"/>
+   </target>  
+
+   <target name="-init.main.class.file" unless="main.class.file.available">   
+        <!-- Needed by UltraEdit extension, but useless for python! -->
+   </target> 
+
+
+   <target name="jar" depends="build" description="Creates a pyzip file containing the project's sources after compiling them">
+      <mkdir dir="${dist.dir}"/>  
+      <delete>
+         <fileset dir="${dist.dir}" includes="${module.name}*.pyzip*"/>
+      </delete>
+      <zip destfile="${dist.file}"
+           basedir="${build.dir}"
+           includes="**/*"
+           excludes="${dist.excludes}"
+      />
+      <!--excludes="${dist.excludes}" -->
+   </target>
+  
+  
+   <!-- Settings for Python Unit testing -->
+   <property name="test.dir"               value="test"  />
+   <property name="test.resource.dir"      value="${test.dir}/resource/" />
+   <property name="test.report.dir"        value="${test.dir}/report" />
+   <property name="test.src.dir"           value="${test.dir}/src" />
+   <property name="test.lib.dir"           value="${test.dir}/lib" />
+   <property name="test.build.dir"         value="${test.dir}/build" />
+
+   <!--property name="build.test.classes.dir" location="${build.dir}/test/classes" />
+   <property name="build.test.results.dir" location="${build.dir}/test/results" />
+   
+   <property name="junit.include"          value="**/*Test.class"/>
+   <property name="junit.exclude"          value="**/Abstract*.class"/>
+   
+   <property name="test.library.path"      value="${test.lib.dir};${lib.dir};${test.lib.local}"/>
+   
+   <fileset dir="." id="test.lib.fileset">
+      <include name="${test.lib.dir}/**/*.jar"/>
+      <include name="${test.lib.local}/**/*.jar"/>
+   </fileset>
+ 
+   <path id="javac-test-sourcepath">
+      <pathelement path="${test.src.dir}"/>
+   </path>            
+   
+   <path id="javac-test-classpath">
+      <path refid="javac-classpath"/>
+      <fileset refid="test.lib.fileset"/>
+   </path> 
+   
+   <path id="junit-test-run-classpath">
+      <path refid="javac-test-classpath"/>
+      <pathelement location="${build.test.classes.dir}"/>
+      <pathelement location="${resource.dir}"/>
+      <pathelement location="${test.resource.dir}"/>
+      <pathelement path="${resource.path}"/> 
+      <pathelement path="${test.resource.path}"/>   
+   </path -->  
+  
+   <!--target name="-junit" depends="compile-tests"  >
+      <delete dir="${build.test.results.dir}" failonerror="false" quiet="true"/>
+      <mkdir dir="${build.test.results.dir}"/>
+      <junit printsummary="false" 
+           haltonfailure="false"
+           fork="yes"  forkmode="perTest"  timeout="1000000"
+           errorProperty="test.failed"
+           failureProperty="test.failed">
+      
+         <classpath refid="junit-test-run-classpath"/>
+         <jvmarg line="${run.jvmargs}"/>
+         <sysproperty key="shared.project.root" path="${shared.project.root}"/> 
+         <sysproperty key="java.library.path" path="${test.library.path}"/> 
+         <formatter type="brief" usefile="false"/>
+         <formatter type="xml"/>
+         <batchtest todir="${build.test.results.dir}" >
+            <fileset dir="${build.test.classes.dir}" >
+               <include name="${junit.include}"/>
+               <exclude name="${junit.exclude}"/>
+               <exclude name="**/*$*.class"/>               
+            </fileset>
+         </batchtest>
+      </junit-->
+
+    <!-- py-test python="${pythonexec}" -->
+
+    <target name="generatecode"/> 
+
+    <target name="compile-tests" depends="compile">
+      <mkdir dir="${test.build.dir}"/>
+      <copy todir="${test.build.dir}">
+          <fileset dir="${test.src.dir}">
+              <exclude name="**/*pyc" />
+              <exclude name="**/.*swp" />
+         </fileset>
+      </copy>
+      <py-compile dir="${test.build.dir}" pythonpath="${test.build.dir}:${build.dir}" optimize="0"/>
+    </target>
+
+    <target name="-test" depends="compile-tests">
+        <py-test pythonpath="${build.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" dir="${test.build.dir}">
+          <fileset dir="${test.build.dir}">
+             <include name="test*.py"/>
+          </fileset>
+       </py-test>
+       <!--py-test>
+          <fileset dir="testscripts2">
+             <include name="**/*Test.py"/>
+          </fileset>
+       </py-test-->
+    </target>
+
+
+   
+   <target name="junit" depends="-test" description="Run all tests">
+      <fail if="test.failed">
+         Some tests failed.
+      </fail>
+   </target>
+   
+   <target name="junitreport" depends="compile-tests" description="Run all tests and create an xunit compatible XML report" >
+      <delete dir="${test.report.dir}" failonerror="false"/>
+      <mkdir dir="${test.report.dir}"/>  
+		<py-run script="${shared.ant.dir}/nose/nosetests" pythonpath="${build.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" optimize="0">
+		   <arg value="--xunit-file=${test.report.dir}/report.xml"/>
+		   <arg value="--with-xunit"/>
+		   <arg value="--where=${test.build.dir}"/>
+		   <arg value="--nologcapture"/>
+		</py-run>	
+   </target>
+   
+   <property name="alternate.build.file" value="build.alternate"/>
+   <available property="alternate.available" file="${alternate.build.file}"/>
+   
+   <target name="alternate" description="switch to alternate build file (build.alternate)">
+       <fail message="No alternate build file found" unless="alternate.available"/>
+       <echo message="swap build files build.xml and ${alternate.build.file}..."/>
+       <move file="${alternate.build.file}" tofile="build.tmp" overwrite="true"/>
+       <move file="build.xml" tofile="${alternate.build.file}" />
+       <move file="build.tmp" tofile="build.xml"  />
+   </target>
+    
+</project>
+
+  
+
+     
+
+  
+   
+
