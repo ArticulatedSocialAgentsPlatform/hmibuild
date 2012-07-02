@@ -190,6 +190,7 @@
    <property name="properties.file" value="build.properties"/>
    <property file="${properties.file}" /> 
    
+   <property name="language" value="java"/>
    <!--available file="${manifest.file}" property="manifest.file.present"/-->
    
    <!-- next we load the "real" build files. They can be redefined, -->
