@@ -73,7 +73,7 @@
    <property name="soa.shared.dir.name" value="soashared"/>
    <property name="soa.shared.dir" value="${shared.project.root}/${soa.shared.dir.name}"/>
    
-   <property name="hmi.build.dir.name" value="HmiBuild"/>
+   <property name="hmi.build.dir.name" value="hmibuild"/>
    <property name="hmi.build.dir" value="${shared.project.root}/${hmi.build.dir.name}"/>
    
    
