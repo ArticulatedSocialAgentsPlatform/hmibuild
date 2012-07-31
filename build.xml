@@ -17,7 +17,7 @@
    <!-- First we set the shared project root directory "shared.project.root" -->
    <!-- We derive it from the location of this build file together with      -->
    <!-- the relative path to our shared ant directory:                       -->
-   <property name="relative.shared.ant.dir" value="HmiBuild"/>
+   <property name="relative.shared.ant.dir" value="hmibuild"/>
 
    <!-- First turn \ into / -->
    <ac:propertyregex property="ant.file.path"
@@ -213,7 +213,7 @@
    <import file="build-Rebuilding.xml" />
    <import file="build-Ivy.xml" />
    <import file="build-Demo.xml" />
-   <import file="build-Webstart.xml" />
+   <!--import file="build-Webstart.xml" / --> <!-- TODO Webstart -> Java ? -->
    
    
    <target name="helphelp">

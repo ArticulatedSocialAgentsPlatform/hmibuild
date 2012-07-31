@@ -56,7 +56,7 @@
    </target>
    
    
-  
+   <target name="dist" depends="jar" description="Alias for jar target (language-independent naming)"/>
    
    
    <!--target name="checkmain"  unless="run.main.class" description="Check for main class">

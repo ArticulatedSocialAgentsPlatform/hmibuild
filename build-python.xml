@@ -200,7 +200,7 @@ Implementation-Vendor:  ${organisation}</echo>
    </target> 
 
 
-   <target name="jar" depends="build" description="Creates a pyzip file containing the project's sources after compiling them">
+   <target name="jar" depends="compile" description="Creates a pyzip file containing the project's sources after compiling them">
       <mkdir dir="${dist.dir}"/>  
       <delete>
          <!--fileset dir="${dist.dir}" includes="${module.name}*.pyzip*"/-->

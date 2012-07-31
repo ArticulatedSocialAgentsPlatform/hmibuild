@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Core" default="compile">
+   <description>Script file collection core build file</description>
+
+   <!-- settings for "jar" -->
+   <property name="manifest.file"         value="manifest.mf"/>
+
+   
+   <target name="createmanifest" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
+      <tstamp>   
+          <format property="MANIFEST_TIME" pattern="MMMM dd yyyy  hh:mm aa" locale="en" />
+      </tstamp>
+      <property name="organisation" value=""/>
+     <echo file="${manifest.file}">Manifest-Version: 1.0
+Main-Class: main
+       
+Name: ${ant.project.name}
+Specification-Title:    ${ant.project.name}
+Specification-Version:  0.1
+Specification-Vendor:   ${organisation}
+Implementation-Title:   ${ant.project.name}
+Implementation-Version: ${MANIFEST_TIME}
+Implementation-Vendor:  ${organisation}</echo>
+   </target>
+   
+   <property name="scripts.dir"               value="scripts"      />
+   <property name="resource.dir"          value="resource" /> 
+   <property name="deps.dir"              value="deps"  />
+   <property name="dist.dir"              value="dist"  />
+
+   <property name="properties.file" value="build.properties"/>
+   <property file="${properties.file}" /> 
+   <available file="${properties.file}" property="properties.file.available" />
+
+   <property name="private.properties.dir" value="privateprops" />
+   <property name="module.name"           value="${ant.project.name}"/>
+
+   <available file="${src.dir}" property="src.dir.present"/> <!-- requires (?) ant 1.8 -->
+
+   <target name="help" description="Help for building and running projects">
+   <echo> -- Building/Running/Testing --
+    ant              Default target is: ${ant.project.default-target}
+    compile          Compiles all files in the project
+    build            clean, then compile
+    </echo>
+    </target>
+
+   <target name="clean" description="Removes the deps and dist directories">
+      <delete dir="${deps.dir}" failonerror="false"/>
+      <delete dir="${dist.dir}" failonerror="false"/>
+   </target>
+
+   <target name="-build-setup">
+   </target>
+   <target name="-pre-compilation">
+       <echo message="No preparations needed for compilation."/>
+   </target>
+   <target name="-compilation" depends="-build-setup, -pre-compilation">
+       <echo message="No compilation required on scripts-only projects."/>
+   </target>
+   <target name="compile" depends="-compilation" description="Compile the sources after preprocessing"/>  
+   <target name="build" depends="compile" description="compile"/>  
+      
+   <target name="jar" depends="build" description="Installs scripts to the dist dir">
+      <mkdir dir="${dist.dir}"/>  
+      <mkdir dir="${dist.dir}/scripts"/>  
+      <!-- grave limitation: <copy> will NEVER preserve permissions! -->
+      <copy todir="${dist.dir}/scripts">
+         <fileset dir="${scripts.dir}"/>
+      </copy>
+      <!-- WORKAROUND -->
+      <exec executable="chmod">
+         <arg value="-R"/>
+         <arg value="ug+x"/>
+         <arg value="${dist.dir}/scripts"/>
+      </exec>
+   </target>
+
+   <target name="-init.main.class.file" unless="main.class.file.available">   
+   </target> 
+
+
+   <target name="compile-tests" depends="compile">
+
+   </target>
+
+</project>
+
+  
+
+     
+
+  
+   
+

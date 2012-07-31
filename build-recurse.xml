@@ -1,0 +1,50 @@
+<project>
+  <!-- ant include to work on all build.xml in subdirectories -->
+  <target name="resolve">
+    <subant target="resolve" genericantfile="build.xml">
+       <sort><fileset dir="." includes="*/build.xml"/></sort>
+    </subant>
+  </target>
+
+  <target name="build" depends="-pre-compilation">
+    <subant target="build" genericantfile="build.xml">
+      <sort><fileset dir="." includes="*/build.xml"/></sort>
+    </subant>
+  </target>
+
+  <target name="clean">
+    <subant target="clean" genericantfile="build.xml">
+      <sort><fileset dir="." includes="*/build.xml"/></sort>
+    </subant>
+  </target>
+
+  <target name="-pre-compilation">
+    <subant target="-pre-compilation" genericantfile="build.xml">
+      <sort><fileset dir="." includes="*/build.xml"/></sort>
+    </subant>
+  </target>
+
+  <target name="compile" depends="-pre-compilation">
+    <subant target="compile" genericantfile="build.xml">
+      <sort><fileset dir="." includes="*/build.xml"/></sort>
+    </subant>
+  </target>
+
+  <target name="dist">
+    <subant target="dist" genericantfile="build.xml">
+      <sort><fileset dir="." includes="*/build.xml"/></sort>
+    </subant>
+  </target>
+
+  <target name="jar">
+    <subant target="jar" genericantfile="build.xml">
+      <sort><fileset dir="." includes="*/build.xml"/></sort>
+    </subant>
+  </target>
+
+  <target name="test">
+    <subant target="test" genericantfile="build.xml">
+      <sort><fileset dir="." includes="*/build.xml"/></sort>
+    </subant>
+  </target>
+</project>
