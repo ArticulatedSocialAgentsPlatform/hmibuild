@@ -4,7 +4,7 @@
   
   
 
-   <!-- Read build properties. Redundant when called from HmiBuild/build.xml, but needed for standalone versions -->
+   <!-- Read build properties. Redundant when called from hmibuild/build.xml, but needed for standalone versions -->
    <property name="properties.file" value="build.properties"/>
    <property file="${properties.file}" /> 
    <available file="${properties.file}" property="properties.file.available" />
