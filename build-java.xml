@@ -33,6 +33,7 @@
    <property name="build.dir"             value="build"    />
    <property name="build.classes.dir"     value="${build.dir}/classes" />
    <property name="dist.dir"              value="dist"  />
+   <property name="deps.dir"              value="deps"  />
     
    <!-- Settings for "compiling with javac" -->
    <property name="javac.include"         value="**/*.java"/>
@@ -84,6 +85,7 @@
    <target name="clean" description="Removes the build directory">
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}"/>
+        <delete dir="${deps.dir}"/>
 	<delete dir="${generatedsrc.dir}"/>
    </target>
    <target name="eclipseproject" description="create eclipse project files">
