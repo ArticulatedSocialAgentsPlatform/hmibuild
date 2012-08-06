@@ -69,6 +69,8 @@ Implementation-Vendor:  ${organisation}</echo>
    <property name="pythonpath"     value="lib" />
    
    <property name="resource.path"  value="resources" />
+
+   <property name="extra.python.path" value="" />
  
    <available file="${src.dir}" property="src.dir.present"/> <!-- requires (?) ant 1.8 -->
   
@@ -304,7 +306,7 @@ Implementation-Vendor:  ${organisation}</echo>
     </target>
 
     <target name="-test" depends="compile-tests">
-        <py-test pythonpath="${build.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" dir="${test.build.dir}">
+		<py-test pythonpath="${build.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}:${extra.python.path}" dir="${test.build.dir}">
           <fileset dir="${test.build.dir}">
              <include name="test*.py"/>
           </fileset>
