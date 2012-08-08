@@ -6,7 +6,7 @@
  <!-- shared.project.root is usually set already, but just a fallback with the most likely location for most projects: -->
  <property name="shared.project.root"   location="../.."  />
  <property name="shared.project.dir"    location="${shared.project.root}/HmiShared" />  
-  <property name="shared.build.dir"    location="${shared.project.root}/HmiBuild" />  
+ <property name="shared.build.dir"    location="${shared.project.root}/mibuild" />  
 
 
  <property name="shared.projectdir.basename" value="HmiShared"/>  
