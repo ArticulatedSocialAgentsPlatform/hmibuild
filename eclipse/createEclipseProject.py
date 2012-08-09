@@ -64,7 +64,7 @@ def getResources():
 def writeDotProject():
   tree = ElementTree.parse(BASE_DIR+'/build.xml')
   projectElem = tree.getroot()
-  fdefaultProject = open(SHARED_PATH+'/HmiBuild/eclipse/defaultproject','r')
+  fdefaultProject = open(SHARED_PATH+'/hmibuild/eclipse/defaultproject','r')
   content = fdefaultProject.read();
   content = content.replace("$name$",projectElem.attrib['name']);
   fproject = open(BASE_DIR+'/.project', 'w')
@@ -100,9 +100,10 @@ def writeClassPath():
     cpEntry.attrib["kind"]="lib"
     cpEntry.attrib["path"]="test/resource"
 
-  dependencies = getDependencies()  
+  dependencies = getDependencies()
+
   for library in getLibraries():
-    if not SOURCE_SETUP or not(reduce(lambda x, y: x|library.startswith('lib/'+y), dependencies, False)):
+    if not SOURCE_SETUP or not(reduce(lambda x, y: x|library.startswith('lib/'+y+'-'), dependencies, False)):
       cpEntry = ElementTree.SubElement(root,"classpathentry")
       cpEntry.attrib["kind"]="lib"
       cpEntry.attrib["path"]=library
