@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Eclipse"   xmlns:ac="antlib:net.sf.antcontrib" >
+   
+   <target name="eclipseproject" description="create eclipse project files">
+   <py-run script="${shared.ant.dir}/eclipse/createEclipseProject.py">
+         <arg value="--sharedroot=${shared.project.root}"/>
+         <arg value="--sharedresource=${shared.resources}"/>
+         <arg value="--basedir=${basedir}"/>       
+         <arg value="--asapsharedresource=${asap.resources}"/>
+   </py-run>
+   </target>   
+
+   <target name="eclipsesourceproject" description="create eclipse project files">
+   <py-run script="${shared.ant.dir}/eclipse/createEclipseProject.py">
+         <arg value="--sharedroot=${shared.project.root}"/>
+         <arg value="--sharedresource=${shared.resources}"/>
+         <arg value="--basedir=${basedir}"/>
+         <arg value="--asapsharedresource=${asap.resources}"/>
+         <arg value="--sourcesetup"/>
+   </py-run>
+   </target>
+   
+ </project>
