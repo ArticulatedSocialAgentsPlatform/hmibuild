@@ -38,6 +38,7 @@ Implementation-Vendor:  ${organisation}</echo>
    <property name="build.dir"             value="build"    />
    <property name="deps.dir"              value="deps"  />
    <property name="dist.dir"              value="dist"  />
+   <property name="dist.dir.absolute"     value="dist"  />
    
    <property name="test.cmake.base.dir"        value="test"      />
    <property name="test.src.dir"               value="test/src"      />
@@ -77,9 +78,10 @@ Implementation-Vendor:  ${organisation}</echo>
  
 
    <target name="clean" description="Removes the build directory">
-      <delete dir="${deps.dir}" failonerror="false"/>
+	   <echo message="Cleaning ${dist.dir}" />
       <delete dir="${build.dir}" failonerror="false"/>
       <delete dir="${dist.dir}" failonerror="false"/>
+      <delete dir="${deps.dir}" failonerror="false"/>
       <delete dir="${test.build.dir}" failonerror="false"/>
       <delete dir="${test.report.dir}" failonerror="false"/>
    </target>

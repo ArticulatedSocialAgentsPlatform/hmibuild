@@ -29,6 +29,7 @@
    <property name="build.dir"             value="build"    />
    <property name="build.classes.dir"     value="${build.dir}/classes" />
    <property name="dist.dir"              value="dist"  />
+   <property name="deps.dir"              value="deps"  />
     
    <!-- Settings for "compiling with javac" -->
    <property name="javac.include"         value="**/*.java"/>
@@ -81,6 +82,7 @@
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}"/>
         <delete dir="${generatedsrc.dir}"/>
+        <delete dir="${deps.dir}"/>
    </target>
    
 

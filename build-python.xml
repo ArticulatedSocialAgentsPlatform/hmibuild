@@ -56,8 +56,11 @@ Implementation-Vendor:  ${organisation}</echo>
    <property name="build.dir"             value="build"    />
    <property name="build.classes.dir"     value="${build.dir}/classes" />
    <property name="dist.dir"              value="dist"  />
+   <property name="dist.python.dir"       value="${dist.dir}/python"  />
+   <property name="deps.dir"              value="deps"  />
+   <property name="deps.python.dir"       value="${deps.dir}/python"  />
    <!--property name="dist.file"             value="${dist.dir}/${module.name}.pyzip" /-->
-   <property name="dist.file"             value="${dist.dir}/${module.name}.zip" />
+   <property name="dist.file"             value="${dist.python.dir}/${module.name}.zip" />
 
    <property name="run.py"                value=""  />
     
@@ -95,6 +98,7 @@ Implementation-Vendor:  ${organisation}</echo>
    <target name="clean" description="Removes the build directory">
       <delete dir="${build.dir}" failonerror="false"/>
       <delete dir="${dist.dir}" failonerror="false"/>
+      <delete dir="${deps.dir}" failonerror="false"/>
       <delete dir="${test.build.dir}" failonerror="false"/>
       <delete dir="${test.report.dir}" failonerror="false"/>
    </target>
@@ -102,6 +106,7 @@ Implementation-Vendor:  ${organisation}</echo>
    <target name="-build-setup">
       <mkdir dir="${build.dir}"/>
       <mkdir dir="${dist.dir}"/>
+      <mkdir dir="${dist.python.dir}"/>
       <delete file="${build.dir}/__main__.py" failonerror="false"/>
    </target>
    <target name="-pre-compilation">
@@ -116,7 +121,7 @@ Implementation-Vendor:  ${organisation}</echo>
               <exclude name="${pyzip.excludes}" />
          </fileset>
       </copy>
-      <py-compile dir="${build.dir}" pythonpath="${build.dir}" optimize="0"/>
+      <py-compile dir="${build.dir}" pythonpath="${deps.python.dir}:${build.dir}" optimize="0"/>
       <!--if> <equals arg1="${run.py}" arg2="" /> <then>
          <echo message="Package did not specify a run script." />
       </then> <else>
@@ -163,7 +168,7 @@ Implementation-Vendor:  ${organisation}</echo>
    </target>
    
    <target name="run" depends="jar">
-       <py-run script="${dist.file}" pythonpath="${lib.dir}:${lib.local.dir}" optimize="0">
+      <py-run script="${dist.file}" pythonpath="${lib.dir}:${lib.local.dir}:${deps.python.dir}" optimize="0">
          <!-- arg value="bla" -->
       </py-run>
    </target>
@@ -204,11 +209,13 @@ Implementation-Vendor:  ${organisation}</echo>
 
    <target name="jar" depends="compile" description="Creates a pyzip file containing the project's sources after compiling them">
       <mkdir dir="${dist.dir}"/>  
+      <mkdir dir="${dist.python.dir}"/>  
       <delete>
          <!--fileset dir="${dist.dir}" includes="${module.name}*.pyzip*"/-->
-         <fileset dir="${dist.dir}" includes="${module.name}*.zip*"/>
+         <fileset dir="${dist.dir}/python" includes="${module.name}*.zip*"/>
       </delete>
-      <property name="jarfile.basename"      value="${module.name}${jar.version.postfix}.zip"/>   
+      <property name="${jar.version.postfix}" value="" />
+      <property name="jarfile.basename"      value="${module.name}${jar.version.postfix}.zip"/>
       <!--
       <zip destfile="${dist.file}"
            basedir="${build.dir}"
@@ -216,11 +223,17 @@ Implementation-Vendor:  ${organisation}</echo>
            excludes="${dist.excludes}"
       />
       -->
-      <zip destfile="${dist.dir}/${jarfile.basename}"
+      <!--  [I replaced this with the copy part, below (for now)  -Ramin ]
+      <zip destfile="${dist.dir}/python/${jarfile.basename}"
            basedir="${build.dir}"
            includes="**/*"
            excludes="${dist.excludes}"
       />
+      -->
+      <copy todir="${dist.python.dir}">
+         <fileset dir="${build.dir}">
+         </fileset>
+      </copy>
       <!--excludes="${dist.excludes}" -->
    </target>
   
@@ -300,11 +313,11 @@ Implementation-Vendor:  ${organisation}</echo>
               <exclude name="**/.*swp" />
          </fileset>
       </copy>
-      <py-compile dir="${test.build.dir}" pythonpath="${test.build.dir}:${build.dir}" optimize="0"/>
+	  <py-compile dir="${test.build.dir}" pythonpath="${deps.python.dir}:${test.build.dir}:${build.dir}" optimize="0"/>
     </target>
 
     <target name="-test" depends="compile-tests">
-		<py-test pythonpath="${build.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}:${extra.python.path}" dir="${test.build.dir}">
+       <py-test pythonpath="${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}:${extra.python.path}" dir="${test.build.dir}">
           <fileset dir="${test.build.dir}">
              <include name="test*.py"/>
           </fileset>
@@ -327,12 +340,12 @@ Implementation-Vendor:  ${organisation}</echo>
    <target name="junitreport" depends="compile-tests" description="Run all tests and create an xunit compatible XML report" >
       <delete dir="${test.report.dir}" failonerror="false"/>
       <mkdir dir="${test.report.dir}"/>  
-		<py-run script="${shared.ant.dir}/nose/nosetests" pythonpath="${build.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" optimize="0">
-		   <arg value="--xunit-file=${test.report.dir}/report.xml"/>
-		   <arg value="--with-xunit"/>
-		   <arg value="--where=${test.build.dir}"/>
-		   <arg value="--nologcapture"/>
-		</py-run>	
+      <py-run script="${shared.ant.dir}/nose/nosetests" pythonpath="${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" optimize="0">
+         <arg value="--xunit-file=${test.report.dir}/report.xml"/>
+         <arg value="--with-xunit"/>
+         <arg value="--where=${test.build.dir}"/>
+         <arg value="--nologcapture"/>
+      </py-run>	
    </target>
    
    <property name="alternate.build.file" value="build.alternate"/>
@@ -353,5 +366,5 @@ Implementation-Vendor:  ${organisation}</echo>
      
 
   
-   
+
 
