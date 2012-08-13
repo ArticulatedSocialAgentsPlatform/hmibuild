@@ -100,9 +100,10 @@ def writeClassPath():
     cpEntry.attrib["kind"]="lib"
     cpEntry.attrib["path"]="test/resource"
 
-  dependencies = getDependencies()  
+  dependencies = getDependencies()
+
   for library in getLibraries():
-    if not SOURCE_SETUP or not(reduce(lambda x, y: x|library.startswith('lib/'+y), dependencies, False)):
+    if not SOURCE_SETUP or not(reduce(lambda x, y: x|library.startswith('lib/'+y+'-'), dependencies, False)):
       cpEntry = ElementTree.SubElement(root,"classpathentry")
       cpEntry.attrib["kind"]="lib"
       cpEntry.attrib["path"]=library

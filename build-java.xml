@@ -2,15 +2,11 @@
 <project name="Core" default="run" xmlns:ac="antlib:net.sf.antcontrib">
    <description>JavaProjects core build file</description>
   
-  
 
    <!-- Read build properties. Redundant when called from hmibuild/build.xml, but needed for standalone versions -->
    <property name="properties.file" value="build.properties"/>
    <property file="${properties.file}" /> 
    <available file="${properties.file}" property="properties.file.available" />
-   
-  
-   
    
    <property name="private.properties.dir" value="privateprops" />
    
@@ -33,6 +29,7 @@
    <property name="build.dir"             value="build"    />
    <property name="build.classes.dir"     value="${build.dir}/classes" />
    <property name="dist.dir"              value="dist"  />
+   <property name="deps.dir"              value="deps"  />
     
    <!-- Settings for "compiling with javac" -->
    <property name="javac.include"         value="**/*.java"/>
@@ -84,32 +81,17 @@
    <target name="clean" description="Removes the build directory">
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}"/>
-	<delete dir="${generatedsrc.dir}"/>
+        <delete dir="${generatedsrc.dir}"/>
+        <delete dir="${deps.dir}"/>
    </target>
-   <target name="eclipseproject" description="create eclipse project files">
-	<py-run script="${shared.ant.dir}/eclipse/createEclipseProject.py">
-		   <arg value="--sharedroot=${shared.project.root}"/>
-		   <arg value="--sharedresource=${shared.resources}"/>
-	           <arg value="--basedir=${basedir}"/>		   
-		   <arg value="--asapsharedresource=${asap.resources}"/>
-	</py-run>
-   </target>	
+   
 
-   <target name="eclipsesourceproject" description="create eclipse project files">
-	<py-run script="${shared.ant.dir}/eclipse/createEclipseProject.py">
-		   <arg value="--sharedroot=${shared.project.root}"/>
-		   <arg value="--sharedresource=${shared.resources}"/>
-		   <arg value="--basedir=${basedir}"/>
-	           <arg value="--asapsharedresource=${asap.resources}"/>
-		   <arg value="--sourcesetup"/>
-	</py-run>
-   </target>
 
-	<target name="-compilegenerated" description="Compile generated java file(s)"> 
-	<ac:if>
+   <target name="-compilegenerated" description="Compile generated java file(s)"> 
+   <ac:if>
         <available file="${generatedsrc.dir}"/>      
-	<then>
- 	
+   <then>
+   
 
       <property name="files" value="${javac.include}"/>
       <mkdir dir="${build.classes.dir}"/>
@@ -181,12 +163,9 @@
    
    <!--property name="run.main.class" value"UNDEFINED" /-->
    <target name="run" depends="compile" description="Runs the main program for this project, compiles if necessary">   
-      <!--property name="run.main.class" value="${default.run.main.class}"/-->
-      <!--property name="myclasspath" refid="run-classpath"/-->   
-      <!--echo message="run-classpath=${myclasspath}"/-->
       <fail message=":${line.separator}${line.separator}No main class defined. ${line.separator}Use 'ant main' to set a main class" unless="run.main.class"/> 
       <java classname="${run.main.class}" fork="${run.fork}" spawn="${run.spawn}" >      
-      	    
+             
           <classpath refid="run-classpath"/>
           <jvmarg line="${run.jvmargs}"/>
           <arg line="${run.argline}"/>
@@ -205,14 +184,14 @@
        then the next condition will not have any effect. Else, it will set run.main.class, but only
        when default.run.main.class is set, to some non-empty value -->    
   <condition property="run.main.class" value="${default.run.main.class}">
-  	 <and>
-  	    <isset property="default.run.main.class"/>
-  	    <not><equals arg1="${default.run.main.class}" arg2="" /></not>
-  	 </and>
+    <and>
+       <isset property="default.run.main.class"/>
+       <not><equals arg1="${default.run.main.class}" arg2="" /></not>
+    </and>
   </condition>    
       
   <target name="tes">
-  	 <echo message="run.main.class: ${run.main.class}"/>
+    <echo message="run.main.class: ${run.main.class}"/>
   </target>  
       
    <target name="-init.main.class.file" unless="main.class.file.available">   
@@ -230,18 +209,6 @@
       />
       <replaceregexp file="${main.class.file}"  match="^run.main.class.*"  replace="run.main.class=${new.main.class}" byline="true"  />
    </target>   
-   
-  
-   <!--target name="checkmain"  unless="run.main.class" description="Check for main class">
-       <antcall target="-init.main.class.file" />
-       <input
-         message="Give the main class (including package name)? ${line.separator}"
-         addproperty="run.main.class"
-       />
-       <replaceregexp file="${main.class.file}"  match="^run.main.class.*"  replace="run.main.class=${run.main.class}" byline="true"  /> 
-       <echo message="${main.class.file} updated; use 'ant main' to (re)set the main class"/>
-   </target-->   
-   
   
       
    <!-- Settings for "javadoc" -->
@@ -355,21 +322,12 @@ Implementation-Vendor:  ${organisation}</echo>
    <property name="test.report.dir"        value="${test.dir}/report" />
    <property name="build.test.classes.dir" location="${build.dir}/test/classes" />
    <property name="build.test.results.dir" location="${build.dir}/test/results" />
-   <!--property name="junit.include"          value="**/*Test.class"/-->
-   <!--
-   <property name="junit.include"          value="**/*.class"/>
-   <property name="junit.exclude"          value=""/>
-   -->
+   
    <property name="junit.include"          value="**/*Test.class"/>
    <property name="junit.exclude"          value="**/Abstract*.class"/>
    
    <property name="test.library.path"      value="${test.lib.dir};${lib.dir};${test.lib.local}"/>
-   <!--
-   <path id="test.library.path">
-      <pathelement location="${lib.dir}"/>
-      <pathelement location="${test.lib.dir}"/>    
-   </path>  
-   -->
+   
    
    <fileset dir="." id="test.lib.fileset">
       <include name="${test.lib.dir}/**/*.jar"/>
@@ -383,7 +341,6 @@ Implementation-Vendor:  ${organisation}</echo>
    <path id="javac-test-classpath">
       <path refid="javac-classpath"/>
       <fileset refid="test.lib.fileset"/>
-      <!--pathelement location="${libs.junit.classpath}"/-->
    </path> 
    
    <path id="junit-test-run-classpath">
