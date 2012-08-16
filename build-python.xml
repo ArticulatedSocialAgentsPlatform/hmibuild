@@ -223,17 +223,15 @@ Implementation-Vendor:  ${organisation}</echo>
            excludes="${dist.excludes}"
       />
       -->
-      <!--  [I replaced this with the copy part, below (for now)  -Ramin ]
       <zip destfile="${dist.dir}/python/${jarfile.basename}"
            basedir="${build.dir}"
            includes="**/*"
            excludes="${dist.excludes}"
       />
-      -->
-      <copy todir="${dist.python.dir}">
+      <!--copy todir="${dist.python.dir}">
          <fileset dir="${build.dir}">
          </fileset>
-      </copy>
+      </copy-->
       <!--excludes="${dist.excludes}" -->
    </target>
   
