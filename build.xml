@@ -164,24 +164,13 @@
    <property name="resource.repository.url"             value="${hmi.repository.url.base}/resource"/>
    
    
-   
-   
-   
-   
-   
-
-   
-   
    <!-- PROJECTS REPO -->
    <!-- Mode switch, for overriding "repository.mode" for "projects" repository: --> 
    <property name="projects.repository.mode"            value="filesystem"/> <!--NB -->
    <!-- The actual locations of the  resource repository: -->
    <property name="projects.repository.filesystem"      value="${projects.dir}/repository"/>
    <!-- NO URL BASED RESOLVER YET FOR PROJECTS-->
-   
-   
-   
-   
+      
    <!-- END IVY REPOSITORIES SECTION -->
     
    <!-- We read the project's ant build properties file.                                -->
@@ -191,8 +180,6 @@
    <property file="${properties.file}" /> 
    
    <property name="language" value="java"/>
-   <!--available file="${manifest.file}" property="manifest.file.present"/-->
-   
    <!-- next we load the "real" build files. They can be redefined, -->
    <!-- for instance within the properties file, by setting build.impl and/or build.customize-->
    <property name="build.impl" value="build-${language}.xml"/>
@@ -202,14 +189,14 @@
    <import file="build-Buildfile.xml" />
    <import file="build-Testing.xml" />
    <import file="build-Versioning.xml" />
-   <!-- overwrite jar taget from Core -->
+   <!-- overwrite jar target from Core -->
    <target name="createmanifest" description="Creates a manifest file with ivy info" unless="${manifest.file.present}"> 
       <antcall target="-ivy.manifest"/>
    </target>
    <target name="jar" depends="versioned.jar" description="Creates a versioned jar"/> 
    <target name="main" depends="Util.main" description="Show/Set main class"/> 
-   <!--target name="checkmain" depends="Util.checkmain" description="Check for main class"/--> 
    <import file="build-UltraEdit.xml" />
+   <import file="build-Eclipse.xml" />
    <import file="build-Rebuilding.xml" />
    <import file="build-Ivy.xml" />
    <import file="build-Demo.xml" />

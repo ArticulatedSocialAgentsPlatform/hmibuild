@@ -333,7 +333,7 @@
          <property name="devnum" value="${devnum}"/>
          <filelist refid="release.project.dirs"/>
       </subant>
-      <antcall target="${release.target}"/>
+     
        
    </target>
    
@@ -361,25 +361,8 @@
       
    </target>
    
-   
-   <!--target name="st">
-      <input message="Ivy password:" defaultvalue="" addproperty="pw"/>
- 
-      <sshexec host="hmigit.ewi.utwente.nl"
-	username="zwiers"
-	password="${pw}"
-	command="touch /hmirepo/tch.txt"/>
-   </target-->
   
-  <!--sshexec host="hmigit.ewi.utwente.nl"-->
-  <!-- <sshexec host="hmics05.ewi.utwente.nl" -->
-  <!--target name="st">
-   <sshexec host="hmics05.ewi.utwente.nl"
-      trust="yes"
-	   username="zwiers"
-	   keyfile="C:/Users/zwiers/.ssh/id_rsa"
-	   command="touch /hmirepo/tch.txt"/>
-   </target-->
+   
   
    <target name="devrelease"  description="publishes a dev release, with Ivy &quot;beta&quot; status">
       <antcall target="resolve">
