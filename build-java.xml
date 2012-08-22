@@ -190,9 +190,6 @@
     </and>
   </condition>    
       
-  <target name="tes">
-    <echo message="run.main.class: ${run.main.class}"/>
-  </target>  
       
    <target name="-init.main.class.file" unless="main.class.file.available">   
       <mkdir dir="${private.properties.dir}"/>
