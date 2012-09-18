@@ -76,6 +76,11 @@ def writeClassPath():
   cpEntry = ElementTree.SubElement(root,"classpathentry")
   cpEntry.attrib["kind"]="src"
   cpEntry.attrib["path"]="src"
+
+  if os.path.isdir(BASE_DIR+'/generatedsrc'):
+    cpEntry = ElementTree.SubElement(root,"classpathentry")
+    cpEntry.attrib["kind"]="src"
+    cpEntry.attrib["path"]="generatedsrc"
   
   if os.path.isdir(BASE_DIR+'/test/src'):
     cpEntry = ElementTree.SubElement(root,"classpathentry")
