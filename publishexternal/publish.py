@@ -30,7 +30,12 @@ def rexists(sftp, path):
 def mkdirifnotexists(sftp, path):
   if not rexists(sftp,path):
     sftp.mkdir(path)
-    
+
+def getFileName(path):
+  splitpath = path.split('/')
+  splitpath = splitpath[len(splitpath)-1].split('\\')
+  return splitpath[len(splitpath)-1]
+      
 def publishAtScp(host, user, key, org, module, revision, jarfile):
   transport = paramiko.Transport((host,22))
   transport.connect(username=user, pkey=key)
@@ -43,7 +48,7 @@ def publishAtScp(host, user, key, org, module, revision, jarfile):
   sftp.mkdir('/hmirepo/external/java/'+org+'/'+module+'/'+revision)
   sftp.mkdir('/hmirepo/external/java/'+org+'/'+module+'/'+revision+'/lib')
   sftp.put(module+"-"+revision+".xml",'/hmirepo/external/java/'+org+'/'+module+'/'+revision+'/'+module+"-"+revision+".xml")
-  sftp.put(jarfile,'/hmirepo/external/java/'+org+'/'+module+'/'+revision+'/lib/'+jarfile)
+  sftp.put(jarfile,'/hmirepo/external/java/'+org+'/'+module+'/'+revision+'/lib/'+getFileName(jarfile))
   sftp.close()
   transport.close()
 
