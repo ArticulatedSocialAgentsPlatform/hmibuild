@@ -45,11 +45,11 @@
    <!--echo message="user.properties.file= ${user.properties.file}"/-->
    <property file="${user.properties.file}" /> 
    <property name="user.keyfile" value="${user.home}/.ssh/id_rsa"/>
-   
+   <property name="publish.user.name" value="${user.name}"/>
    
    
     <target name="tu" >
-       <echo message="user.home= ${user.home} user.name=${user.name} private key location = ${user.keyfile} userprops=${user.properties.file.available}"/>
+       <echo message="user.home= ${user.home} publish.user.name=${publish.user.name} user.name=${user.name} private key location = ${user.keyfile} userprops=${user.properties.file.available}"/>
     </target>
    
    <!-- Next we define a number of "shared" places:-->

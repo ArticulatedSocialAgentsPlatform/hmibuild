@@ -36,6 +36,7 @@
    <property name="maven2.root2" value="http://repository.jboss.org/maven2/"/> 
    <!--property name="maven.pattern" value="[organisation]/[module]/[revision]/[module]-[revision].[ext]"/--> 
  
+   
    <property name="user" value="zwiers"/>
    <property name="password" value="xyz"/>
    <property name="remote.host" value="ewi1228.ewi.utwente.nl"/>
@@ -213,20 +214,20 @@
      
       <!-- NO URL BASED VERSION FOR PROJECTS REPO YET -->
       
-     <sftp name="asap.sftp.publish" host="asap-project.ewi.utwente.nl" user="${user.name}" keyFile="${user.keyfile}" >
+     <sftp name="asap.sftp.publish" host="asap-project.ewi.utwente.nl" user="${publish.user.name}" keyFile="${user.keyfile}" >
          <ivy pattern="/asap-project/repository/${language}/${ivy.local.default.ivy.pattern}" />
          <artifact pattern="/asap-project/repository/${language}/${ivy.local.default.artifact.pattern}" />        
       </sftp>
-      <sftp name="asap.resource.sftp.publish" host="asap-project.ewi.utwente.nl" user="${user.name}" keyFile="${user.keyfile}" >
+      <sftp name="asap.resource.sftp.publish" host="asap-project.ewi.utwente.nl" user="${publish.user.name}" keyFile="${user.keyfile}" >
          <ivy pattern="/asap-project/resource/${ivy.local.default.ivy.pattern}" />
          <artifact pattern="/asap-project/resource/${ivy.local.default.artifact.pattern}" />        
       </sftp> 
       
-      <sftp name="hmicore.sftp.publish" host="hmirepo.ewi.utwente.nl" user="${user.name}" keyFile="${user.keyfile}" >
+      <sftp name="hmicore.sftp.publish" host="hmirepo.ewi.utwente.nl" user="${publish.user.name}" keyFile="${user.keyfile}" >
          <ivy pattern="/hmirepo/hmicore/${language}/${ivy.local.default.ivy.pattern}" />
          <artifact pattern="/hmirepo/hmicore/${language}/${ivy.local.default.artifact.pattern}" />        
       </sftp> 
-      <sftp name="resource.sftp.publish" host="hmirepo.ewi.utwente.nl" user="${user.name}" keyFile="${user.keyfile}" >
+      <sftp name="resource.sftp.publish" host="hmirepo.ewi.utwente.nl" user="${publish.user.name}" keyFile="${user.keyfile}" >
          <ivy pattern="/hmirepo/resource/${ivy.local.default.ivy.pattern}" />
          <artifact pattern="/hmirepo/resource/${ivy.local.default.artifact.pattern}" />        
       </sftp> 
