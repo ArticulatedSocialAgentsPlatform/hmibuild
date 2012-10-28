@@ -160,14 +160,15 @@
    <property name="run.fork"              value="true"/> <!-- set to true if arguments are used -->
    <property name="run.spawn"             value="false"/>
    <property name="run.library.path"      value="${lib.dir};${lib.local}"/>
-   
+   <property name="run.argline" value=""/>
+
    <!--property name="run.main.class" value"UNDEFINED" /-->
    <target name="run" depends="compile" description="Runs the main program for this project, compiles if necessary">   
       <fail message=":${line.separator}${line.separator}No main class defined. ${line.separator}Use 'ant main' to set a main class" unless="run.main.class"/> 
       <java classname="${run.main.class}" fork="${run.fork}" spawn="${run.spawn}" >      
              
           <classpath refid="run-classpath"/>
-          <jvmarg line="${run.jvmargs}"/>
+	  <jvmarg line="${run.jvmargs}"/>
           <arg line="${run.argline}"/>
           <!-- when a build.properties line like -Djava.library.path=lib;${env.windir}/system32 is used, the following is ignored: -->
           <sysproperty key="java.library.path" path="${run.library.path}"/> 
