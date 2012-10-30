@@ -62,6 +62,7 @@
    <property name="projects.repository"                 value="projects.${projects.repository.mode}.repository"/>
    <property name="projects.repository.os"              value="projects.${projects.repository.mode}.repository.os"/>
    <property name="resource.repository"                 value="resource.${resource.repository.mode}.repository"/>
+   <property name="asap.resource.repository"            value="asap.resource.${resource.repository.mode}.repository"/>
    
    
   
@@ -196,7 +197,18 @@
          <artifact pattern="${resource.repository.url}/${ivy.local.default.artifact.pattern}" /> 
          <artifact pattern="${resource.repository.url}/${ivy.local.norevision.artifact.pattern}" /> 
       </url> 
-      
+
+      <filesystem name="asap.resource.filesystem.repository" > 
+         <ivy pattern="${asap.resource.repository.filesystem}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${asap.resource.repository.filesystem}/${ivy.local.default.artifact.pattern}" />
+         <artifact pattern="${asap.resource.repository.filesystem}/${ivy.local.norevision.artifact.pattern}" />
+      </filesystem>
+
+       <url name="asap.resource.url.repository">
+         <ivy pattern="${asap.resource.repository.url}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${asap.resource.repository.url}/${ivy.local.default.artifact.pattern}" /> 
+         <artifact pattern="${asap.resource.repository.url}/${ivy.local.norevision.artifact.pattern}" /> 
+      </url> 
       
       
       <!-- PROJECTS REPO -->
@@ -255,7 +267,8 @@
          <resolver ref="${projects.repository}"/>
          <resolver ref="${projects.repository.os}"/>      
          
-         <resolver ref="${resource.repository}"/>
+	 <resolver ref="${resource.repository}"/>
+	 <resolver ref="${asap.resource.repository}"/>
          
       </chain>       
       

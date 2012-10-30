@@ -145,6 +145,7 @@
    <property name="resource.repository.mode"             value="${repository.mode}"/> <!-- either "filesystem" or "url" -->
    <!-- The property used within the ant/ivy/ivysettings.xml file: -->
    <property name="resource.repository"                  value="resource.${resource.repository.mode}.repository"/>
+   <property name="asap.resource.repository"             value="asap.resource.${resource.repository.mode}.repository"/>
    
    
    <!-- ASAP REPO -->
@@ -162,7 +163,8 @@
    <!-- The actual locations of the  resource repository: -->
    <property name="resource.repository.filesystem"      value="${hmi.repository.filesystem.root}/resource"/>
    <property name="resource.repository.url"             value="${hmi.repository.url.base}/resource"/>
-   
+   <property name="asap.resource.repository.filesystem" value="${asap.repository.filesystem.root}/resource"/>
+   <property name="asap.resource.repository.url"        value="${asap.repository.url.base}/resource"/> 
    
    <!-- PROJECTS REPO -->
    <!-- Mode switch, for overriding "repository.mode" for "projects" repository: --> 
