@@ -17,7 +17,7 @@
   
    
    
-   <target name="versioned.jar" depends="createmanifest">
+   <target name="versioned.jar" depends="init, createmanifest">
       <property name="mf.file" value="${manifest.file}"/> <!-- fallback -->
       <hmi:getmanifestversion versionprop="manifest.specification.version" manifestfile="${mf.file}"/> 
       <property name="specification.version" value="${manifest.specification.version}"/>
@@ -25,7 +25,7 @@
       <antcall target="Core.jar"/>
    </target>
 
-    <target name="versionedtest.jar" >
+    <target name="versionedtest.jar" depends="init">
       <property name="mf.file" value="${manifest.file}"/> <!-- fallback -->
       <hmi:getmanifestversion versionprop="manifest.specification.version" manifestfile="${mf.file}"/> 
       <property name="specification.version" value="${manifest.specification.version}"/>

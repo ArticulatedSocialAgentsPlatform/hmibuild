@@ -23,7 +23,7 @@
    </condition>
    
    
-   <target name="netbeans" description="enable or disable netbeans build file" >
+   <target name="netbeans"  depends="init" description="enable or disable netbeans build file" >
       <condition property="defaultanswer" value="true" else="false">
          <available file="nbproject/build-impl.xml" />
       </condition>

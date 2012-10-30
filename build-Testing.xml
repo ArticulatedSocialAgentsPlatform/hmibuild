@@ -37,7 +37,7 @@
  
    
    
-   <target name="testdir" description="Check for/copy test directory">
+   <target  depends="init" name="testdir" description="Check for/copy test directory">
       <ac:if>
          <not> ${test.dir.available} </not>
       <ac:then>
@@ -56,7 +56,7 @@
       </ac:if> 
    </target>
 
-   <target name="test"  description="Run JUnit test(s)" if="${test.dir.available}">
+   <target  depends="init" name="test"  description="Run JUnit test(s)" if="${test.dir.available}">
       <ac:if>
          <isset property="test.class"/> 
       <ac:then>
@@ -71,7 +71,7 @@
    
   
    <!-- description="JUnit test a single class test.class" -->
-   <target name="testClass"  >
+   <target  depends="init" name="testClass"  >
       <!-- remove Test and/or .java postfix, if present-->
       <ac:propertyregex property="test.base.class"
               input="${test.class}"
@@ -84,7 +84,7 @@
       <antcall target="-testClass"/>
    </target>
    
-   <target name="-testClass" depends="compile-tests" >
+   <target  name="-testClass" depends="compile-tests" >
        
       <junit printsummary="false" 
            haltonfailure="false"
@@ -141,7 +141,7 @@
  </target>
 
 
- <target name="addtest" depends="-decomposefilename" >
+ <target name="addtest" depends="init,-decomposefilename" >
     <property name="testclass.name" value="${class.name}Test"/> 
     <property name="testclass.file" value="${test.src.dir}${package.path}/${class.name}Test.java"/> 
   
@@ -159,7 +159,7 @@
     </copy>
  </target>
 
- <target name="checkstyle" description="check Java style">
+ <target name="checkstyle"  depends="init" description="check Java style">
       <!--cs:checkstyle config="${shared.ant.dir}/checkstyle/hmi_checks_lite.xml"--> 
       <ac:if>
       <available file="${test.src.dir}" type="dir" />
@@ -178,7 +178,7 @@
      </ac:if>
  </target>   
  
- <target name="cpd">
+ <target  depends="init" name="cpd">
    <ac:if>
       <available file="${test.src.dir}" type="dir" />
      <ac:then>
@@ -208,7 +208,7 @@
 	  out="cpd.html" />
  </target>
  
- <target name="checkstylexml" description="check Java style">
+ <target  depends="init" name="checkstylexml" description="check Java style">
       <!--cs:checkstyle config="${shared.ant.dir}/checkstyle/hmi_checks_lite.xml"--> 
       <ac:if>
       <available file="${test.src.dir}" type="dir" />
@@ -235,7 +235,7 @@
  
 
 
-  <target name="findbugsreport" depends="compile" description="find bugs, produce an HTML report">
+  <target name="findbugsreport" depends="init, compile" description="find bugs, produce an HTML report">
     <findbugs home="${findbugs.dir}"
               output="html"              
               outputFile="${test.dir}/findbugs.html" jvmargs="-Xmx512M"
@@ -248,7 +248,7 @@
     </findbugs>
   </target>
 
-	<target name="findbugsxml" depends="compile" description="find bugs, produce an XML report">
+	<target name="findbugsxml" depends="init, compile" description="find bugs, produce an XML report">
     <findbugs home="${findbugs.dir}"
               output="xml"
               outputFile="${test.dir}/findbugs.xml" jvmargs="-Xmx512M"              
@@ -260,7 +260,7 @@
     </findbugs>
   </target>
   
-  <target name="findbugs" depends="compile" description="find bugs">
+  <target name="findbugs" depends="init, compile" description="find bugs">
     <findbugs home="${findbugs.dir}"
               output="text" jvmargs="-Xmx512M"
               reportLevel="high"
@@ -290,14 +290,14 @@
  	</path>   
  	<taskdef resource="emma_ant.properties" classpathref="emma.lib" />
 	
-	<target name="initemma" >
+	<target  depends="init" name="initemma" >
     <mkdir dir="${instrumented.dir}" />
     <path id="run.classpath" >
       <pathelement location="${build.classes.dir}" />
     </path>
   </target>
 
-	<target name="emmajunit" depends="initemma" description="runs junit tests">
+	<target name="emmajunit" depends="init, initemma" description="runs junit tests">
 		<emma>
 		<instr instrpathref="run.classpath"
              destdir="${instrumented.dir}"	

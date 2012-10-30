@@ -78,7 +78,7 @@
    
    <target name="build" depends="clean, compile" description="clean, compile"/>  
  
-   <target name="clean" description="Removes the build directory">
+   <target name="clean" depends="init" description="Removes the build directory">
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}"/>
         <delete dir="${generatedsrc.dir}"/>
@@ -116,7 +116,10 @@
    <!-- default is empty, overwrite when needed -->
    <target name="-pre-compilation"/>
    
-   <target name="compile" depends="-pre-compilation, -compilegenerated" description="Compile java file(s)" if="${src.dir.present}"> 
+   <!--Use init in Util instead -->
+   <!--target name="init" depends="checkVersion"/-->
+
+   <target name="compile" depends="-pre-compilation, -compilegenerated, init" description="Compile java file(s)" if="${src.dir.present}"> 
       <property name="files" value="${javac.include}"/>
       <!--echo message="files=${files}" /-->
       <mkdir dir="${build.classes.dir}"/>
@@ -161,7 +164,19 @@
    <property name="run.spawn"             value="false"/>
    <property name="run.library.path"      value="${lib.dir};${lib.local}"/>
    <property name="run.argline" value=""/>
-
+   <property name="ant.version.required" value="1.8.1"/>
+    
+   <target name="checkVersion">
+     <antversion property="version.running" />
+        <fail message="FATAL ERROR:  The running Ant version, ${version.running}, is too old.">
+        <condition>
+            <not>
+                <antversion atleast="${ant.version.required}" />
+            </not>
+        </condition>
+        </fail>
+   </target>
+   
    <!--property name="run.main.class" value"UNDEFINED" /-->
    <target name="run" depends="compile" description="Runs the main program for this project, compiles if necessary">   
       <fail message=":${line.separator}${line.separator}No main class defined. ${line.separator}Use 'ant main' to set a main class" unless="run.main.class"/> 
@@ -198,7 +213,7 @@
       <echo message="main.class file added to project${line.separator} "/>
    </target> 
       
-   <target name="main" depends="-init.main.class.file" description="Show and Set the main class for &quot;run&quot;">
+   <target name="main" depends="-init.main.class.file, init" description="Show and Set the main class for &quot;run&quot;">
       <echo message="Current main class: ${run.main.class}${line.separator} "/>
       <input
          message="Give (fully qualified) main class:${line.separator}}&lt;Return&gt; : keep current "
@@ -227,7 +242,7 @@
    <property name="javadoc.linksource"    value="yes"/>
    <property name="javadoc.packages"      value="*"/>
    
-   <target name="doc" description="Generates javadoc documentation">      
+   <target name="doc" depends="init" description="Generates javadoc documentation">      
       <javadoc 
          source="${javac.source}"        
          sourcepath="${src.dir}"  
@@ -258,7 +273,7 @@
  
    <available file="${manifest.file}" property="manifest.file.present"/>
  
-   <target name="createmanifest" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
+   <target name="createmanifest" depends="init" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
       <tstamp>   
           <format property="MANIFEST_TIME" pattern="MMMM dd yyyy  hh:mm aa" locale="en" />
       </tstamp>

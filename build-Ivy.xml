@@ -88,7 +88,7 @@
    </target>
   
    
-   <target name="resolve"  description="Resolve and retrieve all dependencies">    
+   <target name="resolve" depends="init"  description="Resolve and retrieve all dependencies">    
        <antcall target="ivyclean" />
        <antcall target="-resolve" />
        <!--antcall target="resolveresource"/-->  
@@ -98,7 +98,7 @@
    <property name="test.lib.local" value="lib.local" />
 
 
-   <target name="resolvelib"  description="Resolve and retrieve (just) lib dependencies "> 
+   <target name="resolvelib"  depends="init" description="Resolve and retrieve (just) lib dependencies "> 
     <echo message = "RESOLVELIB resolve.status= ${resolve.status}" />
       <ivy:retrieve file="${ivy.file}" pattern="${lib.dir}/[artifact]-[revision].[ext]" sync="true" transitive="true" conf="default" resolveMode="default"  log="default"/>
       <mkdir dir="${lib.dir}"/> <!-- repair if ivy throws it away -->
@@ -125,7 +125,7 @@
    </target>     
    
    
-   <target name="resolvetestlib"  description="Resolve and retrieve (just) test lib dependencies ">  
+   <target name="resolvetestlib"  depends="init" description="Resolve and retrieve (just) test lib dependencies ">  
       <available file ="${test.dir}" type="dir" property="test.dir.available"/>
       <echo message="test.dir available: ${test.dir.available}"/>
       <ac:if>
@@ -176,7 +176,7 @@
    
    <available file="${resource.ivy.file}" type="file" property="resource.ivy.file.available"/>
  
-   <target name="resolveresource"  description="Resolve and retrieve resource dependencies" if="${resource.ivy.file.available}"> 
+   <target name="resolveresource" depends="init" description="Resolve and retrieve resource dependencies" if="${resource.ivy.file.available}"> 
    	
     <ac:if>
          <not> <available file="${resource.ivy.file}" type="file"/> </not>
@@ -202,19 +202,19 @@
 
 
 
-   <target name="ivyclean"  description="Clean Ivy cache" >
+   <target name="ivyclean" depends="init" description="Clean Ivy cache" >
       <ivy:cleancache />
    </target>  
    
    
-   <target name="ivyreport" description="Create an ivy report for the last resolve action">
+   <target name="ivyreport" depends="init" description="Create an ivy report for the last resolve action">
       <ivy:resolve log="quit"/>
       <ivy:report/>
    </target>
   
   <available file="${test.src.dir}" property="test.src.dir.present"/>
  
- <target name="ivyinfo">
+ <target name="ivyinfo" depends="init">
  	<ivy:info/>   <!-- retrieves ivy.organisation and ivy.module -->
        <echo message="info  ivy.organisation=${ivy.organisation}    ivy.module= ${ivy.module}" />
        
@@ -266,7 +266,7 @@
  
   
  
-   <target name="releaseresourcelist" description="Performs a release for all resource projects on release.resource.list" >
+   <target name="releaseresourcelist"  depends="init" description="Performs a release for all resource projects on release.resource.list" >
       <ac:if>
          <not><isset property="release.resource.list"/></not>
       <ac:then>
@@ -291,7 +291,7 @@
       
    </target>
 
-   <target name="releaselist" description="Performs a release for all projects on release.list" >
+   <target name="releaselist"  depends="init" description="Performs a release for all projects on release.list" >
       <ac:if>
          <not><isset property="release.list"/></not>
       <ac:then>
@@ -338,7 +338,7 @@
    </target>
    
    
-   <target name="testreleaselist" description="Performs a test release for all projects on release.list, but does not perform the actual publishing" >
+   <target name="testreleaselist"  depends="init" description="Performs a test release for all projects on release.list, but does not perform the actual publishing" >
       
       <filelist id="release.project.dirs" dir="${shared.project.root}" files="${release.list}" />
       
@@ -364,7 +364,7 @@
   
    
   
-   <target name="devrelease"  description="publishes a dev release, with Ivy &quot;beta&quot; status">
+   <target name="devrelease"  depends="init" description="publishes a dev release, with Ivy &quot;beta&quot; status">
       <antcall target="resolve">
          <param name="resolve.status" value="beta"/> <!-- overrides build.properties value -->
       </antcall>
@@ -387,14 +387,14 @@
       <antcall target="-pub"/>
    </target>
    
-   <target name="release"  description="publishes a minor release, with Ivy &quot;release&quot; status">
+   <target name="release"  depends="init" description="publishes a minor release, with Ivy &quot;release&quot; status">
       <!--input message="Ivy password:" defaultvalue="" addproperty="pw"/-->
       <antcall target="minorrelease">
          <!--param name="passwd" value="${pw}"/-->
       </antcall>
    </target>
    
-   <target name="minorrelease"  description="publishes a minor release, with Ivy &quot;release&quot; status">
+   <target name="minorrelease"  depends="init" description="publishes a minor release, with Ivy &quot;release&quot; status">
       <property name="resolve.status" value="release"/>
       <antcall target="resolve">
           <param name="resolve.status" value="release"/> <!-- overrides build.properties value -->
@@ -415,7 +415,7 @@
    </target>
    
    
-   <target name="majorrelease"  description="publishes a major release, with Ivy &quot;release&quot; status">
+   <target name="majorrelease"  depends="init" description="publishes a major release, with Ivy &quot;release&quot; status">
       <antcall target="resolve">
          <param name="resolve.status" value="release"/> <!-- overrides build.properties value -->
       </antcall>
@@ -432,7 +432,7 @@
       <antcall target="-pub"/>
    </target>
    
-   <target name="maintenancerelease" description="publishes a maintenance release version, with Ivy &quot;release&quot; status">
+   <target name="maintenancerelease"  depends="init" description="publishes a maintenance release version, with Ivy &quot;release&quot; status">
       <antcall target="resolve">
         <param name="resolve.status" value="release"/> <!-- overrides build.properties value -->
       </antcall>
@@ -452,7 +452,7 @@
  
   
  
-   <target name="showlatest" description="List latest (alpha/beta/release) version"> 
+   <target name="showlatest"  depends="init" description="List latest (alpha/beta/release) version"> 
       <ivy:info/>
       <ivy:findrevision organisation="${ivy.organisation}" module="${ivy.module}" revision="latest.alpha"/>
       <echo/>
@@ -557,7 +557,7 @@
    </target>
 
 
-   <target name="resolvelist"  depends=" -init.resolve.list" description="resolve all projects found on rebuild.list">    
+   <target name="resolvelist"  depends=" -init.resolve.list, init" description="resolve all projects found on rebuild.list">    
       <ac:if>
          <and>
             <isset property="rebuild.list"/>
@@ -588,7 +588,7 @@
       <echo message="resolverelease.status.file added to project${line.separator} "/>
    </target> 
    
-   <target name="resolvestatus" depends ="-init.resolverelease.status.file" description="Shows and (re)sets the resolve status">
+   <target name="resolvestatus" depends ="-init.resolverelease.status.file, init" description="Shows and (re)sets the resolve status">
       <ac:if>
          <isset property="resolve.status"/>
       <ac:then>
@@ -628,7 +628,7 @@
    
    
    
-   <target name="releasestatus" depends ="-init.resolverelease.status.file" description="Shows and (re)sets the release status">
+   <target name="releasestatus" depends ="-init.resolverelease.status.file,init" description="Shows and (re)sets the release status">
       <ac:if>
          <isset property="release.status"/>
       <ac:then>

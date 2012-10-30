@@ -312,7 +312,8 @@
  </target>      
         
  
- <target name="newproject" depends=" -userDialog, 
+ <target name="newproject" depends="init,
+                                     -userDialog, 
                                      -createDirs,
                                      -createBuildFile,  -replaceBuildFile,
                                      -createBuildImplFile,
