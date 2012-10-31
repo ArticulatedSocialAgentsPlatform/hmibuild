@@ -214,7 +214,17 @@
    </target> 
    
    <target name="help" depends="helphelp, Core.help, Ivy.help" description="Basic help"/>
- 
+
+  <target name="checkVersion">
+     <antversion property="version.running" />
+        <fail message="FATAL ERROR:  The running Ant version, ${version.running}, is too old.">
+        <condition>
+            <not>
+                <antversion atleast="${ant.version.required}" />
+            </not>
+        </condition>
+        </fail>
+   </target>
 </project>
 
   

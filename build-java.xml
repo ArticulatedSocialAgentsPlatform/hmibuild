@@ -166,16 +166,7 @@
    <property name="run.argline" value=""/>
    <property name="ant.version.required" value="1.8.0"/>
     
-   <target name="checkVersion">
-     <antversion property="version.running" />
-        <fail message="FATAL ERROR:  The running Ant version, ${version.running}, is too old.">
-        <condition>
-            <not>
-                <antversion atleast="${ant.version.required}" />
-            </not>
-        </condition>
-        </fail>
-   </target>
+
    
    <!--property name="run.main.class" value"UNDEFINED" /-->
    <target name="run" depends="compile" description="Runs the main program for this project, compiles if necessary">   
