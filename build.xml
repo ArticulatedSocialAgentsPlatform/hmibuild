@@ -37,7 +37,10 @@
    />
    
    <property environment="env"/>
-   
+
+   <!-- minimum required ant version -->
+   <property name="ant.version.required" value="1.8.0"/>
+
    <!-- read a user specific properties file, if available -->
    <property name="user.properties.dir" value="${user.home}" />
    <property name="user.properties.file" value="${user.properties.dir}/hmi.build.properties"/>

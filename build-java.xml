@@ -164,7 +164,7 @@
    <property name="run.spawn"             value="false"/>
    <property name="run.library.path"      value="${lib.dir};${lib.local}"/>
    <property name="run.argline" value=""/>
-   <property name="ant.version.required" value="1.8.0"/>
+
     
 
    
