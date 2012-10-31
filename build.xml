@@ -217,7 +217,7 @@
 
   <target name="checkVersion">
      <antversion property="version.running" />
-        <fail message="FATAL ERROR:  The running Ant version, ${version.running}, is too old.">
+        <fail message="FATAL ERROR:  The running Ant version, ${version.running}, is too old, required version ${ant.version.required}.">
         <condition>
             <not>
                 <antversion atleast="${ant.version.required}" />
