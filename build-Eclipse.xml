@@ -7,6 +7,7 @@
          <arg value="--sharedresource=${shared.resources}"/>
          <arg value="--basedir=${basedir}"/>       
          <arg value="--asapsharedresource=${asap.resources}"/>
+         <arg value="--language=${language}"/>
    </py-run>
    </target>   
 
@@ -17,6 +18,7 @@
          <arg value="--basedir=${basedir}"/>
          <arg value="--asapsharedresource=${asap.resources}"/>
          <arg value="--sourcesetup"/>
+         <arg value="--language=${language}"/>
    </py-run>
    </target>
    
