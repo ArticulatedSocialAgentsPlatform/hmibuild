@@ -52,7 +52,7 @@
                     <fileset dir="${shared.project.root}/@{projectdir}/dist">
                        <include name="**/*.jar"/>
                        <exclude name="**/*.xml"/>
-                     </fileset>
+                     </fileset>                     
                   </path> 
                   <sequential>
                      <!--echo message="item: @{distitem}"/-->
@@ -62,7 +62,7 @@
                                        replace=""
                                        override="true"
                      />
-                     <!--echo message="basename: ${basename}" /-->
+                     <!--echo message="basename: ${basename}"/-->
                      <ac:if>
                         <not>
                            <uptodate srcfile="@{distitem}" targetfile="${lib.dir}/${basename}"/>
@@ -75,13 +75,13 @@
                                           override="true"
                         />
                          <delete>
-                            <fileset dir="${lib.dir}" includes="${unversionedprefix}*"/>
+                            <fileset dir="${lib.dir}" includes="${unversionedprefix}-*"/>                            
                          </delete>
                         
-                        <echo message="update ${basename}" level="info"/>
+                        <!--echo message="update ${basename}" level="info"/-->
                         
                         
-                        <copy file="@{distitem}" todir="${lib.dir}" overwrite="false" preservelastmodified="true" verbose="false"/>
+                        <copy file="@{distitem}" todir="${lib.dir}" overwrite="false" preservelastmodified="true" verbose="true"/>
                      </ac:then>
                      </ac:if>
                   </sequential>
