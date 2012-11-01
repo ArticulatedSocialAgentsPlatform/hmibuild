@@ -62,21 +62,7 @@
 
  
   
-     
-   <ac:if>
-      <not> <available file="ivy.xml" type="file"/> </not>
-   <ac:then>
-      <echo message="No ivy.xml file found, copying template..."/>
-      <property name="organization" value="HMI"/>
-      <copy file="${ivy.settings.dir}/ivy-template.xml" toFile="ivy.xml">
-         <filterset>
-            <filter token="MODULE" value="${ant.project.name}"/>
-            <filter token="ORG" value="${organization}"/>
-         </filterset>
-      </copy>
-   </ac:then>
-   </ac:if>  
-   
+
    
     
    <target name="-resolve"> <!-- resolve without <ivyclean/> -->
@@ -136,12 +122,25 @@
       <ac:then>
          <echo message="Resolve testlib, No ${test.ivy.file} file found, copying template..."/>
          <property name="organization" value="HMI"/>
-         <copy file="${shared.template.dir}/testdir-template/ivy.xml" toFile="${test.ivy.file}">
-         <filterset>
-            <filter token="MODULE" value="${ant.project.name}"/>
-            <filter token="ORG" value="${organization}"/>
-         </filterset>
-         </copy>
+         <ac:if>
+           <available file ="${shared.template.dir}/testdir-template/ivy-${language}.xml"/>
+           <ac:then>
+             <copy file="${shared.template.dir}/testdir-template/ivy-${language}.xml" toFile="${test.ivy.file}">
+             <filterset>
+                <filter token="MODULE" value="${ant.project.name}"/>
+                <filter token="ORG" value="${organization}"/>
+             </filterset>
+             </copy>
+           </ac:then>
+           <ac:else>
+             <copy file="${shared.template.dir}/testdir-template/ivy-generic.xml" toFile="${test.ivy.file}">
+             <filterset>
+                <filter token="MODULE" value="${ant.project.name}"/>
+                <filter token="ORG" value="${organization}"/>
+             </filterset>
+             </copy>
+           </ac:else>
+         </ac:if>
       </ac:then>
       </ac:if>  
       
