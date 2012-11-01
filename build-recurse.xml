@@ -47,4 +47,18 @@
       <sort><fileset dir="." includes="*/build.xml"/></sort>
     </subant>
   </target>
+
+  <target name="eclipsesourceproject"  >
+    <subant target="eclipsesourceproject" genericantfile="build.xml">
+      <sort><fileset dir="." includes="*/build.xml"/></sort>
+    </subant>
+  </target>
+
+  
+  <target name="eclipseproject"  >
+    <subant target="eclipseproject" genericantfile="build.xml">
+      <sort><fileset dir="." includes="*/build.xml"/></sort>
+    </subant>
+  </target>
+
 </project>
