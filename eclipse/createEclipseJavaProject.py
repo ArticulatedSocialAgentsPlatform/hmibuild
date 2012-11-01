@@ -33,6 +33,7 @@ def getDependencies():
       dependencies = properties['rebuild.list']
       dependencies = dependencies.split(',');  
       dependencies = map(lambda x: x.strip(), dependencies)
+      dependencies = map(lambda x: x.replace('/java',''), dependencies)
       dependencies = filter(lambda x: len(x)>0, dependencies)
       dependencies = map(lambda x: re.sub('^.*/','',x), dependencies)    
     return dependencies
