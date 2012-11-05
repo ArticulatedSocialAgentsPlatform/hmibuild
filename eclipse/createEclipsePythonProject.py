@@ -17,6 +17,21 @@ def writePyDevProject():
   spElem = ElementTree.SubElement(sourcePath,"path")
   spElem.text='/'+getProjectName()+'/src'
   
+  spElem = ElementTree.SubElement(sourcePath,"path")
+  spElem.text='/'+getProjectName()+'/lib'
+  
+  if os.path.isdir(BASE_DIR+'/generatedsrc'):
+    spElem = ElementTree.SubElement(sourcePath,"path")
+    spElem.text='/'+getProjectName()+'/generatedsrc'
+
+  if os.path.isdir(BASE_DIR+'/test/src'):
+    spElem = ElementTree.SubElement(sourcePath,"path")
+    spElem.text='/'+getProjectName()+'/test/src'    
+    
+  if os.path.isdir(BASE_DIR+'/test/lib'):
+    spElem = ElementTree.SubElement(sourcePath,"path")
+    spElem.text='/'+getProjectName()+'/test/lib'        
+    
   #<pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 2.7</pydev_property>
   pythonVersion = ElementTree.SubElement(root, "pydev_property")
   pythonVersion.attrib["name"]="org.python.pydev.PYTHON_PROJECT_VERSION"
