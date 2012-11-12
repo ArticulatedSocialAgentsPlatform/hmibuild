@@ -10,7 +10,7 @@
   
     <!-- Updates the main class, using the ant.properties file value                 -->
     <!-- it depends on property new.main.class, typically set from UltraEdit command -->
-   <target name="ueSetmain" depends="-init.main.class.file">
+   <target name="ueSetmain" depends="init, -init.main.class.file">
       <fail unless="new.main.file" message="specify new.main.class"/>
       <echo message="new.main.file=${new.main.file}"/>
       <ac:propertyregex property="full.name"
@@ -39,7 +39,7 @@
  <property name="editor2" value="C:\Program Files\UltraEdit\Uedit32.exe"/>
  <property name="editor" value="ue.bat"/>
   
- <target name="switchTest">
+ <target  depends="init" name="switchTest">
     <ac:propertyregex property="long.name"
               input="${java.file}"
               regexp="\\"
@@ -82,7 +82,7 @@
     </exec>
  </target>  
    
-   <target name="run-nocompile" description="Runs the main program for this project, without compiling anything">    
+   <target name="run-nocompile"  depends="init" description="Runs the main program for this project, without compiling anything">    
       <fail message="No run.main.class defined" unless="run.main.class"/> 
       <java classname="${run.main.class}" fork="${run.fork}" spawn="${run.spawn}" >             
           <classpath refid="run-classpath"/>
@@ -99,7 +99,7 @@
       </java> 
    </target>   
    
-    <target name="showmain"  description="Show the main class for &quot;run&quot;">
+    <target name="showmain"   depends="init" description="Show the main class for &quot;run&quot;">
       <echo message="${run.main.class} "/>
     </target>
 

@@ -1,0 +1,6 @@
+<ivy-module version="2.0">
+   <info organisation="@ORG@" module="@MODULE@Test"/>
+   <dependencies >
+      <dependency org="nose" name="nose"  rev="latest.release" />
+   </dependencies>
+</ivy-module>

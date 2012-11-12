@@ -37,7 +37,10 @@
    />
    
    <property environment="env"/>
-   
+
+   <!-- minimum required ant version -->
+   <property name="ant.version.required" value="1.8.0"/>
+
    <!-- read a user specific properties file, if available -->
    <property name="user.properties.dir" value="${user.home}" />
    <property name="user.properties.file" value="${user.properties.dir}/hmi.build.properties"/>
@@ -45,11 +48,11 @@
    <!--echo message="user.properties.file= ${user.properties.file}"/-->
    <property file="${user.properties.file}" /> 
    <property name="user.keyfile" value="${user.home}/.ssh/id_rsa"/>
-   
+   <property name="publish.user.name" value="${user.name}"/>
    
    
     <target name="tu" >
-       <echo message="user.home= ${user.home} user.name=${user.name} private key location = ${user.keyfile} userprops=${user.properties.file.available}"/>
+       <echo message="user.home= ${user.home} publish.user.name=${publish.user.name} user.name=${user.name} private key location = ${user.keyfile} userprops=${user.properties.file.available}"/>
     </target>
    
    <!-- Next we define a number of "shared" places:-->
@@ -145,6 +148,7 @@
    <property name="resource.repository.mode"             value="${repository.mode}"/> <!-- either "filesystem" or "url" -->
    <!-- The property used within the ant/ivy/ivysettings.xml file: -->
    <property name="resource.repository"                  value="resource.${resource.repository.mode}.repository"/>
+   <property name="asap.resource.repository"             value="asap.resource.${resource.repository.mode}.repository"/>
    
    
    <!-- ASAP REPO -->
@@ -162,7 +166,8 @@
    <!-- The actual locations of the  resource repository: -->
    <property name="resource.repository.filesystem"      value="${hmi.repository.filesystem.root}/resource"/>
    <property name="resource.repository.url"             value="${hmi.repository.url.base}/resource"/>
-   
+   <property name="asap.resource.repository.filesystem" value="${asap.repository.filesystem.root}/resource"/>
+   <property name="asap.resource.repository.url"        value="${asap.repository.url.base}/resource"/> 
    
    <!-- PROJECTS REPO -->
    <!-- Mode switch, for overriding "repository.mode" for "projects" repository: --> 
@@ -212,7 +217,17 @@
    </target> 
    
    <target name="help" depends="helphelp, Core.help, Ivy.help" description="Basic help"/>
- 
+
+  <target name="checkVersion">
+     <antversion property="version.running" />
+        <fail message="FATAL ERROR:  The running Ant version, ${version.running}, is too old, required version ${ant.version.required}.">
+        <condition>
+            <not>
+                <antversion atleast="${ant.version.required}" />
+            </not>
+        </condition>
+        </fail>
+   </target>
 </project>
 
   

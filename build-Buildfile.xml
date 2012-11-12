@@ -25,7 +25,7 @@
    
   
  
-   <target name="freeze" description="Replaces current local build file by standalone core build file">
+   <target name="freeze" depends="init" description="Replaces current local build file by standalone core build file">
       <fail message="Existing ${alternate.build.file} found" if="alternate.available"/>
       <move file="build.xml" tofile="${alternate.build.file}" failonerror="false" />
       <copy file="${shared.ant.dir}/build-Core.xml" tofile="build.xml" overwrite="false">

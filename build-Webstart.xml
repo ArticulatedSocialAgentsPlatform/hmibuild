@@ -20,7 +20,7 @@
    <property name="webstart.http.base"          value="http://hmi.ewi.utwente.nl/~zwiers" />
 
 
-   <target name="jnlp" description="Creates jnlp file in the webstart directory" >
+   <target name="jnlp" depends="init" description="Creates jnlp file in the webstart directory" >
        <echo message="project.dir: ${project.dir}"/>
      <copy file="${shared.template.dir}/webstart-template.jnlp" tofile="${webstart.dir}/${webstart.jnlpfile}">        
          <filterset>
@@ -38,19 +38,19 @@
    
    </target> 
     
-   <target name="webstart" depends="Core.jar, key" description="creates an unsigned jar file, ready for webstart">       
+   <target name="webstart" depends="init, Core.jar, key" description="creates an unsigned jar file, ready for webstart">       
       <copy file="${jarfile}" tofile="${webstart.jarfile}" preservelastmodified="true" />
       <!-- antcall target ="sign"/-->
    </target> 
     
-   <target name = "publish" depends = "webstart">
+   <target name = "publish" depends = "init,webstart">
       <mkdir dir="${webstart.local.base}/${webstart.deployment.dir}"/>
       <copy todir="${webstart.local.base}/${webstart.deployment.dir}">            
          <fileset dir="${webstart.dir}"  includes="**/*" />
       </copy>
    </target> 
     
-   <target name="initsign" description="Initialization for the jar task">
+   <target name="initsign" depends="init" description="Initialization for the jar task">
       <available file="${keystore.file}" property="Key.present"/>
    </target> 
     

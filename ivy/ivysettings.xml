@@ -36,6 +36,7 @@
    <property name="maven2.root2" value="http://repository.jboss.org/maven2/"/> 
    <!--property name="maven.pattern" value="[organisation]/[module]/[revision]/[module]-[revision].[ext]"/--> 
  
+   
    <property name="user" value="zwiers"/>
    <property name="password" value="xyz"/>
    <property name="remote.host" value="ewi1228.ewi.utwente.nl"/>
@@ -61,6 +62,7 @@
    <property name="projects.repository"                 value="projects.${projects.repository.mode}.repository"/>
    <property name="projects.repository.os"              value="projects.${projects.repository.mode}.repository.os"/>
    <property name="resource.repository"                 value="resource.${resource.repository.mode}.repository"/>
+   <property name="asap.resource.repository"            value="asap.resource.${resource.repository.mode}.repository"/>
    
    
   
@@ -195,7 +197,18 @@
          <artifact pattern="${resource.repository.url}/${ivy.local.default.artifact.pattern}" /> 
          <artifact pattern="${resource.repository.url}/${ivy.local.norevision.artifact.pattern}" /> 
       </url> 
-      
+
+      <filesystem name="asap.resource.filesystem.repository" > 
+         <ivy pattern="${asap.resource.repository.filesystem}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${asap.resource.repository.filesystem}/${ivy.local.default.artifact.pattern}" />
+         <artifact pattern="${asap.resource.repository.filesystem}/${ivy.local.norevision.artifact.pattern}" />
+      </filesystem>
+
+       <url name="asap.resource.url.repository">
+         <ivy pattern="${asap.resource.repository.url}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="${asap.resource.repository.url}/${ivy.local.default.artifact.pattern}" /> 
+         <artifact pattern="${asap.resource.repository.url}/${ivy.local.norevision.artifact.pattern}" /> 
+      </url> 
       
       
       <!-- PROJECTS REPO -->
@@ -213,20 +226,20 @@
      
       <!-- NO URL BASED VERSION FOR PROJECTS REPO YET -->
       
-     <sftp name="asap.sftp.publish" host="asap-project.ewi.utwente.nl" user="${user.name}" keyFile="${user.keyfile}" >
+     <sftp name="asap.sftp.publish" host="asap-project.ewi.utwente.nl" user="${publish.user.name}" keyFile="${user.keyfile}" >
          <ivy pattern="/asap-project/repository/${language}/${ivy.local.default.ivy.pattern}" />
          <artifact pattern="/asap-project/repository/${language}/${ivy.local.default.artifact.pattern}" />        
       </sftp>
-      <sftp name="asap.resource.sftp.publish" host="asap-project.ewi.utwente.nl" user="${user.name}" keyFile="${user.keyfile}" >
+      <sftp name="asap.resource.sftp.publish" host="asap-project.ewi.utwente.nl" user="${publish.user.name}" keyFile="${user.keyfile}" >
          <ivy pattern="/asap-project/resource/${ivy.local.default.ivy.pattern}" />
          <artifact pattern="/asap-project/resource/${ivy.local.default.artifact.pattern}" />        
       </sftp> 
       
-      <sftp name="hmicore.sftp.publish" host="hmirepo.ewi.utwente.nl" user="${user.name}" keyFile="${user.keyfile}" >
+      <sftp name="hmicore.sftp.publish" host="hmirepo.ewi.utwente.nl" user="${publish.user.name}" keyFile="${user.keyfile}" >
          <ivy pattern="/hmirepo/hmicore/${language}/${ivy.local.default.ivy.pattern}" />
          <artifact pattern="/hmirepo/hmicore/${language}/${ivy.local.default.artifact.pattern}" />        
       </sftp> 
-      <sftp name="resource.sftp.publish" host="hmirepo.ewi.utwente.nl" user="${user.name}" keyFile="${user.keyfile}" >
+      <sftp name="resource.sftp.publish" host="hmirepo.ewi.utwente.nl" user="${publish.user.name}" keyFile="${user.keyfile}" >
          <ivy pattern="/hmirepo/resource/${ivy.local.default.ivy.pattern}" />
          <artifact pattern="/hmirepo/resource/${ivy.local.default.artifact.pattern}" />        
       </sftp> 
@@ -254,7 +267,8 @@
          <resolver ref="${projects.repository}"/>
          <resolver ref="${projects.repository.os}"/>      
          
-         <resolver ref="${resource.repository}"/>
+	 <resolver ref="${resource.repository}"/>
+	 <resolver ref="${asap.resource.repository}"/>
          
       </chain>       
       

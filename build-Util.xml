@@ -35,12 +35,12 @@
    </target>
  
    
-   <target name="init" depends="-init.main.class.file,-init.build.properties, -init.dirs">
+   <target name="init" depends="checkVersion, -init.main.class.file,-init.build.properties, -init.dirs">
       
    </target>
   
  
-   <target name="main" depends="-init.main.class.file" description="Show and Set the main class for &quot;run&quot;">
+   <target name="main" depends="init, -init.main.class.file" description="Show and Set the main class for &quot;run&quot;">
        <hmi:findmain mainclassprop="main.class.prop" mainpref="Info" mainlistprop="main.list">
           <fileset dir="${src.dir}" includes="**/*.java"/>
        </hmi:findmain>
@@ -56,7 +56,7 @@
    </target>
    
    
-   <target name="dist" depends="jar" description="Alias for jar target (language-independent naming)"/>
+   <target name="dist" depends="init, jar" description="Alias for jar target (language-independent naming)"/>
    
    
    <!--target name="checkmain"  unless="run.main.class" description="Check for main class">
@@ -96,52 +96,6 @@
          </fileset>    
       </classpath>
    </typedef>  
-   
-   
-   <!--target name="tool-availability"> 
-      <available resource="org/tigris/subversion/svnant/svnantlib.xml"      classpathref="svnant.classpath"      property="available.svnant" />  
-      <echo message="SVN-ANT is available = ${available.svnant}"/>
-   </target-->
-   
-   
-  
-  
-   
-   <!--target name="svnupdate"  description="svn update">
-      <echo message="svnupdate for ${user.name}" />
-       <input message="password for ${user.name}?"   addproperty="user.password">
-          <handler classname="org.apache.tools.ant.input.SecureInputHandler" />
-       </input>
-
-       <tigris:svn javahl="false" svnkit="true" username="${user.name}" password="${user.password}"> 
-          <update dir="."/>
-       </tigris:svn>
-    </target-->
-    
-    
-    <!--target name="svnup"  description="svn update">
-       <tigris:svn javahl="false" svnkit="false"  >  <!- - cannot use svnkit here, in order to (re)use the authenication info from Documents and Settings/<user>/Application Data/Subversion/auth - ->
-          <update dir="."/>
-       </tigris:svn>
-    </target-->
-    
-    <!--target name="svnu"  description="svn update">
-      <echo message="svnupdate for ${user.name}" />
-       <input message="password for ${user.name}?"   addproperty="user.password">
-          <handler classname="org.apache.tools.ant.input.SecureInputHandler" />
-       </input>
-       
-       <tigris:svn javahl="false" svnkit="false" username="${user.name}" password="${user.password}"> <!- - password will (usually) be cached by svn - ->
-          <update dir="."/>
-       </tigris:svn>
-    </target-->
-   
-   <!--target name="svninfo"  description="svn info">
-      <echo message="svninfo" />
-       <tigris:svn javahl="false" svnkit="false"> 
-          <info target="."/>
-       </tigris:svn>
-    </target-->
    
    
    <ac:if>

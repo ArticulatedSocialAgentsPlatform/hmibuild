@@ -14,7 +14,7 @@
    </target>    
   
    
-   <target name="alpha" depends="createmanifest" description="produces an alpha jar version in the dist directory">   
+   <target name="alpha" depends="init,createmanifest" description="produces an alpha jar version in the dist directory">   
       <delete dir="${dist.dir}"/>    
       <property name="mf.file" value="alpha-manifest.mf" />      
       <copy file="${manifest.file}" toFile="alpha-manifest.mf" overwrite="true"/>
@@ -32,14 +32,14 @@
       <antcall target="alpha"/>
    </target>
   
-   <target name="ca" description="get alphas, compile and build new alpha">
+   <target name="ca"  depends="init" description="get alphas, compile and build new alpha">
       <antcall target="getalphas"/>
       <antcall target="alpha"/>
    </target>
 
   
  
-    <target name="getalphas" description="Copy alpha versions for rebuild list"> 
+    <target name="getalphas"  depends="init" description="Copy alpha versions for rebuild list"> 
        <ac:for  param="projectdir" list="${rebuild.list}" trim="true" keepgoing="true">
          <sequential>
             <!--echo message="ctes param=@{projectdir}"/-->    
@@ -52,7 +52,7 @@
                     <fileset dir="${shared.project.root}/@{projectdir}/dist">
                        <include name="**/*.jar"/>
                        <exclude name="**/*.xml"/>
-                     </fileset>
+                     </fileset>                     
                   </path> 
                   <sequential>
                      <!--echo message="item: @{distitem}"/-->
@@ -62,7 +62,7 @@
                                        replace=""
                                        override="true"
                      />
-                     <!--echo message="basename: ${basename}" /-->
+                     <!--echo message="basename: ${basename}"/-->
                      <ac:if>
                         <not>
                            <uptodate srcfile="@{distitem}" targetfile="${lib.dir}/${basename}"/>
@@ -75,13 +75,13 @@
                                           override="true"
                         />
                          <delete>
-                            <fileset dir="${lib.dir}" includes="${unversionedprefix}*"/>
+                            <fileset dir="${lib.dir}" includes="${unversionedprefix}-*"/>                            
                          </delete>
                         
-                        <echo message="update ${basename}" level="info"/>
+                        <!--echo message="update ${basename}" level="info"/-->
                         
                         
-                        <copy file="@{distitem}" todir="${lib.dir}" overwrite="false" preservelastmodified="true" verbose="false"/>
+                        <copy file="@{distitem}" todir="${lib.dir}" overwrite="false" preservelastmodified="true" verbose="true"/>
                      </ac:then>
                      </ac:if>
                   </sequential>
@@ -105,7 +105,7 @@
         </subant>
    </target-->
  
-   <target name="compilelist"   description="clean, getalphas, compile, and produce alpha jar, for all projects found on rebuild.list">  
+   <target name="compilelist"   depends="init" description="clean, getalphas, compile, and produce alpha jar, for all projects found on rebuild.list">  
       <echo message="REBUILDING ${module.name}"/> 
       <ac:if>
          <and>

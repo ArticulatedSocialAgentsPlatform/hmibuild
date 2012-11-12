@@ -1,6 +1,5 @@
 <project>
   <!-- ant include to work on all build.xml in subdirectories -->
-  
   <property name="build.dir"             value="build"    />
   <property name="deps.dir"              value="deps"  />
   <property name="dist.dir"              value="dist"  />
@@ -35,7 +34,7 @@
   </target>
 
   <target name="-pre-compilation">
-    <subant target="-pre-compilation" genericantfile="build.xml">
+    <subant target="-pre-compilation"   genericantfile="build.xml">
       <sort><fileset dir="." includes="*/build.xml"/></sort>
     </subant>
   </target>
@@ -46,21 +45,35 @@
     </subant>
   </target>
 
-  <target name="dist">
+  <target name="dist"  >
     <subant target="dist" genericantfile="build.xml">
       <sort><fileset dir="." includes="*/build.xml"/></sort>
     </subant>
   </target>
 
-  <target name="jar">
+  <target name="jar"  >
     <subant target="jar" genericantfile="build.xml">
       <sort><fileset dir="." includes="*/build.xml"/></sort>
     </subant>
   </target>
 
-  <target name="test">
+  <target name="test"  >
     <subant target="test" genericantfile="build.xml">
       <sort><fileset dir="." includes="*/build.xml"/></sort>
     </subant>
   </target>
+
+  <target name="eclipsesourceproject"  >
+    <subant target="eclipsesourceproject" genericantfile="build.xml">
+      <sort><fileset dir="." includes="*/build.xml"/></sort>
+    </subant>
+  </target>
+
+  
+  <target name="eclipseproject"  >
+    <subant target="eclipseproject" genericantfile="build.xml">
+      <sort><fileset dir="." includes="*/build.xml"/></sort>
+    </subant>
+  </target>
+
 </project>
