@@ -5,6 +5,12 @@
    <!-- settings for "jar" -->
    <property name="manifest.file"         value="manifest.mf"/>
 
+   <target name="-ivy.manifest" unless="${manifest.file.present}">
+      <!-- not needed for shell script local resolution -->
+      <!--ivy:info/-->
+      <!--property name="organisation" value="${ivy.organisation}"/ -->
+      <antcall target="Core.createmanifest"/>
+   </target>
    
    <target name="createmanifest" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
       <tstamp>   
@@ -74,7 +80,9 @@ Implementation-Vendor:  ${organisation}</echo>
          <arg value="ug+x"/>
          <arg value="${dist.dir}/scripts"/>
       </exec>
-   </target>
+  </target>
+  <target name="dist" depends="jar">
+  </target>
 
    <target name="-init.main.class.file" unless="main.class.file.available">   
    </target> 
