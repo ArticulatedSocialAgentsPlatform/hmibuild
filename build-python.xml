@@ -61,7 +61,7 @@ Implementation-Vendor:  ${organisation}</echo>
    <property name="deps.dir"              value="deps"  />
    <property name="deps.python.dir"       value="${deps.dir}/python"  />
    <!--property name="dist.file"             value="${dist.dir}/${module.name}.pyzip" /-->
-   <property name="dist.file"             value="${dist.python.dir}/${module.name}.zip" />
+   <property name="dist.file"             value="${dist.python.dir}/${module.name}.py.zip" />
 
    <property name="run.py"                value=""  />
     
@@ -213,10 +213,10 @@ Implementation-Vendor:  ${organisation}</echo>
       <mkdir dir="${dist.python.dir}"/>  
       <delete>
          <!--fileset dir="${dist.dir}" includes="${module.name}*.pyzip*"/-->
-         <fileset dir="${dist.python.dir}" includes="${module.name}*.zip*"/>
+         <fileset dir="${dist.python.dir}" includes="${module.name}*py.zip*"/>
       </delete>
       <property name="${jar.version.postfix}" value="" />
-      <property name="jarfile.basename"      value="${module.name}${jar.version.postfix}.zip"/>
+      <property name="jarfile.basename"      value="${module.name}${jar.version.postfix}.py.zip"/>
       <!--
       <zip destfile="${dist.file}"
            basedir="${build.dir}"
