@@ -1,6 +1,7 @@
 <project>
   <!-- ant include to work on all build.xml in subdirectories -->
   <property name="build.dir"             value="build"    />
+  <property name="lib.dir"               value="lib"  />
   <property name="deps.dir"              value="deps"  />
   <property name="dist.dir"              value="dist"  />
   <property name="dist.dir.absolute"     value="dist"  />
@@ -20,8 +21,9 @@
   </target>
 
    <target name="-clean-toplevel" description="Removes the top-level build directories">
-      <echo message="Cleaning ${dist.dir}" />
+      <echo message="Cleaning top-level build directories" />
       <delete dir="${build.dir}" failonerror="false"/>
+      <delete dir="${lib.dir}" failonerror="false"/>
       <delete dir="${dist.dir}" failonerror="false"/>
       <delete dir="${deps.dir}" failonerror="false"/>
       <delete dir="${test.build.dir}" failonerror="false"/>
