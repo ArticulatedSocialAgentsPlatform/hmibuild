@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Core" default="run">
+<project name="Core" default="run" xmlns:ac="antlib:net.sf.antcontrib" >
    <description>PythonProjects core build file</description>
 
    <taskdef 
@@ -20,7 +20,7 @@
    <!-- The main.class.file file keeps track of the run.main.class property, (re)defining the main class for "run" -->
    <property name="main.class.file" value="${private.properties.dir}/main.class"/>
    <property file="${main.class.file}" />
-   <available file="${main.class.file}" property="main.class.file.available" />
+   
    
       <!-- settings for "jar" -->
    <property name="manifest.file"         value="manifest.mf"/>
@@ -96,6 +96,23 @@ Implementation-Vendor:  ${organisation}</echo>
    
    <target name="build" depends="clean, compile" description="clean, compile"/>  
  
+  <target name="-findmain">
+    <path id="main.list.path">
+          <fileset dir="${src.dir}" includes="**/*.py"/>
+    </path>  
+    <echo message="${project.dir}/${src.dir}"/>
+    <pathconvert property="main.list" pathsep="," refid="main.list.path">
+      <map from="${project.dir}/${src.dir}/" to=""/>
+      <map from="${project.dir}\${src.dir}\" to=""/>            
+    </pathconvert>   
+    <ac:propertyregex property="main.class.prop"
+              input="${main.list}"
+              regexp=".*,"
+              replace=""
+              global="true"
+   />                   
+  </target>      
+  
    <target name="clean" description="Removes the build directory">
       <delete dir="${build.dir}" failonerror="false"/>
       <delete dir="${dist.dir}" failonerror="false"/>
@@ -202,11 +219,6 @@ Implementation-Vendor:  ${organisation}</echo>
    <target name="tes">
       <echo message="run.py: ${run.py}"/>
    </target>  
-
-   <target name="-init.main.class.file" unless="main.class.file.available">   
-        <!-- Needed by UltraEdit extension, but useless for python! -->
-   </target> 
-
 
    <target name="jar" depends="compile" description="Creates a pyzip file containing the project's sources after compiling them">
       <mkdir dir="${dist.dir}"/>  

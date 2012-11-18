@@ -128,9 +128,6 @@ Implementation-Vendor:  ${organisation}</echo>
 	<target name="test" depends="build-test" description="Run test cases">
 		<echo>FIXME: Doing nothing at the moment!</echo>
 	</target>
-   <target name="-init.main.class.file" unless="main.class.file.available">   
-        <!-- Needed by UltraEdit extension, but useless for proto! -->
-   </target> 
 
             
    <target name="compile-tests" depends="compile">

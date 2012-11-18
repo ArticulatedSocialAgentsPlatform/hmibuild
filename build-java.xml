@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Core" default="run" xmlns:ac="antlib:net.sf.antcontrib">
+<project name="Core" default="run" xmlns:ac="antlib:net.sf.antcontrib" xmlns:hmi="antlib:hmi.ant">
    <description>JavaProjects core build file</description>
   
 
@@ -13,7 +13,7 @@
    <!-- The main.class.file file keeps track of the run.main.class property, (re)defining the main class for "run" -->
    <property name="main.class.file" value="${private.properties.dir}/main.class"/>
    <property file="${main.class.file}" />
-   <available file="${main.class.file}" property="main.class.file.available" />
+   
    
    
    <!-- The module.name is used for javadoc, jar files etec.                                                              -->
@@ -198,12 +198,13 @@
   </condition>    
       
       
-   <target name="-init.main.class.file" unless="main.class.file.available">   
-      <mkdir dir="${private.properties.dir}"/>
-      <echo file="${main.class.file}" message="run.main.class=none"/>
-      <echo message="main.class file added to project${line.separator} "/>
-   </target> 
-      
+
+  <target name="-findmain">
+    <hmi:findmain mainclassprop="main.class.prop" mainpref="Info" mainlistprop="main.list">
+          <fileset dir="${src.dir}" includes="**/*.java"/>
+    </hmi:findmain>       
+  </target>      
+  
    <target name="main" depends="-init.main.class.file, init" description="Show and Set the main class for &quot;run&quot;">
       <echo message="Current main class: ${run.main.class}${line.separator} "/>
       <input

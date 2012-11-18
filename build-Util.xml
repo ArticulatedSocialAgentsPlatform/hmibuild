@@ -40,12 +40,16 @@
    <target name="init" depends="checkVersion, -init.main.class.file,-init.build.properties, -init.dirs">
       
    </target>
-  
+   
+   <available file="${main.class.file}" property="main.class.file.available" />
+   <target name="-init.main.class.file" unless="main.class.file.available">   
+      <mkdir dir="${private.properties.dir}"/>
+      <echo file="${main.class.file}" message="run.main.class=none"/>
+      <echo message="main.class file added to project${line.separator} "/>
+   </target> 
+
  
-   <target name="main" depends="init, -init.main.class.file" description="Show and Set the main class for &quot;run&quot;">
-       <hmi:findmain mainclassprop="main.class.prop" mainpref="Info" mainlistprop="main.list">
-          <fileset dir="${src.dir}" includes="**/*.java"/>
-       </hmi:findmain>
+   <target name="main" depends="init, -init.main.class.file, -findmain" description="Show and Set the main class for &quot;run&quot;">
        <property name="run.main.class" value="${main.class.prop}"/>
        <echo message="Current main class: ${run.main.class}${line.separator} "/>
        <input
@@ -54,7 +58,8 @@
          validargs="${main.list}"
          defaultvalue="${run.main.class}"
        />
-       <replaceregexp file="${main.class.file}"  match="^run.main.class.*"  replace="run.main.class=${new.main.class}" byline="true"  /> 
+       <!--replaceregexp file="${main.class.file}"  match="^run.main.class.*"  replace="run.main.class=${new.main.class}" byline="true"  /--> 
+       <echo file="${main.class.file}" message="run.main.class=${new.main.class}"/>
    </target>
    
    
