@@ -134,6 +134,10 @@ Implementation-Vendor:  ${organisation}</echo>
       
    </target>
 
+  <target name="-findmain">
+    <echo message="Not implemented." />
+  </target>
+
 </project>
 
   

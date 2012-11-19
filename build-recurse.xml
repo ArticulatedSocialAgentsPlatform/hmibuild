@@ -78,4 +78,9 @@
     </subant>
   </target>
 
+  <target name="-findmain">
+    <echo message="findmain not relevant for build-recurse" />
+  </target>
+ 
+
 </project>
