@@ -1,0 +1,18 @@
+<project xmlns:au="antlib:org.apache.ant.antunit" default="test">
+    <taskdef 
+            uri="antlib:org.apache.ant.antunit"
+            resource="org/apache/ant/antunit/antlib.xml">
+            <classpath>
+              <pathelement location="ant-antunit-1.2-hmi.jar"/>
+            </classpath>
+          </taskdef>
+	
+  <!-- is called prior to the test -->
+  <target name="test">
+    <au:antunit>
+      <fileset dir="." includes="testresolve/build.xml"/>
+      <au:plainlistener/>
+    </au:antunit>
+	  
+  </target>
+</project>
