@@ -3,4 +3,9 @@
 /**/*.*~
 *.*~
 .*.sw?
+/test/*/dist
+/test/*/lib
+/test/*/privateprops
+*.class
+*~
 

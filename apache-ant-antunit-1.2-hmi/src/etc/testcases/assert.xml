@@ -1,0 +1,240 @@
+<?xml version="1.0"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project name="assert-test"
+         default="all" xmlns:au="antlib:org.apache.ant.antunit">
+
+  <target name="all">
+    <au:antunit>
+      <fileset file="${ant.file}"/>
+      <au:plainlistener/>
+    </au:antunit>
+  </target>
+
+  <target name="fail">
+    <au:fail />
+  </target>
+
+  <target name="failWithMessage">
+    <au:fail message="This test is expecting to fail" />
+  </target>
+
+  <target name="assertTruePass">
+    <au:assertTrue>
+      <istrue value="true"/>
+    </au:assertTrue>
+  </target>
+
+  <target name="assertTrueFail">
+    <au:assertTrue>
+      <istrue value="false"/>
+    </au:assertTrue>
+  </target>
+
+  <target name="assertFalsePass">
+    <au:assertFalse>
+      <isfalse value="true"/>
+    </au:assertFalse>
+  </target>
+
+  <target name="assertFalseFail">
+    <au:assertFalse>
+      <isfalse value="false"/>
+    </au:assertFalse>
+  </target>
+
+  <target name="assertEqualsPass">
+    <au:assertEquals expected="bar" actual="bar"/>
+  </target>
+
+  <target name="assertEqualsCasePass">
+    <au:assertEquals expected="bar" actual="BAR" casesensitive="false"/>
+  </target>
+
+  <target name="assertEqualsFail1">
+    <au:assertEquals expected="bar" actual="baz"/>
+  </target>
+
+  <target name="assertEqualsFail2">
+    <au:assertEquals expected="bar" actual="BAR"/>
+  </target>
+
+  <target name="assertPropertySetPass">
+    <property name="foo" value="bar"/>
+    <au:assertPropertySet name="foo"/>
+  </target>
+
+  <target name="assertPropertySetFail">
+    <au:assertPropertySet name="foo"/>
+  </target>
+
+  <target name="assertPropertyEqualsPass">
+    <property name="foo" value="bar"/>
+    <au:assertPropertyEquals name="foo" value="bar"/>
+  </target>
+
+  <target name="assertPropertyEqualsCasePass">
+    <property name="foo" value="bar"/>
+    <au:assertPropertyEquals name="foo" value="BAR" casesensitive="false"/>
+  </target>
+
+  <target name="assertPropertyEqualsFail1">
+    <au:assertPropertyEquals name="foo" value="bar"/>
+  </target>
+
+  <target name="assertPropertyEqualsFail2">
+    <property name="foo" value="bar"/>
+    <au:assertPropertyEquals name="foo" value="baz"/>
+  </target>
+
+  <target name="assertPropertyEqualsFail3">
+    <property name="foo" value="bar"/>
+    <au:assertPropertyEquals name="foo" value="BAR"/>
+  </target>
+
+  <target name="assertPropertyContains">
+    <property name="foo" value="bar"/>
+    <au:assertPropertyContains name="foo" value="ba"/>
+  </target>
+
+  <target name="assertPropertyContainsFail">
+    <property name="foo" value="bar"/>
+    <au:assertPropertyContains name="foo" value="foo"/>
+  </target>
+
+  <target name="assertFileExistsPass">
+    <au:assertFileExists file="assert.xml"/>
+  </target>
+
+  <target name="assertFileExistsFail">
+    <au:assertFileExists file="assert.txt"/>
+  </target>
+
+  <target name="assertFileDoesntExistPass">
+    <au:assertFileDoesntExist file="assert.txt"/>
+  </target>
+
+  <target name="assertFileDoesntExistFail">
+    <au:assertFileDoesntExist file="assert.xml"/>
+  </target>
+
+  <target name="assertResourceExistsPass">
+    <au:assertResourceExists resource="assert.xml"/>
+  </target>
+
+  <target name="assertResourceExistsFail">
+    <au:assertResourceExists resource="assert.txt"/>
+  </target>
+
+  <target name="assertResourceDoesntExistPass">
+    <au:assertResourceDoesntExist resource="assert.txt"/>
+  </target>
+
+  <target name="assertResourceDoesntExistFail">
+    <au:assertResourceDoesntExist resource="assert.xml"/>
+  </target>
+
+  <target name="assertDestIsUptodatePass">
+    <au:assertDestIsUptodate
+      src="../../main/org/apache/ant/antunit/AssertTask.java"
+
+      dest="../../../build/classes/org/apache/ant/antunit/AssertTask.class"/>
+  </target>
+
+  <target name="assertDestIsUptodateFail">
+    <au:assertDestIsUptodate
+      dest="../../main/org/apache/ant/antunit/AssertTask.java"
+
+      src="../../../build/classes/org/apache/ant/antunit/AssertTask.class"/>
+  </target>
+
+  <target name="assertDestIsOutofdatePass">
+    <au:assertDestIsOutofdate
+      dest="../../main/org/apache/ant/antunit/AssertTask.java"
+
+      src="../../../build/classes/org/apache/ant/antunit/AssertTask.class"/>
+  </target>
+
+  <target name="assertDestIsOutofdateFail">
+    <au:assertDestIsOutofdate
+      src="../../main/org/apache/ant/antunit/AssertTask.java"
+
+      dest="../../../build/classes/org/apache/ant/antunit/AssertTask.class"/>
+  </target>
+
+  <target name="assertFilesMatchPass">
+    <au:assertFilesMatch expected="assert.xml" actual="assert.xml"/>
+  </target>
+
+  <target name="assertFilesMatchFail">
+    <au:assertFilesMatch expected="assert.xml" actual="antunit.xml"/>
+  </target>
+
+  <target name="assertFilesDifferFail">
+    <au:assertFilesDiffer expected="assert.xml" actual="assert.xml"/>
+  </target>
+
+  <target name="assertFilesDifferPass">
+    <au:assertFilesDiffer expected="assert.xml" actual="antunit.xml"/>
+  </target>
+
+  <target name="assertReferenceSetPass">
+    <path id="foo1"/>
+    <au:assertReferenceSet refid="foo1"/>
+  </target>
+
+  <target name="assertReferenceSetFail">
+    <au:assertReferenceSet refid="foo2"/>
+  </target>
+
+  <target name="assertReferenceIsTypePass">
+    <path id="foo3"/>
+    <au:assertReferenceIsType refid="foo3" type="path"/>
+  </target>
+
+  <target name="assertReferenceIsTypeFailNotSet">
+    <au:assertReferenceIsType refid="foo4" type="path"/>
+  </target>
+
+  <target name="assertReferenceIsTypeFailWrongType">
+    <path id="foo5"/>
+    <au:assertReferenceIsType refid="foo5" type="fileset"/>
+  </target>
+
+  <target name="assertMatches">
+    <au:assertMatches string="this is AbC"
+                      pattern="abc"
+                      casesensitive="false"/>
+  </target>
+
+  <target name="assertMatchesDefaultCaseSensitivity">
+    <au:expectfailure>
+      <au:assertMatches string="this is AbC"
+                        pattern="abc"/>
+    </au:expectfailure>
+  </target>
+
+  <target name="assertDoesntMatch">
+    <au:assertDoesntMatch string="this is AbC"
+                          pattern="abcd"
+                          casesensitive="false"/>
+  </target>
+</project>

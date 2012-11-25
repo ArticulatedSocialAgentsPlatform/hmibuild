@@ -1,0 +1,64 @@
+<body>
+<h1>Changes in 1.2</h1>
+<h2>Changes that Could Break Older Environments:</h2>
+<ul>
+<li>
+      assertResourceContains now first validates that the given
+      resource actually exists using assertResourceExists - this may
+      lead to a different error message than the ones generated with
+      AntUnit 1.1.
+    </li>
+<li>
+      The XSLT stylesheets now create HTML files instead of plain text
+      for logs sent to System.err and System.out.  You can always get
+      back to your own reporting by providing custom stylesheets.
+    </li>
+</ul>
+<h2>Fixed Bugs:</h2>
+<ul>
+<li>
+      The XSLT stylesheets now create HTML files instead of plain text
+      for logs sent to System.err and System.out.  You can always get
+      back to your own reporting by providing custom stylesheets.
+    </li>
+<li>
+      Default XSLT stylesheets now properly escape XML in exception
+      stack traces.
+    </li>
+<li>
+      assertPropertyContains was not checking the value of the property but
+      the name of the property.
+    </li>
+</ul>
+<h2>Other Changes:</h2>
+<ul>
+<li>
+      assertResourceContains now first validates that the given
+      resource actually exists using assertResourceExists - this may
+      lead to a different error message than the ones generated with
+      AntUnit 1.1.
+    </li>
+<li>
+      New assertion assertResourceExists and assertResourceDoesntExist
+      have been added.
+    </li>
+<li>
+      It is now possible to pass references from the build file
+      containing the &lt;antunit&gt; task to the build files under
+      test.
+    <a href="http://issues.apache.org/bugzilla/show_bug.cgi?id=49168">BugZilla Issue 49168</a>
+</li>
+<li>
+      Add experimental JUnit3 and JUnit4 adapters allowing to launch
+      AntUnit script from JUnit runner.  The API of that code is not
+      fixed and may change in future releases.
+    </li>
+<li>
+      expectfailure report the original build exception chained when failing
+    </li>
+<li>
+      Add a fail task that makes a test case fail if no condition is provided or
+      if the provided one is evaluated to false.
+    </li>
+</ul>
+</body>

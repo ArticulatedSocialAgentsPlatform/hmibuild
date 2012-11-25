@@ -1,0 +1,31 @@
+
+      <ivy-module version="2.0">
+        <info organisation="org/apache"
+              module="ant"
+              revision="1.2"
+              publication="20121125224124">
+          <license name="Apache Software License 2.0"
+                   url="http://www.apache.org/licenses/LICENSE-2.0"/>
+          <ivyauthor name="Apache Ant Development Team"
+                     url="http://ant.apache.org/"/>
+        </info>
+        <publications xmlns:e="urn:ant.apache.org:ivy-extras">
+          <artifact name="ant-antunit" type="pom" ext="pom"/>
+          <artifact name="ant-antunit" type="pom.asc" ext="pom.asc"/>
+          <artifact name="ant-antunit" type="jar" ext="jar"/>
+          <artifact name="ant-antunit" type="jar.asc" ext="jar.asc"/>
+          <artifact name="ant-antunit" type="source" ext="jar"
+                    e:classifier="sources"/>
+          <artifact name="ant-antunit" type="source.asc" ext="jar.asc"
+                    e:classifier="sources"/>
+          <artifact name="ant-antunit" type="javadoc" ext="jar"
+                    e:classifier="javadoc"/>
+          <artifact name="ant-antunit" type="javadoc.asc" ext="jar.asc"
+                    e:classifier="javadoc"/>
+          <artifact name="ant-antunit" type="ivy" ext="xml"
+                    e:classifier="ivy"/>
+          <artifact name="ant-antunit" type="ivy.asc" ext="xml.asc"
+                    e:classifier="ivy"/>
+        </publications>
+      </ivy-module>
+ 

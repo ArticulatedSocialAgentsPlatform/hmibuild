@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<!DOCTYPE document
+[
+<!ELEMENT document (properties?, release+)>
+<!ELEMENT properties (title)>
+<!ELEMENT title (#PCDATA)>
+<!ELEMENT release (action*)>
+<!ELEMENT action (#PCDATA)>
+<!ATTLIST release
+          version CDATA #REQUIRED
+          date CDATA #REQUIRED
+          description CDATA #IMPLIED>
+<!ATTLIST action
+          issue CDATA #IMPLIED
+          type (add|fix|remove|update) #REQUIRED
+          breaks-bwc (true|false) #IMPLIED>
+]
+>
+<document>
+  <properties>
+    <title>Apache AntUnit</title>
+  </properties>
+
+  <release version="1.2" date="not-released">
+    <action type="update" breaks-bwc="true">
+      assertResourceContains now first validates that the given
+      resource actually exists using assertResourceExists - this may
+      lead to a different error message than the ones generated with
+      AntUnit 1.1.
+    </action>
+    <action type="add">
+      New assertion assertResourceExists and assertResourceDoesntExist
+      have been added.
+    </action>
+    <action type="fix" breaks-bwc="true">
+      The XSLT stylesheets now create HTML files instead of plain text
+      for logs sent to System.err and System.out.  You can always get
+      back to your own reporting by providing custom stylesheets.
+    </action>
+    <action type="add" issue="49168">
+      It is now possible to pass references from the build file
+      containing the &lt;antunit&gt; task to the build files under
+      test.
+    </action>
+    <action type="add">
+      Add experimental JUnit3 and JUnit4 adapters allowing to launch
+      AntUnit script from JUnit runner.  The API of that code is not
+      fixed and may change in future releases.
+    </action>
+    <action type="update">
+      expectfailure report the original build exception chained when failing
+    </action>
+    <action type="fix">
+      Default XSLT stylesheets now properly escape XML in exception
+      stack traces.
+    </action>
+    <action type="fix">
+      assertPropertyContains was not checking the value of the property but
+      the name of the property.
+    </action>
+    <action type="add">
+      Add a fail task that makes a test case fail if no condition is provided or
+      if the provided one is evaluated to false.
+    </action>
+  </release>
+  
+  <release version="1.1" date="2008-09-26">
+    <action type="fix" issue="42745">
+      assertFileExists example wrong, should use @file instead of @name
+    </action>
+    <action type="fix" issue="43466">
+      Failure in tearDown doesn't result in failed test run
+    </action>
+    <action type="fix" issue="43639">
+      assertMatches' casesensitive attribute didn't default to true as
+      documented
+    </action>
+    <action type="add" issue="43639">
+      added a new assertDoesntMatch assertion
+    </action>
+    <action type="add" issue="43475">
+      added suiteSetUp and suiteTearDown targets
+    </action>
+    <action type="add" issue="43604">
+      plainlistener and xmllistener can now optionally contain the
+      test's log output in their reports
+    </action>
+    <action type="add" issue="43614">
+      xmllistener will now log the properties of the project under
+      test
+    </action>
+    <action type="add">
+      added new assertResourceContains and assertResourceDoesntContain
+      assertion
+    </action>
+  </release>
+
+</document>

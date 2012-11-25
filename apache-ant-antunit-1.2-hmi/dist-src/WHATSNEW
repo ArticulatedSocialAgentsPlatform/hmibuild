@@ -1,0 +1,110 @@
+Changes in 1.2
+==============================================
+
+Changes that Could Break Older Environments:
+--------------------------------------------
+
+
+      assertResourceContains now first validates that the given
+      resource actually exists using assertResourceExists - this may
+      lead to a different error message than the ones generated with
+      AntUnit 1.1.
+    
+
+      The XSLT stylesheets now create HTML files instead of plain text
+      for logs sent to System.err and System.out.  You can always get
+      back to your own reporting by providing custom stylesheets.
+    
+Fixed Bugs:
+-----------
+
+
+      Default XSLT stylesheets now properly escape XML in exception
+      stack traces.
+    
+
+      assertPropertyContains was not checking the value of the property but
+      the name of the property.
+    
+Other Changes:
+--------------
+
+
+      New assertion assertResourceExists and assertResourceDoesntExist
+      have been added.
+    
+
+      It is now possible to pass references from the build file
+      containing the <antunit> task to the build files under
+      test.
+    
+        BugZilla Issue 49168
+      
+
+      Add experimental JUnit3 and JUnit4 adapters allowing to launch
+      AntUnit script from JUnit runner.  The API of that code is not
+      fixed and may change in future releases.
+    
+
+      expectfailure report the original build exception chained when failing
+    
+
+      Add a fail task that makes a test case fail if no condition is provided or
+      if the provided one is evaluated to false.
+    
+
+Changes in 1.1
+==============================================
+
+Changes that Could Break Older Environments:
+--------------------------------------------
+
+Fixed Bugs:
+-----------
+
+
+      assertFileExists example wrong, should use @file instead of @name
+    
+        BugZilla Issue 42745
+      
+
+      Failure in tearDown doesn't result in failed test run
+    
+        BugZilla Issue 43466
+      
+
+      assertMatches' casesensitive attribute didn't default to true as
+      documented
+    
+        BugZilla Issue 43639
+      
+Other Changes:
+--------------
+
+
+      added a new assertDoesntMatch assertion
+    
+        BugZilla Issue 43639
+      
+
+      added suiteSetUp and suiteTearDown targets
+    
+        BugZilla Issue 43475
+      
+
+      plainlistener and xmllistener can now optionally contain the
+      test's log output in their reports
+    
+        BugZilla Issue 43604
+      
+
+      xmllistener will now log the properties of the project under
+      test
+    
+        BugZilla Issue 43614
+      
+
+      added new assertResourceContains and assertResourceDoesntContain
+      assertion
+    
+

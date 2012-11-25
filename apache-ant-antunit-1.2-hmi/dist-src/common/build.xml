@@ -1,0 +1,518 @@
+<?xml version="1.0"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<project name="common">
+
+  <dirname property="common.basedir" file="${ant.file.common}"/>
+  <import file="${common.basedir}/common-tasks.xml"/>
+
+  <target name="setup-properties">
+    <property file="build.properties"/>
+    <!--load in an optional file containing versions of things-->
+    <property file="version.properties"/>
+    
+    <!--load in a file containing versions of ant
+      and other libraries-->
+    <property file="${ant.home}/lib/libraries.properties"/>
+
+    <!-- properties for build and test -->
+    <property name="build" value="build"/>
+    <property name="build.classes" value="${build}/classes"/>
+    <property name="build.testclasses" value="${build}/test-classes"/>
+    <property name="build.lib" value="${build}/lib"/>
+    <property name="build.javarepository"
+              value="${build}/java-repository"/>
+    <property name="build.javadoc" value="${build}/javadoc"/>
+    <property name="src.junit" location="src/tests/junit"/>
+    <property name="src.antunit" location="src/tests/antunit"/>
+    
+    <!-- javac properties -->
+    <property name="javac.-source" value="1.2"/>
+    <property name="javac.-target" value="1.2"/>
+    <property name="javac.test-source" value="${javac.-source}"/>
+    <property name="javac.test-target" value="${javac.-target}"/>
+    <property name="javac.debug" value="on"/>
+
+    <!--you really need a proper version in version.properties-->
+    <property name="artifact.version" value="0.1-SNAPSHOT"/>
+    <property name="artifact.name" value="ant-${ant.project.name}"/>
+    <property name="artifact.stub" value="${artifact.name}-${artifact.version}"/>
+    <property name="jarname" value="${build.lib}/${artifact.stub}.jar"/>
+    <property name="target.jar" value="${jarname}"/>
+
+    <!-- properties for distribution target -->
+    <property name="dist.name"
+      value="apache-${artifact.name}-${artifact.version}"/>
+    <property name="dist.base" value="distribution"/>
+    <property name="dist.base.source" value="${dist.base}/source"/>
+    <property name="dist.base.binaries" value="${dist.base}/binaries"/>
+    <property name="bin.dist.dir" value="dist-bin"/>
+    <property name="src.dist.dir" value="dist-src"/>
+
+    <!-- junit test properties -->
+    <property name="junit.fork" value="true" />
+    <property name="junit.forkmode" value="once" />
+  </target>
+
+  <target name="setup" depends="setup-properties">
+    <mkdir dir="${build.classes}"/>
+    <mkdir dir="${build.testclasses}"/>
+    <mkdir dir="${build.lib}"/>
+    <copy file="${common.basedir}/style.css" todir="docs"/>
+  </target>
+
+  <!--Milestones to extend or override-->
+  <target name="ready-to-compile" depends="setup"/>
+  <target name="ready-to-test-with-junit" depends="compile-tests"/>
+  <target name="ready-to-test-with-antunit" depends="setup-for-antunit-tests"/>
+  <target name="ready-to-package" depends="compile"/>
+  <target name="ready-to-distribute" depends="antlib"/>
+  <target name="package" depends="checksum-target-jar"
+       description="Package everything up"/>
+
+  <target name="compile" depends="setup">
+    <javac 
+      srcdir="src/main"
+      destdir="${build.classes}"
+      debug="${javac.debug}"
+      source="${javac.-source}"
+      target="${javac.-target}"
+      includeantruntime="true"
+      />
+  </target>
+
+  <target name="check-for-NOTICE">
+    <available file="NOTICE" property="notice-present?"/>
+
+    <fail unless="notice-present?">You must create a product specific
+    NOTICE file based on common/NOTICE.template in the top level
+    directory</fail>
+  </target>
+
+  <target name="antlib" depends="compile, check-for-NOTICE">
+    <copy todir="${build.classes}">
+      <fileset dir="src/main" includes="**/*.xml,**/*.properties"/>
+    </copy>
+    <jar destfile="${jarname}">
+      <fileset dir="${build.classes}"/>
+      <metainf file="NOTICE"/>
+      <metainf file="${common.basedir}/LICENSE"/>
+    </jar>
+  </target>
+
+  <target name="checksum-target-jar"
+          description="checksum our jar" depends="antlib">
+    <checksums>
+      <file file="${target.jar}"/>
+    </checksums>
+  </target>
+  
+  <target name="determine-test-types">
+    <condition property="skip-junit">
+      <not>
+        <available file="${src.junit}"/>
+      </not>
+    </condition>
+    <condition property="skip-antunit">
+      <not>
+        <available file="${src.antunit}"/>
+      </not>
+    </condition>
+  </target>
+
+  <target name="setup-for-junit-tests" depends="setup,determine-test-types"
+    unless="skip-junit">
+    <available classname="junit.framework.TestCase" property="junit-present?"/>    
+    <fail unless="junit-present?">The JUnit library is not present.</fail>
+            
+    <available classname="org.apache.tools.ant.BuildFileTest"
+      property="testutil-present?"
+      ignoresystemclasses="true"
+      classpath="${ant-testutil.jar}"/>
+
+    <fail unless="testutil-present?">Expected to find ant-testutil.jar
+    in ${ant-testutil.jar}, please set the property ant-testutil.jar
+    to the correct location.</fail>
+  </target>
+
+  <target name="setup-for-antunit-tests" depends="setup,determine-test-types"
+    unless="skip-antunit">
+    <available classname="org.apache.ant.antunit.AntUnit"
+      property="antunit-present?"/>
+
+    <fail unless="antunit-present?">The AntUnit Ant library is not present.</fail>
+  </target>
+
+  <target name="compile-tests" depends="setup-for-junit-tests, antlib"
+    unless="skip-junit">
+    <javac 
+      srcdir="${src.junit}"
+      destdir="${build.testclasses}"
+      debug="${javac.debug}"
+      source="${javac.test-source}"
+      target="${javac.test-target}"
+      >
+      <classpath>
+        <pathelement location="${jarname}"/>
+        <pathelement location="${ant-testutil.jar}"/>
+      </classpath>
+    </javac>
+    <copy todir="${build.testclasses}">
+      <fileset dir="${src.junit}" includes="**/*.xml,**/*.properties"/>
+    </copy>
+  </target>
+
+  <target name="junit-test" depends="ready-to-test-with-junit"
+    unless="skip-junit">
+    <junit
+      printsummary="false"
+      haltonfailure="false"
+      failureproperty="junit.tests.failed"
+      filtertrace="false"
+      fork="${junit.fork}"
+      forkmode="${junit.forkmode}"
+      includeantruntime="true"
+      >
+      <classpath>
+        <pathelement location="${jarname}"/>
+        <pathelement location="${ant-testutil.jar}"/>
+        <pathelement location="${build.testclasses}"/>
+      </classpath>
+
+      <batchtest>
+        <fileset dir="${src.junit}"/>
+      </batchtest>
+
+      <formatter type="plain" usefile="false"/>
+    </junit>
+  </target>
+
+  <target name="antunit-test" depends="ready-to-test-with-antunit"
+    unless="skip-antunit">
+    <condition property="antunit.includes" value="${antunit.testcase}"
+               else="**/test.xml,**/*-test.xml">
+      <isset property="antunit.testcase" />
+    </condition>
+
+    <property name="antunit.excludes" value="" />
+
+    <au:antunit xmlns:au="antlib:org.apache.ant.antunit"
+      failOnError="false"
+      errorProperty="antunit.tests.failed"
+      >
+      <fileset dir="${src.antunit}" includes="${antunit.includes}"
+               excludes="${antunit.excludes}" />
+
+      <au:plainlistener/>
+    </au:antunit>
+  </target>
+
+  <target name="test" depends="junit-test, antunit-test">
+    <fail if="junit.tests.failed">At least one JUnit test has failed.</fail>
+    <fail if="antunit.tests.failed">At least one AntUnit test has failed.</fail>
+  </target>
+
+  <target name="clean" depends="setup-properties">
+    <delete dir="${build}"/>
+    <delete dir="${dist.base}"/>
+    <delete dir="${dist.name}"/>
+    <delete dir="${bin.dist.dir}"/>
+    <delete dir="${src.dist.dir}"/>
+  </target>
+
+  <target name="javadoc_check">
+    <uptodate property="javadoc.notrequired"
+              targetfile="${build.javadoc}/package-list">
+      <srcfiles dir="src/main" includes="**/*.java,**/*.html"/>
+    </uptodate>
+  </target>
+
+  <target name="javadoc" depends="setup-properties, javadoc_check"
+          description="--> creates the API documentation"
+          unless="javadoc.notrequired">
+    <mkdir dir="${build.javadoc}"/>
+    <javadoc useexternalfile="yes"
+             maxmemory="1000M"	
+             destdir="${build.javadoc}"
+             version="true"
+             locale="en"
+             windowtitle="${artifact.name} API"
+             doctitle="${artifact.name}"
+             failonerror="true"
+             verbose="false">
+      <packageset dir="src/main"/>
+    </javadoc>
+  </target>
+
+  <!--copy the target to the destination. Only allowed if the tests pass!-->
+
+  <target name="install" depends="test">
+    <copy file="${jarname}" todir="${ant.home}/lib"/>
+  </target>  
+
+  <import file="${common.basedir}/m2.xml"/>
+  <import file="${common.basedir}/ivy.xml"/>
+
+  <target name="src-dist" depends="m2-pom,ivy.xml"
+    description="--> creates a source distribution">
+
+    <mkdir dir="${src.dist.dir}"/>
+    <copy todir="${src.dist.dir}">
+      <fileset dir=".">
+        <include name="src/"/>
+        <include name="common/"/>
+        <include name="docs/"/>
+        <include name="README"/>
+        <include name="INSTALL"/>
+        <include name="NOTICE"/>
+        <include name="TODO"/>
+        <include name="changes.xml"/>
+        <include name="contributors.xml"/>
+        <include name="build.xml"/>
+        <include name="version.properties"/>
+      </fileset>
+      <fileset dir="common">
+        <include name="LICENSE"/>
+      </fileset>
+      <fileset file="${target.pom}"/>
+    </copy>
+
+    <fixcrlf srcdir="${src.dist.dir}" eol="dos" includes="*.bat,*.cmd"/>
+    <fixcrlf srcdir="${src.dist.dir}" eol="unix">
+      <include name="**/*.sh"/>
+      <include name="**/*.pl"/>
+    </fixcrlf>
+    <fixcrlf srcdir="${src.dist.dir}">
+      <include name="**/*.java"/>
+    </fixcrlf>
+
+    <antcall target="create-readable-documents">
+      <param name="dest.dir" value="${src.dist.dir}"/>
+    </antcall>
+  </target>
+
+  <target name="bin-dist" depends="checksum-target-jar,m2-pom,ivy.xml,javadoc">
+    <mkdir dir="${bin.dist.dir}"/>
+
+    <copy todir="${bin.dist.dir}">
+      <fileset dir=".">
+        <include name="docs/"/>
+        <include name="README"/>
+        <include name="INSTALL"/>
+        <include name="NOTICE"/>
+        <include name="TODO"/>
+        <include name="changes.xml"/>
+        <include name="contributors.xml"/>
+      </fileset>
+      <fileset dir="common">
+        <include name="LICENSE"/>
+      </fileset>
+      <fileset file="${jarname}*"/>
+      <fileset file="${target.pom}"/>
+    </copy>
+    <copy todir="${bin.dist.dir}/javadoc">
+      <fileset dir="${build.javadoc}"/>
+    </copy>
+    <copy todir="${bin.dist.dir}/" includeemptydirs="false">
+      <fileset dir="src">
+        <include name="etc/"/>
+        <exclude name="etc/testcases/"/>
+      </fileset>
+    </copy>
+    <antcall target="create-readable-documents">
+      <param name="dest.dir" value="${bin.dist.dir}"/>
+    </antcall>
+  </target>
+
+  <target name="distribution" description="creates a complete distribution"
+    depends="ready-to-distribute">
+
+    <mkdir dir="${dist.base.binaries}"/>
+    <mkdir dir="${dist.base.source}"/>
+
+    <!--delete dir="${java-repository.dir}"/-->
+    <!--mkdir dir="${java-repository.dir}"/-->
+
+    <delete dir="${dist.name}"/>
+    <antcall target="bin-dist" inheritall="false">
+      <param name="bin.dist.dir" value="${dist.name}"/>
+    </antcall>
+
+    <zip destfile="${dist.base.binaries}/${dist.name}-bin.zip">
+      <zipfileset dir="${dist.name}/.." filemode="755">
+        <include name="${dist.name}/bin/*.pl"/>
+        <include name="${dist.name}/bin/*.py"/>
+      </zipfileset>
+      <fileset dir="${dist.name}/..">
+        <include name="${dist.name}/**"/>
+        <exclude name="${dist.name}/bin/*.pl"/>
+        <exclude name="${dist.name}/bin/*.py"/>
+      </fileset>
+    </zip>
+    <tar longfile="gnu"
+      destfile="${dist.base.binaries}/${dist.name}-bin.tar">
+      <tarfileset dir="${dist.name}/.." mode="755" username="ant" group="ant">
+        <include name="${dist.name}/bin/*.pl"/>
+        <include name="${dist.name}/bin/*.py"/>
+      </tarfileset>
+      <tarfileset dir="${dist.name}/.." username="ant" group="ant">
+        <include name="${dist.name}/**"/>
+        <exclude name="${dist.name}/bin/*.pl"/>
+        <exclude name="${dist.name}/bin/*.py"/>
+      </tarfileset>
+    </tar>
+    <gzip destfile="${dist.base.binaries}/${dist.name}-bin.tar.gz"
+      src="${dist.base.binaries}/${dist.name}-bin.tar"/>
+    <bzip2 destfile="${dist.base.binaries}/${dist.name}-bin.tar.bz2"
+      src="${dist.base.binaries}/${dist.name}-bin.tar"/>
+    <delete file="${dist.base.binaries}/${dist.name}-bin.tar"/>
+
+    <!--copy todir="${java-repository.dir}">
+      <fileset dir="${dist.name}/lib">
+        <include name="ant*.jar"/>
+      </fileset>
+      <mapper type="glob" from="*.jar" to="*-${version}.jar"/>
+    </copy>
+    <checksums>
+      <fileset dir="${java-repository.dir}" includes="*${version}.jar"/>
+    </checksums-->
+
+    <checksums>
+      <fileset dir="${dist.base.binaries}/">
+        <include name="**/*"/>
+        <exclude name="**/*.asc"/>
+        <exclude name="**/*.md5"/>
+        <exclude name="**/*.sha1"/>
+        <exclude name="**/*.sha512"/>
+      </fileset>
+    </checksums>
+
+    <delete dir="${dist.name}"/>
+    <antcall target="src-dist" inheritall="false">
+      <param name="src.dist.dir" value="${dist.name}"/>
+    </antcall>
+
+    <zip destfile="${dist.base.source}/${dist.name}-src.zip">
+      <fileset dir="${dist.name}/..">
+        <include name="${dist.name}/**"/>
+      </fileset>
+    </zip>
+    <tar longfile="gnu"
+      destfile="${dist.base.source}/${dist.name}-src.tar">
+      <tarfileset dir="${dist.name}/.." username="ant" group="ant">
+        <include name="${dist.name}/**"/>
+      </tarfileset>
+    </tar>
+    <gzip destfile="${dist.base.source}/${dist.name}-src.tar.gz"
+      src="${dist.base.source}/${dist.name}-src.tar"/>
+    <bzip2 destfile="${dist.base.source}/${dist.name}-src.tar.bz2"
+      src="${dist.base.source}/${dist.name}-src.tar"/>
+    <delete file="${dist.base.source}/${dist.name}-src.tar"/>
+    <delete dir="${dist.name}"/>
+    <checksums>
+      <fileset dir="${dist.base.source}/">
+        <include name="**/*"/>
+        <exclude name="**/*.asc"/>
+        <exclude name="**/*.md5"/>
+        <exclude name="**/*.sha1"/>
+        <exclude name="**/*.sha512"/>
+      </fileset>
+    </checksums>
+  </target>
+
+  <target name="check-contributors">
+    <available property="contributors.file.exists?"
+      file="contributors.xml"/>
+  </target>
+
+  <target name="check-changes">
+    <available property="changes.file.exists?"
+      file="changes.xml"/>
+  </target>
+
+  <target name="style-contributors" depends="check-contributors"
+    if="contributors.file.exists?">
+    <xslt style="${common.basedir}/stylesheets/contributors.xsl" in="contributors.xml"
+      out="${dest.dir}/CONTRIBUTORS"/>
+  </target>
+
+  <target name="style-changes" depends="check-changes"
+    if="changes.file.exists?">
+    <xslt style="${common.basedir}/stylesheets/changes2whatsnew.xsl" in="changes.xml"
+      out="${dest.dir}/WHATSNEW"/>
+    <xslt style="${common.basedir}/stylesheets/changes2readmehtml.xsl" in="changes.xml"
+      out="${dest.dir}/README.html"/>
+  </target>
+
+  <target name="create-readable-documents"
+    depends="style-contributors,style-changes"/>
+
+  <!-- uploading of releases -->
+  <import file="${common.basedir}/upload.xml"/>
+
+  <target name="prepare-upload" depends="bin-dist">
+    <property name="upload.dir"
+              value="${build.javarepository}/org/apache/ant/${artifact.name}/${artifact.version}"/>
+    <mkdir dir="${upload.dir}"/>
+    <copy file="${jarname}" todir="${upload.dir}"/>
+    <copy file="${target.pom}" todir="${upload.dir}"/>
+    <copy file="${target.ivy.xml}" todir="${upload.dir}"/>
+    <jar destfile="${upload.dir}/${artifact.stub}-sources.jar">
+      <fileset dir="src/main"/>
+      <metainf file="NOTICE"/>
+      <metainf file="${common.basedir}/LICENSE"/>
+    </jar>
+    <jar destfile="${upload.dir}/${artifact.stub}-javadoc.jar">
+      <fileset dir="${build.javadoc}"/>
+      <metainf file="NOTICE"/>
+      <metainf file="${common.basedir}/LICENSE"/>
+    </jar>
+  </target>
+
+  <target name="check-sigs" depends="prepare-upload">
+    <uptodate property="jar.sig.ok"
+              srcfile="${upload.dir}/${artifact.stub}.jar"
+              targetfile="${upload.dir}/${artifact.stub}.jar.asc"/>
+    <uptodate property="pom.sig.ok"
+              srcfile="${upload.dir}/${artifact.stub}.pom"
+              targetfile="${upload.dir}/${artifact.stub}.pom.asc"/>
+    <uptodate property="sources.sig.ok"
+              srcfile="${upload.dir}/${artifact.stub}-sources.jar"
+              targetfile="${upload.dir}/${artifact.stub}-sources.jar.asc"/>
+    <uptodate property="javadoc.sig.ok"
+              srcfile="${upload.dir}/${artifact.stub}-javadoc.jar"
+              targetfile="${upload.dir}/${artifact.stub}-javadoc.jar.asc"/>
+    <uptodate property="ivy.sig.ok"
+              srcfile="${upload.dir}/${artifact.stub}-ivy.xml"
+              targetfile="${upload.dir}/${artifact.stub}-ivy.xml.asc"/>
+    <fail message="Your OpenPGP signature of the artifacts is too old or missing">
+      <condition>
+        <not>
+          <and>
+            <isset property="jar.sig.ok"/>
+            <isset property="pom.sig.ok"/>
+            <isset property="sources.sig.ok"/>
+            <isset property="javadoc.sig.ok"/>
+            <isset property="ivy.sig.ok"/>
+          </and>
+        </not>
+      </condition>
+    </fail>
+  </target>
+
+  <target name="upload" depends="check-sigs,perform-nexus-upload"/>
+</project>

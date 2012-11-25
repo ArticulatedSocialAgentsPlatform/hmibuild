@@ -1,0 +1,334 @@
+<?xml version="1.0"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<antlib xmlns:au="antlib:org.apache.ant.antunit">
+  <taskdef name="antunit"
+    classname="org.apache.ant.antunit.AntUnit"/>
+
+  <taskdef name="fail"
+    classname="org.apache.ant.antunit.AssertTask"/>
+
+  <taskdef name="expectfailure"
+    classname="org.apache.ant.antunit.ExpectFailureTask"/>
+
+  <typedef name="plainlistener"
+    classname="org.apache.ant.antunit.listener.PlainAntUnitListener"/>
+
+  <typedef name="xmllistener"
+    classname="org.apache.ant.antunit.listener.XMLAntUnitListener"/>
+
+  <typedef name="failurelistener"
+    classname="org.apache.ant.antunit.listener.FailureAntUnitListener"/>
+
+  <typedef name="logcapturer"
+           classname="org.apache.ant.antunit.LogCapturer"/>
+
+  <typedef name="logcontains"
+    classname="org.apache.ant.antunit.LogContains"/>
+
+  <typedef name="logcontent"
+    classname="org.apache.ant.antunit.LogContent" />
+
+  <typedef name="resourceExists"
+    classname="org.apache.ant.antunit.ResourceExists"/>
+
+  <!-- Actually just an alias of fail that expects a condition -->
+  <macrodef name="assertTrue" backtrace="false">
+    <attribute name="message" default="Assertion failed"/>
+    <element name="assertion" implicit="true"/>
+    <sequential>
+      <au:fail message="@{message}">
+        <assertion/>
+      </au:fail>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertFalse" backtrace="false">
+    <attribute name="message" default="Assertion failed"/>
+    <element name="assertion" implicit="true"/>
+    <sequential>
+      <au:fail message="@{message}">
+        <not>
+          <assertion/>
+        </not>
+      </au:fail>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertEquals" backtrace="false">
+    <attribute name="expected"/>
+    <attribute name="actual"/>
+    <attribute name="casesensitive" default="true"/>
+    <attribute name="message"
+      default="Expected '@{expected}' but was '@{actual}'"/>
+    <sequential>
+      <au:fail message="@{message}">
+        <equals arg1="@{expected}" arg2="@{actual}"
+                  casesensitive="@{casesensitive}"/>
+      </au:fail>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertPropertySet" backtrace="false">
+    <attribute name="name"/>
+    <attribute name="message"
+      default="Expected property '@{name}'"/>
+    <sequential>
+      <au:fail message="@{message}">
+        <isset property="@{name}"/>
+      </au:fail>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertPropertyEquals" backtrace="false">
+    <attribute name="name"/>
+    <attribute name="value"/>
+    <attribute name="casesensitive" default="true"/>
+    <attribute name="message"
+      default="Expected property '@{name}' to have value '@{value}' but was '${@{name}}'"/>
+    <sequential>
+      <au:assertPropertySet message="@{message}" name="@{name}"/>
+      <au:assertEquals message="@{message}" expected="@{value}"
+        actual="${@{name}}" casesensitive="@{casesensitive}"/>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertPropertyContains" backtrace="false">
+    <attribute name="name"/>
+    <attribute name="value"/>
+    <attribute name="casesensitive" default="true"/>
+    <attribute name="message"
+               default="Expected property '@{name}' to contain value '@{value}' but was '${@{name}}'"/>
+    <sequential>
+      <au:assertPropertySet message="@{message}" name="@{name}"/>
+      <au:fail message="@{message}">
+        <contains string="${@{name}}" substring="@{value}"
+                  casesensitive="@{casesensitive}"/>
+      </au:fail>
+    </sequential>
+  </macrodef>
+  
+  <macrodef name="assertFileExists" backtrace="false">
+    <attribute name="file"/>
+    <attribute name="message"
+      default="Expected file '@{file}' to exist"/>
+    <sequential>
+      <au:fail message="@{message}">
+        <available file="@{file}"/>
+      </au:fail>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertFileDoesntExist" backtrace="false">
+    <attribute name="file"/>
+    <attribute name="message"
+      default="Didn't expect file '@{file}' to exist"/>
+    <sequential>
+      <au:assertFalse message="@{message}">
+        <available file="@{file}"/>
+      </au:assertFalse>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertResourceExists" backtrace="false">
+    <attribute name="resource"/>
+    <attribute name="message"
+      default="Expected resource '@{resource}' to exist"/>
+    <sequential>
+      <au:fail message="@{message}">
+        <au:resourceExists resource="@{resource}"/>
+      </au:fail>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertResourceDoesntExist" backtrace="false">
+    <attribute name="resource"/>
+    <attribute name="message"
+      default="Didn't expect resource '@{resource}' to exist"/>
+    <sequential>
+      <au:assertFalse message="@{message}">
+        <au:resourceExists resource="@{resource}"/>
+      </au:assertFalse>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertResourceContains">
+    <attribute name="resource"/>
+    <attribute name="value"/>
+    <attribute name="casesensitive" default="true"/>
+    <attribute name="message"
+	       default="Expected resource '@{resource}' to contain value '@{value}' but was '${@{resource}}'"/>
+    <sequential>
+      <au:assertResourceExists resource="@{resource}"/>
+      <au:fail message="@{message}">
+	<resourcecontains resource="@{resource}" substring="@{value}"
+                          casesensitive="@{casesensitive}"/>
+      </au:fail>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertResourceDoesntContain">
+    <attribute name="resource"/>
+    <attribute name="value"/>
+    <attribute name="casesensitive" default="true"/>
+    <attribute name="message"
+	       default="Didn't expect resource '@{resource}' to contain value '@{value}' but was '${@{resource}}'"/>
+    <sequential>
+      <au:assertFalse message="@{message}">
+	<resourcecontains resource="@{resource}" substring="@{value}"
+                          casesensitive="@{casesensitive}"/>
+      </au:assertFalse>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertDestIsUptodate" backtrace="false">
+    <attribute name="src"/>
+    <attribute name="dest"/>
+    <attribute name="message"
+      default="Expected '@{dest}' to be more recent than '@{src}'"/>
+    <sequential>
+      <au:fail message="@{message}">
+        <uptodate srcfile="@{src}" targetfile="@{dest}"/>
+      </au:fail>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertDestIsOutofdate" backtrace="false">
+    <attribute name="src"/>
+    <attribute name="dest"/>
+    <attribute name="message"
+      default="Expected '@{src}' to be more recent than '@{dest}'"/>
+    <sequential>
+      <au:assertFalse message="@{message}">
+        <uptodate srcfile="@{src}" targetfile="@{dest}"/>
+      </au:assertFalse>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertFilesMatch" backtrace="false">
+    <attribute name="expected"/>
+    <attribute name="actual"/>
+    <attribute name="message"
+      default="Expected files '@{expected}' and '@{actual}' to match"/>
+    <sequential>
+      <au:fail message="@{message}">
+        <filesmatch file1="@{expected}" file2="@{actual}"/>
+      </au:fail>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertFilesDiffer" backtrace="false">
+    <attribute name="expected"/>
+    <attribute name="actual"/>
+    <attribute name="message"
+      default="Expected files '@{expected}' and '@{actual}' to differ"/>
+    <sequential>
+      <au:assertFalse message="@{message}">
+        <filesmatch file1="@{expected}" file2="@{actual}"/>
+      </au:assertFalse>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertReferenceSet" backtrace="false">
+    <attribute name="refid"/>
+    <attribute name="message"
+      default="Expected reference '@{refid}'"/>
+    <sequential>
+      <au:fail message="@{message}">
+        <isreference refid="@{refid}"/>
+      </au:fail>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertReferenceIsType" backtrace="false">
+    <attribute name="refid"/>
+    <attribute name="type"/>
+    <attribute name="message"
+      default="Expected reference '@{refid}' to be a '@{type}'"/>
+    <sequential>
+      <au:assertReferenceSet refid="@{refid}"/>
+      <au:fail message="@{message}">
+        <isreference refid="@{refid}" type="@{type}"/>
+      </au:fail>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertLogContains" backtrace="false">
+    <attribute name="text"/>
+    <attribute name="level" default="info"/>
+    <attribute name="message"
+      default="Expected log to contain '@{text}' at level @{level}"/>
+    <sequential>
+      <au:fail message="@{message}">
+        <au:logcontains text="@{text}" level="@{level}"/>
+      </au:fail>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertLogDoesntContain" backtrace="false">
+    <attribute name="text"/>
+    <attribute name="level" default="info"/>
+    <attribute name="message"
+      default="Unexpected log '@{text}' at level @{level}"/>
+    <sequential>
+      <au:assertFalse message="@{message}">
+        <au:logcontains text="@{text}" level="@{level}"/>
+      </au:assertFalse>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertMatches" backtrace="false">
+    <attribute name="string"/>
+    <attribute name="pattern"/>
+    <attribute name="casesensitive" default="true"/>
+    <attribute name="singleline" default="false"/>
+    <attribute name="multiline" default="false"/>
+    <attribute name="message"
+      default="Expected '@{string}' to match pattern '@{pattern}'"/>
+    <sequential>
+      <au:fail message="@{message}">
+	<matches string="@{string}" pattern="@{pattern}"
+                 casesensitive="@{casesensitive}"
+                 singleline="@{singleline}"
+                 multiline="@{multiline}"/>
+      </au:fail>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="assertDoesntMatch" backtrace="false">
+    <attribute name="string"/>
+    <attribute name="pattern"/>
+    <attribute name="casesensitive" default="true"/>
+    <attribute name="singleline" default="false"/>
+    <attribute name="multiline" default="false"/>
+    <attribute name="message"
+      default="Expected '@{string}' to not match pattern '@{pattern}'"/>
+    <sequential>
+      <au:fail message="@{message}">
+        <not>
+          <matches string="@{string}" pattern="@{pattern}"
+                   casesensitive="@{casesensitive}"
+                   singleline="@{singleline}"
+                   multiline="@{multiline}"/>
+        </not>
+      </au:fail>
+    </sequential>
+  </macrodef>
+
+</antlib>
