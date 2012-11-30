@@ -37,7 +37,7 @@ Checkstyle configuration that checks the HMI coding conventions.
     </module>
     <module name="RedundantModifier"/>
     <module name="EmptyBlock"/>
-    <module name="DoubleCheckedLocking"/>
+    <!--module name="DoubleCheckedLocking"/-->
     <module name="EmptyStatement"/>
     <module name="EqualsHashCode"/>
     <module name="IllegalInstantiation"/>
