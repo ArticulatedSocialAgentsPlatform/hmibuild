@@ -305,16 +305,19 @@
       </ac:if> 
       <antcall target="-checkversionnumber"/>
       <property name="devnum" value="-1"/> <!-- default, causing autoincrement for dev release numbers -->
-      <echo message="releaselist (${release.target}) ${release.list}"/>
       
       <filelist id="release.project.dirs" dir="${shared.project.root}" files="${release.list}" />
+      
+      <!-- debug print -->
+      <pathconvert pathsep="," property="release.project.dirs.printed" refid="release.project.dirs"/>      
+      <echo message="releaselist (${release.target}) ${release.list}, projects: ${release.project.dirs.printed}"/>
+      
       
       <!-- First resolve all relevant projects, so external dependencies have been resolved correctly  ... -->
       <antcall target="ivyclean"/>
       <subant target="-resolve" verbose="false" inheritall="false">
          <filelist refid="release.project.dirs"/>
-      </subant>
-      <antcall target="-resolve"/>
+      </subant>      
       
       <!-- next, produce the alpha versions, needed to test at the source code level -->
       <property name="compile.list" value="${release.list}"/>
@@ -323,8 +326,7 @@
       <!-- Then test them all  ... -->
       <subant target="junit" verbose="false" inheritall="false">
          <filelist refid="release.project.dirs"/>
-      </subant>
-      <antcall target="junit"/>
+      </subant>      
       
       <!-- Finally do the actual ivy release  ... -->
       <!--antcall target="ivyclean"/--> <!-- not sure we need this -->
