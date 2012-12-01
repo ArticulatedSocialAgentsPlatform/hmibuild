@@ -107,6 +107,7 @@
  
    <target name="compilelist"   depends="init" description="clean, getalphas, compile, and produce alpha jar, for all projects found on rebuild.list">  
       <echo message="REBUILDING ${module.name}"/> 
+      <mkdir dir="${lib.dir}"/>
       <ac:if>
          <and>
             <isset property="rebuild.list"/>
