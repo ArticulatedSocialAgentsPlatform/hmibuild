@@ -7,12 +7,22 @@
             </classpath>
           </taskdef>
 	
-  <!-- is called prior to the test -->
+  
   <target name="test">
+    <mkdir dir="reports"/>
     <au:antunit>
       <fileset dir="." includes="test*/build.xml"/>      
+      <au:xmllistener toDir="reports"/>      
       <au:plainlistener/>
-    </au:antunit>
-	  
+    </au:antunit>	  
+  </target>
+  
+  <target name="testreport" depends="test">
+    <junitreport todir="./reports">
+       <fileset dir="./reports">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report format="frames"  styledir="styles" todir="./reports/html"/>
+    </junitreport>
   </target>
 </project>
