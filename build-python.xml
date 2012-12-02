@@ -318,6 +318,7 @@ Implementation-Vendor:  ${organisation}</echo>
 
     <target name="compile-tests" depends="compile">
       <mkdir dir="${test.build.dir}"/>
+      <mkdir dir="${test.src.dir}"/>
       <copy todir="${test.build.dir}">
           <fileset dir="${test.src.dir}">
               <exclude name="**/*pyc" />
