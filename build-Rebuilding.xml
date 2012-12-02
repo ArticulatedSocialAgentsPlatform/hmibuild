@@ -105,8 +105,8 @@
         </subant>
    </target-->
  
-   <target name="compilelist"   depends="init" description="clean, getalphas, compile, and produce alpha jar, for all projects found on rebuild.list">  
-      <echo message="REBUILDING ${module.name}"/> 
+   <target name="compilerebuildlist"   depends="init" description="clean, getalphas, compile, and produce alpha jar, for all projects found on rebuild.list">  
+    <echo message="REBUILDING ${module.name}"/> 
       <mkdir dir="${lib.dir}"/>
       <ac:if>
          <and>
@@ -118,6 +118,9 @@
          <delegate target="-gba" list="rebuildList" verbose="false"/>
       </ac:then>
       </ac:if>
+   </target>
+   
+   <target name="compilelist"   depends="compilerebuildlist" description="clean, getalphas, compile, and produce alpha jar, for all projects found on rebuild.list, then clean, getalphas, compile, and produce alpha jar for self">        
       <antcall target="-gba"/>
    </target>
  
