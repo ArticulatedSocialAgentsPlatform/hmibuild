@@ -349,6 +349,11 @@ Implementation-Vendor:  ${organisation}</echo>
       </fail>
    </target>
    
+   <!-- nofail version of junit -->
+   <target name="-junit" depends="-test" description="Run all tests">
+      
+   </target>
+   
    <target name="junitreport" depends="compile-tests" description="Run all tests and create an xunit compatible XML report" >
       <delete dir="${test.report.dir}" failonerror="false"/>
       <mkdir dir="${test.report.dir}"/>  
