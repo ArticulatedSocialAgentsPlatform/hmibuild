@@ -321,7 +321,7 @@
       
       <!-- next, produce the alpha versions, needed to test at the source code level -->
       <property name="compile.list" value="${release.list}"/>
-      <antcall target="compilelist"/>
+      <antcall target="compilerebuildlist"/>
       
       <!-- Then test them all  ... -->
       <subant target="junit" verbose="false" inheritall="false">
