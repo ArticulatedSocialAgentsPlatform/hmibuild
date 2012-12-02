@@ -1,0 +1,6 @@
+<ivy-module version="2.0">
+   <info organisation="HMI" module="HmiAntTest"/>
+   <dependencies> 
+	   <dependency org="google" name="protobuf" rev="2.4.1"/>
+</dependencies>
+</ivy-module>

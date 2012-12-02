@@ -10,7 +10,7 @@
   <!-- is called prior to the test -->
   <target name="test">
     <au:antunit>
-      <fileset dir="." includes="testresolve/build.xml"/>
+      <fileset dir="." includes="test*/build.xml"/>      
       <au:plainlistener/>
     </au:antunit>
 	  
