@@ -6,12 +6,15 @@
   </target>
 
   <!-- is called after the test, even if that caused an error -->
-  <target name="tearDown">    
+  <target name="tearDown">  
+    <delete dir="lib"/>  
+    <delete dir="privateprops"/>
   </target>
 
   <!-- the actual test case -->
   <target name="antunittestResolve">
     <antcall target="Ivy.resolve"/>
+    <au:assertFileExists file="lib/HmiUtil-1.25.jar"/>    
     <au:plainlistener/>
   </target>
 </project>
