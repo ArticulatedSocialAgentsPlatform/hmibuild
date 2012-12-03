@@ -8,7 +8,7 @@
   <!-- is called after the test, even if that caused an error -->
   <target name="tearDown">  
 	 
-	  <delete dir="build/classes"/>  
+	  <delete dir="build"/>  
 	  <delete dir="privateprops"/>  
 	 <delete dir="dist"/>  
   </target>
