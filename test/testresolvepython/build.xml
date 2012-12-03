@@ -12,7 +12,7 @@
   </target>
 
   <!-- the actual test case -->
-  <target name="antunittestResolve">
+  <target name="antunittestResolvePython">
     <antcall target="Ivy.resolve"/>
     <au:assertFileExists file="lib/protobuf-2.4.1.zip"/>    
     <au:plainlistener/>

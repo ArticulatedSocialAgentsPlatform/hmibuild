@@ -12,7 +12,7 @@
   </target>
 
   <!-- the actual test case -->
-  <target name="antunittestResolve">
+  <target name="antunittestCompileJava">
     <antcall target="Core.compile"/>
     <au:assertFileExists file="build/classes/Test.class"/>    
     <au:plainlistener/>

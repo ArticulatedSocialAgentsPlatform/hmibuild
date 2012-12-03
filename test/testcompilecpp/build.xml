@@ -7,16 +7,17 @@
 
   <!-- is called after the test, even if that caused an error -->
   <target name="tearDown">  
-	 
-	  <delete dir="build"/>  
+	  <delete includeemptydirs="true">
+      <fileset dir="build" includes="**/*"/>
+    </delete>
 	  <delete dir="privateprops"/>  
-	 <delete dir="dist"/>  
+	  <delete dir="dist"/>  	  
   </target>
 
   <!-- the actual test case -->
-  <target name="antunittestCompilePython">
-    <antcall target="Core.compile"/>
-    <au:assertFileExists file="build/test.pyc"/>    
-    <au:plainlistener/>
+  <target name="antunittestCompileCpp">
+	  <antcall target="Core.compile"/>
+	  <au:assertFileExists file="build/CMakeCache.txt"/>    
+    <au:plainlistener/>    
   </target>
 </project>

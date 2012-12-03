@@ -12,7 +12,7 @@
   </target>
 
   <!-- the actual test case -->
-  <target name="antunittestResolve">
+  <target name="antunittestResolveJava">
     <antcall target="Ivy.resolve"/>
     <au:assertFileExists file="lib/HmiUtil-1.25.jar"/>    
     <au:plainlistener/>
