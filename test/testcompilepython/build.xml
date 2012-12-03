@@ -1,0 +1,22 @@
+<project xmlns:au="antlib:org.apache.ant.antunit">
+  <import file="../../build.xml" />
+  
+  <!-- is called prior to the test -->
+  <target name="setUp">
+  </target>
+
+  <!-- is called after the test, even if that caused an error -->
+  <target name="tearDown">  
+	 
+	  <delete dir="build/classes"/>  
+	  <delete dir="privateprops"/>  
+	 <delete dir="dist"/>  
+  </target>
+
+  <!-- the actual test case -->
+  <target name="antunittestResolve">
+    <antcall target="Core.compile"/>
+    <au:assertFileExists file="build/test.pyc"/>    
+    <au:plainlistener/>
+  </target>
+</project>
