@@ -51,6 +51,7 @@
                   <path>
                     <fileset dir="${shared.project.root}/@{projectdir}/dist">
                        <include name="**/*.jar"/>
+                       <include name="**/*.zip"/>
                        <exclude name="**/*.xml"/>
                      </fileset>                     
                   </path> 
@@ -90,6 +91,18 @@
             </ac:if>
          </sequential>
       </ac:for>
+      <!-- unzip all zips in lib.dir -->
+      <unzip dest="${lib.dir}">
+         <fileset dir="${lib.dir}/" includes="*.zip"/>
+         <patternset>
+            <include name="**/*.jar"/>
+            <include name="**/*.dll"/>
+            <include name="**/*.so"/>
+            <include name="**/*.jnilib"/>
+            <include name="**/*.py"/>
+            <include name="**/*.data"/>
+         </patternset>
+      </unzip>
    </target>
    
    <!--target name="rebuild"  depends=" -init.rebuild.list" description="rebuild project including projects on the rebuild-list" >    
