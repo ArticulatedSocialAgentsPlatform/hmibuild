@@ -23,11 +23,13 @@
           
    <!-- Names of main project directories -->   
    <property name="src.dir"               value="src"      />
+
    <property name="generatedsrc.dir"      value="generatedsrc"      />
    <property name="resource.dir"          value="resource" /> 
    <property name="lib.dir"               value="lib"      />
    <property name="build.dir"             value="build"    />
    <property name="build.classes.dir"     value="${build.dir}/classes" />
+   <property name="src.delombok.dir"      value="${build.dir}/src-delomboked"/>
    <property name="dist.dir"              value="dist"  />
    <property name="deps.dir"              value="deps"  />
     
@@ -84,8 +86,12 @@
         <delete dir="${generatedsrc.dir}"/>
         <delete dir="${deps.dir}"/>
    </target>
-   
 
+   <target name="delombok" depends="init">
+   <taskdef classname="lombok.delombok.ant.DelombokTask" classpath="${ant.file.JavaProjects}/../lombok-0.11.6.jar" name="delombok" />
+	<mkdir dir="build/src-delomboked" />
+	<delombok verbose="true" encoding="UTF-8" to="${src.delombok.dir}" from="${src.dir}" />
+   </target>
 
    <target name="-compilegenerated" description="Compile generated java file(s)"> 
    <ac:if>
