@@ -15,7 +15,7 @@
 
   <!-- the actual test case -->
   <target name="antunittestCompilePython">
-    <antcall target="Core.compile"/>
+    <antcall target="compile"/>
     <au:assertFileExists file="build/test.pyc"/>    
     <au:plainlistener/>
   </target>

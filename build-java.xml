@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Core" default="run" xmlns:ac="antlib:net.sf.antcontrib" xmlns:hmi="antlib:hmi.ant">
+<project name="CoreJava" default="run" xmlns:ac="antlib:net.sf.antcontrib" xmlns:hmi="antlib:hmi.ant">
    <description>JavaProjects core build file</description>
   
 
@@ -62,7 +62,7 @@
  
    <available file="${src.dir}" property="src.dir.present"/> <!-- requires (?) ant 1.8 -->
   
-   <target name="help" description="Help for building and running projects">
+   <target name="-help" description="Help for building and running projects">
    <echo> -- Building/Running/Testing --
     ant              Default target is: ${ant.project.default-target}
     clean            Deletes the build and dist directories
@@ -298,7 +298,7 @@ Implementation-Vendor:  ${organisation}</echo>
        <property name="jar.version" value="-${specification.version}"/> <!- - set only if specification.version defined - ->
    </target-->
  
-   <target name="jar" depends="createmanifest, compile" description="Creates a jar file containing the project's class files and resources">
+   <target name="-jar" depends="createmanifest, compile" description="Creates a jar file containing the project's class files and resources">
       <mkdir dir="${dist.dir}"/>  
       <delete>
          <fileset dir="${dist.dir}" includes="${module.name}*.jar*"/>

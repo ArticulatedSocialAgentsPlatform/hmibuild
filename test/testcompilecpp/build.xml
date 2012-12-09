@@ -16,7 +16,7 @@
 
   <!-- the actual test case -->
   <target name="antunittestCompileCpp">
-	  <antcall target="Core.compile"/>
+	  <antcall target="compile"/>
 	  <au:assertFileExists file="build/CMakeCache.txt"/>    
     <au:plainlistener/>    
   </target>

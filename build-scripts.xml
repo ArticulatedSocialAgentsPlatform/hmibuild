@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Core" default="compile">
+<project name="CoreScripts" default="compile">
    <description>Script file collection core build file</description>
 
    <!-- settings for "jar" -->
@@ -9,7 +9,7 @@
       <!-- not needed for shell script local resolution -->
       <!--ivy:info/-->
       <!--property name="organisation" value="${ivy.organisation}"/ -->
-      <antcall target="Core.createmanifest"/>
+      <antcall target="createmanifest"/>
    </target>
    
    <target name="createmanifest" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
@@ -43,7 +43,7 @@ Implementation-Vendor:  ${organisation}</echo>
 
    <available file="${src.dir}" property="src.dir.present"/> <!-- requires (?) ant 1.8 -->
 
-   <target name="help" description="Help for building and running projects">
+   <target name="-help" description="Help for building and running projects">
    <echo> -- Building/Running/Testing --
     ant              Default target is: ${ant.project.default-target}
     compile          Compiles all files in the project
@@ -67,7 +67,7 @@ Implementation-Vendor:  ${organisation}</echo>
    <target name="compile" depends="-compilation" description="Compile the sources after preprocessing"/>  
    <target name="build" depends="compile" description="compile"/>  
       
-   <target name="jar" depends="build" description="Installs scripts to the dist dir">
+   <target name="-jar" depends="build" description="Installs scripts to the dist dir">
       <mkdir dir="${dist.dir}"/>  
       <mkdir dir="${dist.dir}/scripts"/>  
       <!-- grave limitation: <copy> will NEVER preserve permissions! -->
