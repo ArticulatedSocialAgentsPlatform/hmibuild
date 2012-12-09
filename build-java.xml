@@ -30,6 +30,7 @@
    <property name="build.dir"             value="build"    />
    <property name="build.classes.dir"     value="${build.dir}/classes" />
    <property name="src.delombok.dir"      value="${build.dir}/src-delomboked"/>
+   <property name="src.doc.dir"      	  value="${src.delombok.dir}"/>
    <property name="dist.dir"              value="dist"  />
    <property name="deps.dir"              value="deps"  />
     
@@ -240,10 +241,13 @@
    <property name="javadoc.linksource"    value="yes"/>
    <property name="javadoc.packages"      value="*"/>
    
-   <target name="doc" depends="init" description="Generates javadoc documentation">      
+   <target name="-pre-doc" depends="delombok">      
+   </target>
+   
+   <target name="doc" depends="init, -pre-doc" description="Generates javadoc documentation">      
       <javadoc 
          source="${javac.source}"        
-         sourcepath="${src.dir}"  
+         sourcepath="${src.doc.dir}"  
          destdir="${javadoc.dir}" 
          packagenames="${javadoc.packages}"
          doctitle="${javadoc.doctitle}"
