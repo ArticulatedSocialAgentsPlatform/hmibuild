@@ -275,7 +275,7 @@
  
    <available file="${manifest.file}" property="manifest.file.present"/>
  
-   <target name="createmanifest" depends="init" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
+   <target name="-createmanifest" depends="init" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
      <tstamp>   
           <format property="MANIFEST_TIME" pattern="MMMM dd yyyy  hh:mm aa" locale="en" />
       </tstamp>

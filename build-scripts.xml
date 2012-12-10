@@ -9,7 +9,7 @@
       <!-- not needed for shell script local resolution -->
       <!--ivy:info/-->
       <!--property name="organisation" value="${ivy.organisation}"/ -->
-      <antcall target="createmanifest"/>
+      <antcall target="-createmanifest"/>
    </target>
    
    <target name="createmanifest" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
