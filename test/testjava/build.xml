@@ -7,14 +7,20 @@
 
   <!-- is called after the test, even if that caused an error -->
   <target name="tearDown">  
-	  <delete dir="build"/>  
-	  <delete dir="privateprops"/>  
+	  <delete failonerror="false" dir="build"/>  
+	  <delete failonerror="false" dir="privateprops"/>  
+	  <delete failonerror="false" dir="lib"/>      
   </target>
 
-  <!-- the actual test case -->
   <target name="antunittestCompileJava">
     <antcall target="compile"/>
     <au:assertFileExists file="build/classes/Test.class"/>    
+    <au:plainlistener/>
+  </target>
+  
+  <target name="antunittestResolveJava">
+    <antcall target="Ivy.resolve"/>
+    <au:assertFileExists file="lib/HmiUtil-1.25.jar"/>    
     <au:plainlistener/>
   </target>
 </project>

@@ -7,11 +7,16 @@
 
   <!-- is called after the test, even if that caused an error -->
   <target name="tearDown">  
-    <delete dir="dist"/>  	  
-    <delete file="manifest.mf"/>  	  
+    <delete failonerror="false" dir="dist"/>  	  
+    <delete failonerror="false" dir="build"/>  	  
+    <delete failonerror="false" file="manifest.mf"/>  	       
   </target>
 
-  <!-- the actual test case -->
+  <target name="antunittestCompileScripts">
+	  <antcall target="compile"/>
+    <au:plainlistener/>    
+  </target>
+  
   <target name="antunittestDistScripts">
 	  <antcall target="dist"/>
 	  <au:assertFileExists file="dist/scripts/test.script"/> 

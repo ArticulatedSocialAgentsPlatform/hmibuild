@@ -7,11 +7,20 @@
 
   <!-- is called after the test, even if that caused an error -->
   <target name="tearDown">  
-    <delete dir="lib"/>  
-    <delete dir="privateprops"/>    
+	 
+	  <delete failonerror="false" dir="build"/>  
+	  <delete failonerror="false" dir="privateprops"/>  
+	  <delete failonerror="false" dir="dist"/>  
+	  <delete failonerror="false" dir="lib"/>      
   </target>
 
   <!-- the actual test case -->
+  <target name="antunittestCompilePython">
+    <antcall target="compile"/>
+    <au:assertFileExists file="build/test.pyc"/>    
+    <au:plainlistener/>
+  </target>
+  
   <target name="antunittestResolvePython">
     <antcall target="Ivy.resolve"/>
     <au:assertFileExists file="lib/protobuf-2.4.1.zip"/>    

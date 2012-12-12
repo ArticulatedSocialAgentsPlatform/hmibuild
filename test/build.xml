@@ -9,6 +9,7 @@
 	
   
   <target name="test">
+    <delete failonerror="false" dir="reports"/> 
     <mkdir dir="reports"/>
     <au:antunit>
       <fileset dir="." includes="test*/build.xml"/>      
