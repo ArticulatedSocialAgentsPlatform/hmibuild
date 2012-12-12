@@ -12,13 +12,19 @@
 	  <delete failonerror="false" dir="privateprops"/>  
 	  <delete failonerror="false" dir="dist"/>  
 	  <delete failonerror="false" dir="lib"/>      
+	  <delete failonerror="false" file="manifest.mf"/>      
   </target>
 
-  <!-- the actual test case -->
   <target name="antunittestCompilePython">
     <antcall target="compile"/>
     <au:assertFileExists file="build/test.pyc"/>    
     <au:plainlistener/>
+  </target>
+  
+  <target name="antunittestDistPython">
+    <antcall target="dist"/>
+    <au:assertFileExists file="dist/testpython-0.1.py.zip"/> 
+	  <au:assertFileExists file="manifest.mf"/> 
   </target>
   
   <target name="antunittestResolvePython">
