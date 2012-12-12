@@ -12,7 +12,7 @@
       <antcall target="-createmanifest"/>
    </target>
    
-   <target name="createmanifest" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
+   <target name="-createmanifest" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
       <tstamp>   
           <format property="MANIFEST_TIME" pattern="MMMM dd yyyy  hh:mm aa" locale="en" />
       </tstamp>
