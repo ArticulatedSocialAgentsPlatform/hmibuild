@@ -74,12 +74,17 @@ Implementation-Vendor:  ${organisation}</echo>
       <copy todir="${dist.dir}/scripts">
          <fileset dir="${scripts.dir}"/>
       </copy>
+      
       <!-- WORKAROUND -->
+      <!--
       <exec executable="chmod">
          <arg value="-R"/>
          <arg value="ug+x"/>
          <arg value="${dist.dir}/scripts"/>
       </exec>
+      -->
+      <!-- windows compliant version of WORKAROUND -->
+      <chmod perm="ug+x" includes="${dist.dir}/scripts/**"/>            
   </target>
   <target name="dist" depends="jar">
   </target>
