@@ -1,0 +1,17 @@
+<project xmlns:au="antlib:org.apache.ant.antunit">
+  <import file="../../build.xml" />
+  
+  <!-- is called prior to the test -->
+  <target name="setUp">
+  </target>
+
+  <!-- is called after the test, even if that caused an error -->
+  <target name="tearDown">  
+  </target>
+
+  <!-- the actual test case -->
+  <target name="antunittestCompileScripts">
+	  <antcall target="compile"/>
+    <au:plainlistener/>    
+  </target>
+</project>
