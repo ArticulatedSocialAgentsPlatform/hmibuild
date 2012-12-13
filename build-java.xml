@@ -49,8 +49,7 @@
    </path>  
       
    <fileset id="lib.fileset" dir=".">
-      <include name="${lib.dir}/**/*.jar"   />
-      <include name="${lib.local}/**/*.jar" />
+      <include name="${lib.dir}/*.jar"   />      
    </fileset>
     
    <path id="javac-classpath">
