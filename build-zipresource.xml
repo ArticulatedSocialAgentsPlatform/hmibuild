@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Used to build a resource that is to be published as a .zip file
+-->
+<project name="CoreZipResource" default="run" xmlns:ac="antlib:net.sf.antcontrib" >
+    <property name="dist.dir"               value="dist"/>
+    <property name="lib.dir"               value="lib"/>
+    <property name="resource.dir"          value="resource"/>
+    <property name="module.name"           value="${ant.project.name}"/>
+    <property name="manifest.file"         value="manifest.mf"/>
+
+    <target name="clean"/>
+    <target name="compile"/>
+    <target name="compile-tests"/>
+    <target name="-help"/>
+    <target name="-findmain"/>
+    <target name="junit"/>
+
+    <target name="-jar">
+      <mkdir dir="${dist.dir}"/>
+      <delete failonerror="false">
+         <fileset dir="${dist.dir}" includes="${module.name}-*.zip*"/>
+      </delete>
+      <property name="${jar.version.postfix}" value="" />
+      <property name="jarfile.basename"      value="${module.name}${jar.version.postfix}.zip"/>
+      <zip destfile="${dist.dir}/${jarfile.basename}"
+           basedir="${resource.dir}"
+           includes="**/*"
+      />
+    </target>
+
+
+    <available file="${manifest.file}" property="manifest.file.present"/>
+    <target name="-createmanifest" depends="init" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
+     <tstamp>
+          <format property="MANIFEST_TIME" pattern="MMMM dd yyyy  hh:mm aa" locale="en" />
+      </tstamp>
+      <property name="organisation" value=""/>
+     <echo file="${manifest.file}">Manifest-Version: 1.0
+Main-Class: main
+
+Name: ${ant.project.name}
+Specification-Title:    ${ant.project.name}
+Specification-Version:  0.1
+Specification-Vendor:   ${organisation}
+Implementation-Title:   ${ant.project.name}
+Implementation-Version: ${MANIFEST_TIME}
+Implementation-Vendor:  ${organisation}</echo>
+   </target>
+
+</project>
+
+  
+
+     
+
+  
+
+

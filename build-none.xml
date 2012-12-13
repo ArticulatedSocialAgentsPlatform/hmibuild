@@ -8,6 +8,7 @@
     <target name="-help"/>
     <target name="-jar"/>
     <target name="-findmain"/>
+    <target name="junit"/>
 </project>
 
   
