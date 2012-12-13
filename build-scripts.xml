@@ -84,7 +84,7 @@ Implementation-Vendor:  ${organisation}</echo>
       </exec>
       -->
       <!-- windows compliant version of WORKAROUND -->
-      <chmod perm="ug+x" includes="${dist.dir}/scripts/**"/>            
+      <chmod dir="${dist.dir}/scripts" perm="ug+x" includes="**/*"/>
   </target>
   <target name="dist" depends="jar">
   </target>
