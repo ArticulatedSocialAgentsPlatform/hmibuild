@@ -6,6 +6,7 @@
   <!--xmlns:tigris="antlib:org.tigris.subversion.svnant"-->
    <description>Some common initialization and utils</description>
    
+   
    <macrodef name="delegate">
       <attribute name="target"/>
       <attribute name="list" default="rebuildList"/>
@@ -59,8 +60,12 @@
          validargs="${main.list}"
          defaultvalue="${run.main.class}"
        />
+       
+        <ac:propertyregex property="new.main.class.escaped" input="${new.main.class}" regexp="\\" replace="/"
+              casesensitive="true"/>
        <!--replaceregexp file="${main.class.file}"  match="^run.main.class.*"  replace="run.main.class=${new.main.class}" byline="true"  /--> 
-       <echo file="${main.class.file}" message="run.main.class=${new.main.class}"/>
+       <echo file="${main.class.file}" message="run.main.class=${new.main.class.escaped}"/>
+       
    </target>
    
    
