@@ -33,6 +33,10 @@ Implementation-Vendor:  ${organisation}</echo>
    <property name="resource.dir"          value="resource" /> 
    <property name="deps.dir"              value="deps"  />
    <property name="dist.dir"              value="dist"  />
+   <property name="dist.scripts.dir"      value="${dist.dir}"  />
+   <property name="zip.tmp.dir"          value="zip_root.tmp" />
+   
+   <property name="dist.excludes"              value=""  />
 
    <property name="properties.file" value="build.properties"/>
    <property file="${properties.file}" /> 
@@ -68,18 +72,33 @@ Implementation-Vendor:  ${organisation}</echo>
    <target name="build" depends="compile" description="compile"/>  
       
    <target name="jar" depends="build" description="Installs scripts to the dist dir">
-      <mkdir dir="${dist.dir}"/>  
-      <mkdir dir="${dist.dir}/scripts"/>  
+      <echo message="Installing to temporary root directory ${zip.tmp.dir}."/>
+      <mkdir dir="${zip.tmp.dir}"/>
+      <!--mkdir dir="${zip.tmp.dir}/scripts"/-->
+      <mkdir dir="${dist.dir}"/>
       <!-- grave limitation: <copy> will NEVER preserve permissions! -->
-      <copy todir="${dist.dir}/scripts">
+      <copy todir="${zip.tmp.dir}"> <!-- /scripts" -->
          <fileset dir="${scripts.dir}"/>
       </copy>
       <!-- WORKAROUND -->
       <exec executable="chmod">
          <arg value="-R"/>
          <arg value="ug+x"/>
-         <arg value="${dist.dir}/scripts"/>
+         <arg value="${zip.tmp.dir}"/>
       </exec>
+      <echo message="Packaging temporary root to ZIP file."/>
+      <delete>
+         <fileset dir="${dist.scripts.dir}" includes="${module.name}*scripts.zip*"/>
+      </delete>
+      <property name="${jar.version.postfix}" value="" />
+      <property name="jarfile.basename"      value="${module.name}${jar.version.postfix}.scripts.zip"/>
+      <zip destfile="${dist.scripts.dir}/${jarfile.basename}"
+        basedir="${zip.tmp.dir}"
+        includes="**/*"
+        excludes="${dist.excludes}"
+        />
+      <echo message="Removing temporary root directory."/>
+      <delete dir="${zip.tmp.dir}" failonerror="false"/>
   </target>
   <target name="dist" depends="jar">
   </target>

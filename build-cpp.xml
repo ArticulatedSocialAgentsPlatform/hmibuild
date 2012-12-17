@@ -39,6 +39,10 @@ Implementation-Vendor:  ${organisation}</echo>
    <property name="deps.dir"              value="deps"  />
    <property name="dist.dir"              value="dist"  />
    <property name="dist.dir.absolute"     value="dist"  />
+   <property name="dist.cpp.dir"          value="${dist.dir}"/>
+   <property name="zip.tmp.dir"          value="zip_root.tmp" />
+   
+   <property name="dist.excludes"              value=""  />
    
    <property name="test.cmake.base.dir"        value="test"      />
    <property name="test.src.dir"               value="test/src"      />
@@ -79,6 +83,7 @@ Implementation-Vendor:  ${organisation}</echo>
 
    <target name="clean" description="Removes the build directory">
 	   <echo message="Cleaning ${dist.dir}" />
+      <delete dir="${zip.tmp.dir}" failonerror="false"/>
       <delete dir="${build.dir}" failonerror="false"/>
       <delete dir="${dist.dir}" failonerror="false"/>
       <delete dir="${deps.dir}" failonerror="false"/>
@@ -101,20 +106,36 @@ Implementation-Vendor:  ${organisation}</echo>
 		   <!--variable name="CMAKE_INSTALL_PREFIX" type="FILEPATH" value="${cmake.install.prefix}" /-->
 		</cmake>
 	</target>
-   <target name="compile" depends="-compilation" description="Compile the sources after preprocessing"/>  
-   <target name="build" depends="compile" description="compile"/>  
-	
-	<target name="jar" depends="build" description="Installs libraries and headers to the dist dir">
+	<target name="compile" depends="-compilation" description="Compile the sources after preprocessing"/>  
+	<target name="build" depends="compile" description="compile"/>  
+
+	<target name="-jar-prepare-tmp">
+		<echo message="Installing to temporary root directory ${zip.tmp.dir}."/>
+		<mkdir dir="${zip.tmp.dir}"/>  
 		<mkdir dir="${dist.dir}"/>  
-		<mkdir dir="${dist.dir}/lib"/>  
-		<mkdir dir="${dist.dir}/include"/>  
-		<mkdir dir="${dist.dir}/bin"/>  
-		<mkdir dir="${dist.dir}/scripts"/>  
+		<mkdir dir="${dist.cpp.dir}"/>  
+	</target>
+	<target name="-jar-install-tmp">
 		<exec executable="make" dir="${build.dir}">
 			<arg value="install"/>
-			<arg value="DESTDIR=../${dist.dir}"/>
+			<arg value="DESTDIR=../${zip.tmp.dir}"/>
 		</exec>
-   </target>
+	</target>
+	<target name="jar" depends="build,-jar-prepare-tmp,-jar-install-tmp" description="Installs libraries and headers to the dist dir">
+		<echo message="Packaging temporary root to ZIP file."/>
+		<echo message="  Excluded patterns: ${dist.excludes}"/>
+		<delete>
+			<fileset dir="${dist.cpp.dir}" includes="${module.name}*cpp.zip*"/>
+		</delete>
+		<property name="${jar.version.postfix}" value="" />
+		<property name="jarfile.basename"      value="${module.name}${jar.version.postfix}.cpp.zip"/>
+		<zip destfile="${dist.cpp.dir}/${jarfile.basename}"
+		  basedir="${zip.tmp.dir}"
+		  excludes="${dist.excludes}"
+		  />
+		<echo message="Removing temporary root directory."/>
+		<delete dir="${zip.tmp.dir}" failonerror="false"/>
+  </target>
 
    <target name="build-test" depends="jar" description="Build test cases. Requires fully-built library.">
 	   <cmake srcdir="${test.cmake.base.dir}"

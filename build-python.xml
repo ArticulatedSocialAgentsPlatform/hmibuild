@@ -62,6 +62,8 @@ Implementation-Vendor:  ${organisation}</echo>
    <property name="deps.python.dir"       value="${deps.dir}/python"  />
    <!--property name="dist.file"             value="${dist.dir}/${module.name}.pyzip" /-->
    <property name="dist.file"             value="${dist.python.dir}/${module.name}.py.zip" />
+   
+   <property name="pyzip.excludes"        value=""  />
 
    <property name="run.py"                value=""  />
     
@@ -185,9 +187,14 @@ Implementation-Vendor:  ${organisation}</echo>
    <target name="-gather-pyzips">
    </target>
    
-   <target name="run" depends="jar">
+   <!--target name="run" depends="jar">
       <py-run script="${dist.file}" pythonpath="${lib.dir}:${lib.local.dir}:${deps.python.dir}" optimize="0">
-         <!-- arg value="bla" -->
+         <! - - arg value="bla"  - ->
+      </py-run>
+   </target-->
+   <target name="run" depends="compile" description="Runs the main program for this project, compiles if necessary">   
+      <fail message=":${line.separator}${line.separator}No main class defined. ${line.separator}Use 'ant main' to set a main class" unless="run.main.class"/> 
+      <py-run script="${build.dir}/${run.main.class}" pythonpath="${src.dir}:${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" optimize="0">
       </py-run>
    </target>
 
