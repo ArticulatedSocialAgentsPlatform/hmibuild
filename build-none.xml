@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="CoreNone" default="run" xmlns:ac="antlib:net.sf.antcontrib" >
+    <property name="lib.dir"               value="lib"      />
+    
+    <target name="clean"/>
+    <target name="compile"/>
+    <target name="compile-tests"/>
+    <target name="-help"/>
+    <target name="-jar"/>
+    <target name="-findmain"/>
+    <target name="junit"/>
+</project>
+
+  
+
+     
+
+  
+
+

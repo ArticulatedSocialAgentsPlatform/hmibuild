@@ -28,7 +28,7 @@
    <target name="freeze" depends="init" description="Replaces current local build file by standalone core build file">
       <fail message="Existing ${alternate.build.file} found" if="alternate.available"/>
       <move file="build.xml" tofile="${alternate.build.file}" failonerror="false" />
-      <copy file="${shared.ant.dir}/build-Core.xml" tofile="build.xml" overwrite="false">
+      <copy file="${shared.ant.dir}/build-${language}.xml" tofile="build.xml" overwrite="false">
          <!--filterset>
             <filter token="MAIN_CLASS"         value="${run.main.class}" />
          </filterset-->

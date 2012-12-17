@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Core" default="run" xmlns:ac="antlib:net.sf.antcontrib" xmlns:hmi="antlib:hmi.ant">
+<project name="CoreJava" default="run" xmlns:ac="antlib:net.sf.antcontrib" xmlns:hmi="antlib:hmi.ant">
    <description>JavaProjects core build file</description>
   
 
@@ -23,11 +23,14 @@
           
    <!-- Names of main project directories -->   
    <property name="src.dir"               value="src"      />
+
    <property name="generatedsrc.dir"      value="generatedsrc"      />
    <property name="resource.dir"          value="resource" /> 
    <property name="lib.dir"               value="lib"      />
    <property name="build.dir"             value="build"    />
    <property name="build.classes.dir"     value="${build.dir}/classes" />
+   <property name="src.delombok.dir"      value="${build.dir}/src-delomboked"/>
+   <property name="src.doc.dir"      	  value="${src.delombok.dir}"/>
    <property name="dist.dir"              value="dist"  />
    <property name="deps.dir"              value="deps"  />
     
@@ -46,8 +49,7 @@
    </path>  
       
    <fileset id="lib.fileset" dir=".">
-      <include name="${lib.dir}/**/*.jar"   />
-      <include name="${lib.local}/**/*.jar" />
+      <include name="${lib.dir}/*.jar"   />      
    </fileset>
     
    <path id="javac-classpath">
@@ -59,7 +61,7 @@
  
    <available file="${src.dir}" property="src.dir.present"/> <!-- requires (?) ant 1.8 -->
   
-   <target name="help" description="Help for building and running projects">
+   <target name="-help" description="Help for building and running projects">
    <echo> -- Building/Running/Testing --
     ant              Default target is: ${ant.project.default-target}
     clean            Deletes the build and dist directories
@@ -84,8 +86,12 @@
         <delete dir="${generatedsrc.dir}"/>
         <delete dir="${deps.dir}"/>
    </target>
-   
 
+   <target name="delombok" depends="init">
+   <taskdef classname="lombok.delombok.ant.DelombokTask" classpath="${ant.file.JavaProjects}/../lombok-0.11.6.jar" name="delombok" />
+	<mkdir dir="build/src-delomboked" />
+	<delombok verbose="true" encoding="UTF-8" to="${src.delombok.dir}" from="${src.dir}" />
+   </target>
 
    <target name="-compilegenerated" description="Compile generated java file(s)"> 
    <ac:if>
@@ -234,10 +240,13 @@
    <property name="javadoc.linksource"    value="yes"/>
    <property name="javadoc.packages"      value="*"/>
    
-   <target name="doc" depends="init" description="Generates javadoc documentation">      
+   <target name="-pre-doc" depends="delombok">      
+   </target>
+   
+   <target name="doc" depends="init, -pre-doc" description="Generates javadoc documentation">      
       <javadoc 
          source="${javac.source}"        
-         sourcepath="${src.dir}"  
+         sourcepath="${src.doc.dir}"  
          destdir="${javadoc.dir}" 
          packagenames="${javadoc.packages}"
          doctitle="${javadoc.doctitle}"
@@ -265,7 +274,7 @@
  
    <available file="${manifest.file}" property="manifest.file.present"/>
  
-   <target name="createmanifest" depends="init" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
+   <target name="-createmanifest" depends="init" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
      <tstamp>   
           <format property="MANIFEST_TIME" pattern="MMMM dd yyyy  hh:mm aa" locale="en" />
       </tstamp>
@@ -288,7 +297,7 @@ Implementation-Vendor:  ${organisation}</echo>
        <property name="jar.version" value="-${specification.version}"/> <!- - set only if specification.version defined - ->
    </target-->
  
-   <target name="jar" depends="createmanifest, compile" description="Creates a jar file containing the project's class files and resources">
+   <target name="-jar" depends="createmanifest, compile" description="Creates a jar file containing the project's class files and resources">
       <mkdir dir="${dist.dir}"/>  
       <delete>
          <fileset dir="${dist.dir}" includes="${module.name}*.jar*"/>

@@ -11,7 +11,7 @@
       <echo>
  -- Jarring and versioning --
     versioned.jar:     create a versioned jar file for the project.
-    jar:               Core.jar produces a jar file without version number attached to the file name, jar itself is equivalent to versioned.jar
+    jar:               jar produces a jar file without version number attached to the file name, jar itself is equivalent to versioned.jar
       </echo> 
    </target>    
   
@@ -22,7 +22,7 @@
       <hmi:getmanifestversion versionprop="manifest.specification.version" manifestfile="${mf.file}"/> 
       <property name="specification.version" value="${manifest.specification.version}"/>
       <property name="jar.version.postfix" value="-${specification.version}"/>
-      <antcall target="Core.jar"/>
+      <antcall target="-jar"/>
    </target>
 
     <target name="versionedtest.jar" depends="init">
@@ -30,7 +30,7 @@
       <hmi:getmanifestversion versionprop="manifest.specification.version" manifestfile="${mf.file}"/> 
       <property name="specification.version" value="${manifest.specification.version}"/>
       <property name="jar.version.postfix" value="-${specification.version}"/>
-      <antcall target="Core.jar"/>
+      <antcall target="-jar"/>
    </target>
 
 
@@ -41,7 +41,7 @@
    <target name="-ivy.manifest" unless="${manifest.file.present}">
       <ivy:info/>
       <property name="organisation" value="${ivy.organisation}"/>
-      <antcall target="Core.createmanifest"/>
+      <antcall target="-createmanifest"/>
 
    </target>
 

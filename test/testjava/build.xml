@@ -1,0 +1,34 @@
+<project xmlns:au="antlib:org.apache.ant.antunit">
+  <import file="../../build.xml" />
+  
+  <!-- is called prior to the test -->
+  <target name="setUp">
+  </target>
+
+  <!-- is called after the test, even if that caused an error -->
+  <target name="tearDown">  
+	  <delete failonerror="false" dir="build"/>  
+	  <delete failonerror="false" dir="privateprops"/>  
+	  <delete failonerror="false" dir="lib"/>      
+	  <delete failonerror="false" dir="dist"/>      
+	  <delete failonerror="false" file="manifest.mf"/>      
+  </target>
+
+  <target name="antunittestCompileJava">
+    <antcall target="compile"/>
+    <au:assertFileExists file="build/classes/Test.class"/>    
+    <au:plainlistener/>
+  </target>
+  
+  <target name="antunittestDistJava">
+    <antcall target="dist"/>
+    <au:assertFileExists file="dist/testjava-0.1.jar"/> 
+	  <au:assertFileExists file="manifest.mf"/> 
+  </target>
+  
+  <target name="antunittestResolveJava">
+    <antcall target="Ivy.resolve"/>
+    <au:assertFileExists file="lib/HmiUtil-1.25.jar"/>    
+    <au:plainlistener/>
+  </target>
+</project>

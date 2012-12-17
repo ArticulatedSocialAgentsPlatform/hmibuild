@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Core" default="compile">
+<project name="CoreCpp" default="compile">
    <description>JavaProjects core build file</description>
   <taskdef name="cmake" 
 	  classname="org.iainhull.ant.CmakeBuilder">
@@ -12,7 +12,7 @@
    <property name="manifest.file"         value="manifest.mf"/>
 
    
-   <target name="createmanifest" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
+   <target name="-createmanifest" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
       <tstamp>   
           <format property="MANIFEST_TIME" pattern="MMMM dd yyyy  hh:mm aa" locale="en" />
       </tstamp>
@@ -70,7 +70,7 @@ Implementation-Vendor:  ${organisation}</echo>
    
    <available file="${src.dir}" property="src.dir.present"/> <!-- requires (?) ant 1.8 -->
   
-   <target name="help" description="Help for building and running projects">
+   <target name="-help" description="Help for building and running projects">
    <echo> -- Building/Running/Testing --
     ant              Default target is: ${ant.project.default-target}
     compile          Compiles all files in the project
@@ -121,7 +121,7 @@ Implementation-Vendor:  ${organisation}</echo>
 			<arg value="DESTDIR=../${zip.tmp.dir}"/>
 		</exec>
 	</target>
-	<target name="jar" depends="build,-jar-prepare-tmp,-jar-install-tmp" description="Installs libraries and headers to the dist dir">
+	<target name="-jar" depends="build,-jar-prepare-tmp,-jar-install-tmp" description="Installs libraries and headers to the dist dir">
 		<echo message="Packaging temporary root to ZIP file."/>
 		<echo message="  Excluded patterns: ${dist.excludes}"/>
 		<delete>

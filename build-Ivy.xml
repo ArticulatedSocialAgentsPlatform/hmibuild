@@ -97,6 +97,7 @@
             <include name="**/*.jnilib"/>
             <include name="**/*.py"/> 
             <include name="**/*.data"/>
+            <include name="*/**/*"/>
          </patternset>
          <!-- flattenmapper/ commented out by Hendrik and Herwin-->
       </unzip>
@@ -156,7 +157,8 @@
                <include name="**/*.dll"/>
                <include name="**/*.so"/>    
                <include name="**/*.jnilib"/>                 
-		<include name="**/*.py"/>                         
+		<include name="**/*.py"/>
+                <include name="*/**/*"/>
             </patternset>
 	    <!-- flattenmapper/ commented out by Hendrik and Herwin-->
          </unzip>

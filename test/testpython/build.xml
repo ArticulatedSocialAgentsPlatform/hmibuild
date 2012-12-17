@@ -1,0 +1,35 @@
+<project xmlns:au="antlib:org.apache.ant.antunit">
+  <import file="../../build.xml" />
+  
+  <!-- is called prior to the test -->
+  <target name="setUp">
+  </target>
+
+  <!-- is called after the test, even if that caused an error -->
+  <target name="tearDown">  
+	 
+	  <delete failonerror="false" dir="build"/>  
+	  <delete failonerror="false" dir="privateprops"/>  
+	  <delete failonerror="false" dir="dist"/>  
+	  <delete failonerror="false" dir="lib"/>      
+	  <delete failonerror="false" file="manifest.mf"/>      
+  </target>
+
+  <target name="antunittestCompilePython">
+    <antcall target="compile"/>
+    <au:assertFileExists file="build/test.pyc"/>    
+    <au:plainlistener/>
+  </target>
+  
+  <target name="antunittestDistPython">
+    <antcall target="dist"/>
+    <au:assertFileExists file="dist/testpython-0.1.py.zip"/> 
+	  <au:assertFileExists file="manifest.mf"/> 
+  </target>
+  
+  <target name="antunittestResolvePython">
+    <antcall target="Ivy.resolve"/>
+    <au:assertFileExists file="lib/protobuf-2.4.1.zip"/>    
+    <au:plainlistener/>
+  </target>
+</project>

@@ -37,11 +37,12 @@
    </target>
  
    
-   <target name="init" depends="checkVersion, -init.main.class.file,-init.build.properties, -init.dirs">
+   <target name="init" depends="checkVersion">
       
    </target>
    
    <available file="${main.class.file}" property="main.class.file.available" />
+   
    <target name="-init.main.class.file" unless="main.class.file.available">   
       <mkdir dir="${private.properties.dir}"/>
       <echo file="${main.class.file}" message="run.main.class=none"/>

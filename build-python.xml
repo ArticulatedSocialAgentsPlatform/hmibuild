@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Core" default="run" xmlns:ac="antlib:net.sf.antcontrib" >
+<project name="CorePython" default="run" xmlns:ac="antlib:net.sf.antcontrib" >
    <description>PythonProjects core build file</description>
 
    <taskdef 
@@ -26,7 +26,7 @@
    <property name="manifest.file"         value="manifest.mf"/>
 
     <available file="${manifest.file}" property="manifest.file.present"/>
-   <target name="createmanifest" depends="init" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
+   <target name="-createmanifest" depends="init" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
      <tstamp>   
           <format property="MANIFEST_TIME" pattern="MMMM dd yyyy  hh:mm aa" locale="en" />
       </tstamp>
@@ -79,7 +79,7 @@ Implementation-Vendor:  ${organisation}</echo>
  
    <available file="${src.dir}" property="src.dir.present"/> <!-- requires (?) ant 1.8 -->
   
-   <target name="help" description="Help for building and running projects">
+   <target name="-help" description="Help for building and running projects">
    <echo> -- Building/Running/Testing --
     ant              Default target is: ${ant.project.default-target}
     clean            Deletes the build and dist directories
@@ -227,7 +227,7 @@ Implementation-Vendor:  ${organisation}</echo>
       <echo message="run.py: ${run.py}"/>
    </target>  
 
-   <target name="jar" depends="compile" description="Creates a pyzip file containing the project's sources after compiling them">
+   <target name="-jar" depends="compile" description="Creates a pyzip file containing the project's sources after compiling them">
       <mkdir dir="${dist.dir}"/>  
       <mkdir dir="${dist.python.dir}"/>  
       <delete>

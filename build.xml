@@ -210,13 +210,13 @@
    
    <target name="helphelp">
     <echo> -- Help commands --
-    Core.help        Help for building, running, testing programs
+    help             Help for building, running, testing programs
     Ivy.help         Help for version management
     Demo.help        Help for creating demo versions
     Buildfile.help   Help for managing build files </echo> 
    </target> 
    
-   <target name="help" depends="helphelp, Core.help, Ivy.help" description="Basic help"/>
+   <target name="help" depends="helphelp, -help, Ivy.help" description="Basic help"/>
 
   <target name="checkVersion">
      <antversion property="version.running" />

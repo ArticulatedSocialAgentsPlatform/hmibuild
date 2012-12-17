@@ -1,0 +1,26 @@
+<project xmlns:au="antlib:org.apache.ant.antunit">
+  <import file="../../build.xml" />
+  
+  <!-- is called prior to the test -->
+  <target name="setUp">
+  </target>
+
+  <!-- is called after the test, even if that caused an error -->
+  <target name="tearDown">  
+    <delete failonerror="false" dir="dist"/>  	  
+    <delete failonerror="false" dir="build"/>  	  
+    <delete failonerror="false" file="manifest.mf"/>  	       
+  </target>
+
+  <target name="antunittestCompileScripts">
+	  <antcall target="compile"/>
+    <au:plainlistener/>    
+  </target>
+  
+  <target name="antunittestDistScripts">
+	  <antcall target="dist"/>
+	  <au:assertFileExists file="dist/scripts/test.script"/> 
+	  <au:assertFileExists file="manifest.mf"/> 
+    <au:plainlistener/>    
+  </target>
+</project>
