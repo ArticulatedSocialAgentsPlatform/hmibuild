@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="CoreCpp" default="compile">
+   <description>JavaProjects core build file</description>
+  <taskdef name="cmake" 
+	  classname="org.iainhull.ant.CmakeBuilder">
+       <classpath>
+            <pathelement location="${ant.file.JavaProjects}/../cmakeant.jar"/>
+		</classpath>
+	</taskdef>
+  
+   <!-- settings for "jar" -->
+   <property name="manifest.file"         value="manifest.mf"/>
+
+   
+   <target name="-createmanifest" description="Creates an initial version of the manifest file" unless="${manifest.file.present}">
+      <tstamp>   
+          <format property="MANIFEST_TIME" pattern="MMMM dd yyyy  hh:mm aa" locale="en" />
+      </tstamp>
+      <property name="organisation" value=""/>
+     <echo file="${manifest.file}">Manifest-Version: 1.0
+Main-Class: main
+       
+Name: ${ant.project.name}
+Specification-Title:    ${ant.project.name}
+Specification-Version:  0.1
+Specification-Vendor:   ${organisation}
+Implementation-Title:   ${ant.project.name}
+Implementation-Version: ${MANIFEST_TIME}
+Implementation-Vendor:  ${organisation}</echo>
+   </target>
+   
+   
+   <property name="cmake.base.dir"        value="."      />
+   <property name="src.dir"               value="src"      />
+   <property name="resource.dir"          value="resource" /> 
+   <property name="lib.dir"               value="lib"      />
+   <property name="lib.local.dir"         value="lib.local"      />
+   <property name="build.dir"             value="build"    />
+   <property name="deps.dir"              value="deps"  />
+   <property name="dist.dir"              value="dist"  />
+   <property name="dist.dir.absolute"     value="dist"  />
+   <property name="dist.cpp.dir"          value="${dist.dir}"/>
+   <property name="zip.tmp.dir"          value="zip_root.tmp" />
+   
+   <property name="dist.excludes"              value=""  />
+   
+   <property name="test.cmake.base.dir"        value="test"      />
+   <property name="test.src.dir"               value="test/src"      />
+   <property name="test.build.dir"             value="test/build"    />
+   
+   <!--property name="cmake.install.prefix"          value=""    / -->
+
+
+   <!-- Read build properties. Redundant when called from HmiShared/ant/build.xml, but needed for standalone versions -->
+   <property name="properties.file" value="build.properties"/>
+   <property file="${properties.file}" /> 
+   <available file="${properties.file}" property="properties.file.available" />
+   
+   <property name="private.properties.dir" value="privateprops" />
+   
+   
+   <!-- The module.name is used for javadoc, jar files etec.                                                              -->
+   <!-- module.name can be set explicitly, but else we use ant.project.name as module name.                               -->
+   <!-- Note that ant.project.name is the name set by the top-most build file, so usually not the name of this build file -->
+   <property name="module.name"           value="${ant.project.name}"/>
+          
+   <!-- Names of main project directories -->   
+   <property name="src.dir"               value="src"      />
+    
+   
+   <available file="${src.dir}" property="src.dir.present"/> <!-- requires (?) ant 1.8 -->
+  
+   <target name="-help" description="Help for building and running projects">
+   <echo> -- Building/Running/Testing --
+    ant              Default target is: ${ant.project.default-target}
+    compile          Compiles all files in the project
+    build            clean, then compile
+    </echo> 
+    </target>
+   
+   
+ 
+
+   <target name="clean" description="Removes the build directory">
+	   <echo message="Cleaning ${dist.dir}" />
+      <delete dir="${zip.tmp.dir}" failonerror="false"/>
+      <delete dir="${build.dir}" failonerror="false"/>
+      <delete dir="${dist.dir}" failonerror="false"/>
+      <delete dir="${deps.dir}" failonerror="false"/>
+      <delete dir="${test.build.dir}" failonerror="false"/>
+      <delete dir="${test.report.dir}" failonerror="false"/>
+   </target>
+   
+   <target name="-build-setup">
+      <mkdir dir="${build.dir}"/>
+      <mkdir dir="${dist.dir}"/>
+   </target>
+   <target name="-pre-compilation">
+       <echo message="No preparations needed for compilation."/>
+      <!-- Preprocessing, such as compiling protocol files. Overwrite in own build.xml -->
+   </target>
+   <target name="-compilation" depends="-build-setup, -pre-compilation">
+	   <cmake srcdir="${cmake.base.dir}"
+		   bindir="${build.dir}"
+		   buildtype="Debug">
+		   <!--variable name="CMAKE_INSTALL_PREFIX" type="FILEPATH" value="${cmake.install.prefix}" /-->
+		</cmake>
+	</target>
+	<target name="compile" depends="-compilation" description="Compile the sources after preprocessing"/>  
+	<target name="build" depends="compile" description="compile"/>  
+
+	<target name="-jar-prepare-tmp">
+		<echo message="Installing to temporary root directory ${zip.tmp.dir}."/>
+		<mkdir dir="${zip.tmp.dir}"/>  
+		<mkdir dir="${dist.dir}"/>  
+		<mkdir dir="${dist.cpp.dir}"/>  
+	</target>
+	<target name="-jar-install-tmp">
+		<exec executable="make" dir="${build.dir}">
+			<arg value="install"/>
+			<arg value="DESTDIR=../${dist.dir}"/>
+		</exec>
+	</target>
+	<target name="-jar" depends="build,-jar-prepare-tmp,-jar-install-tmp" description="Installs libraries and headers to the dist dir">
+  </target>
+
+   <target name="build-test" depends="jar" description="Build test cases. Requires fully-built library.">
+	   <cmake srcdir="${test.cmake.base.dir}"
+		  bindir="${test.build.dir}"
+		  buildtype="Debug" />
+		<exec executable="make" dir="${test.build.dir}">
+			<arg value="install"/>
+			<arg value="DESTDIR=../../${dist.dir}"/>
+		</exec>
+	</target>
+	<target name="test" depends="build-test" description="Run test cases">
+		<echo>FIXME: Doing nothing at the moment!</echo>
+	</target>
+
+            
+   <target name="compile-tests" depends="compile">
+      
+   </target>
+
+  <target name="-findmain">
+    <echo message="Not implemented." />
+  </target>
+
+</project>
+
+  
+
+     
+
+  
+   
+
