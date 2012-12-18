@@ -25,6 +25,14 @@
     <au:assertFileExists file="dist/testjava-0.1.jar"/> 
 	  <au:assertFileExists file="manifest.mf"/> 
   </target>
+
+  <target name="antunittestCleanJava">
+    <antcall target="dist"/>
+    <touch file="dist/noremove"/>
+    <antcall target="clean"/>
+    <au:assertFileDoesntExist file="dist/testjava-0.1.jar"/>
+    <au:assertFileExists file="dist/noremove"/>
+  </target>
   
   <target name="antunittestResolveJava">
     <antcall target="Ivy.resolve"/>

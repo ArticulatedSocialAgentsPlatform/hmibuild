@@ -23,4 +23,14 @@
 	  <au:assertFileExists file="manifest.mf"/> 
     <au:plainlistener/>    
   </target>
+
+  <target name="antunittestCleanScripts">
+    <antcall target="dist"/>
+    <au:assertFileExists file="dist/scripts/test.script"/>
+    <au:assertFileExists file="manifest.mf"/>
+    <touch file="dist/scripts/noremove.script"/>
+    <antcall target="clean"/>
+    <au:assertFileDoesntExist file="dist/scripts/test.script"/>
+    <au:assertFileExists file="dist/scripts/testnoremove.script"/>
+  </target>
 </project>

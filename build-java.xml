@@ -77,16 +77,14 @@
     findbugsreport   Find potential Java bugs, produce an HTML findbugs report</echo> 
     </target>
    
-   <!-- WORKAROUND for consistency with CPP version
-   <target name="build" depends="clean, compile" description="clean, compile"/>  
-   -->
-   <target name="build" depends="compile" description="compile"/>  
-   
+   <target name="build" depends="clean, compile" description="clean, compile"/>
+
    <target name="clean" depends="init" description="Removes the build directory">
         <delete dir="${build.dir}"/>
-        <delete dir="${generatedsrc.dir}"/>	
-	<delete dir="${dist.dir}"/>        
-        <delete dir="${deps.dir}"/>
+        <delete dir="${generatedsrc.dir}"/>
+        <delete failonerror="false">
+         <fileset dir="${dist.dir}" includes="${module.name}-*.jar"/>
+         </delete>
    </target>
 
    <target name="delombok" depends="init">
@@ -302,7 +300,7 @@ Implementation-Vendor:  ${organisation}</echo>
    <target name="-jar" depends="createmanifest, compile" description="Creates a jar file containing the project's class files and resources">
       <mkdir dir="${dist.dir}"/>  
       <delete>
-         <fileset dir="${dist.dir}" includes="${module.name}*.jar*"/>
+         <fileset dir="${dist.dir}" includes="${module.name}-*.jar"/>
       </delete>    
       <property name="jar.version.postfix"   value=""/>                   <!-- fall back, when no versioning is being used -->
       <property name="jarfile.basename"      value="${module.name}${jar.version.postfix}.jar"/>   
