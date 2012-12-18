@@ -85,8 +85,6 @@ Implementation-Vendor:  ${organisation}</echo>
       <echo message="Installing to temporary root directory ${zip.tmp.dir}."/>
       <mkdir dir="${zip.tmp.dir}"/>
       <mkdir dir="${dist.dir}"/>
-      <mkdir dir="${dist.dir}"/>  
-      <mkdir dir="${dist.dir}/scripts"/>  
       <!-- grave limitation: <copy> will NEVER preserve permissions! -->
       <copy todir="${zip.tmp.dir}">
          <fileset dir="${scripts.dir}"/>

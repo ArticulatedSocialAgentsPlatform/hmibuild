@@ -19,18 +19,16 @@
   
   <target name="antunittestDistScripts">
 	  <antcall target="dist"/>
-	  <au:assertFileExists file="dist/scripts/test.script"/> 
+	  <au:assertFileExists file="dist/testscripts-0.1.scripts.zip"/>
 	  <au:assertFileExists file="manifest.mf"/> 
     <au:plainlistener/>    
   </target>
 
   <target name="antunittestCleanScripts">
     <antcall target="dist"/>
-    <au:assertFileExists file="dist/scripts/test.script"/>
-    <au:assertFileExists file="manifest.mf"/>
-    <touch file="dist/scripts/noremove.script"/>
+    <touch file="dist/noremove"/>
     <antcall target="clean"/>
-    <au:assertFileDoesntExist file="dist/scripts/test.script"/>
-    <au:assertFileExists file="dist/scripts/testnoremove.script"/>
+    <au:assertFileDoesntExist file="dist/testscripts-0.1.scripts.zip"/>
+    <au:assertFileExists file="dist/noremove"/>
   </target>
 </project>

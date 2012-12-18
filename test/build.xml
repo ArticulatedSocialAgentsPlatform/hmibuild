@@ -11,7 +11,7 @@
   <target name="test">
     <delete failonerror="false" dir="reports"/> 
     <mkdir dir="reports"/>
-    <au:antunit>
+    <au:antunit failOnError="false">
       <fileset dir="." includes="test*/build.xml"/>      
       <au:xmllistener toDir="reports"/>      
       <au:plainlistener/>
