@@ -82,13 +82,13 @@ Implementation-Vendor:  ${organisation}</echo>
  
 
    <target name="clean" description="Removes the build directory">
-	   <echo message="Cleaning ${dist.dir}" />
       <delete dir="${zip.tmp.dir}" failonerror="false"/>
       <delete dir="${build.dir}" failonerror="false"/>
-      <delete dir="${dist.dir}" failonerror="false"/>
       <delete dir="${deps.dir}" failonerror="false"/>
       <delete dir="${test.build.dir}" failonerror="false"/>
       <delete dir="${test.report.dir}" failonerror="false"/>
+      <echo message="cpp-internal: Info: Cleaning ${dist.dir} completely" />
+      <delete dir="${dist.dir}" failonerror="false"/>
    </target>
    
    <target name="-build-setup">

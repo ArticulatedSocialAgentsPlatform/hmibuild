@@ -85,10 +85,20 @@ Implementation-Vendor:  ${organisation}</echo>
 	   <echo message="Cleaning ${dist.dir}" />
       <delete dir="${zip.tmp.dir}" failonerror="false"/>
       <delete dir="${build.dir}" failonerror="false"/>
-      <delete dir="${dist.dir}" failonerror="false"/>
       <delete dir="${deps.dir}" failonerror="false"/>
       <delete dir="${test.build.dir}" failonerror="false"/>
       <delete dir="${test.report.dir}" failonerror="false"/>
+      <delete>
+         <fileset dir="${dist.dir}" includes="${module.name}-*.cpp.zip*"/>
+      </delete>
+      <delete includeemptydirs="true">
+         <fileset dir="${dist.dir}"  >
+            <and>
+               <size value="0"/>
+               <type type="dir"/>
+            </and>
+         </fileset>
+      </delete>
    </target>
    
    <target name="-build-setup">
@@ -125,7 +135,7 @@ Implementation-Vendor:  ${organisation}</echo>
 		<echo message="Packaging temporary root to ZIP file."/>
 		<echo message="  Excluded patterns: ${dist.excludes}"/>
 		<delete>
-			<fileset dir="${dist.cpp.dir}" includes="${module.name}*cpp.zip*"/>
+			<fileset dir="${dist.cpp.dir}" includes="${module.name}-*cpp.zip*"/>
 		</delete>
 		<property name="${jar.version.postfix}" value="" />
 		<property name="jarfile.basename"      value="${module.name}${jar.version.postfix}.cpp.zip"/>

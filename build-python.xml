@@ -117,10 +117,20 @@ Implementation-Vendor:  ${organisation}</echo>
   
    <target name="clean" description="Removes the build directory">
       <delete dir="${build.dir}" failonerror="false"/>
-      <delete dir="${dist.dir}" failonerror="false"/>
       <delete dir="${deps.dir}" failonerror="false"/>
       <delete dir="${test.build.dir}" failonerror="false"/>
       <delete dir="${test.report.dir}" failonerror="false"/>
+      <delete>
+         <fileset dir="${dist.dir}" includes="${module.name}-*.py.zip*"/>
+      </delete>
+      <delete includeemptydirs="true">
+         <fileset dir="${dist.dir}"  >
+            <and>
+               <size value="0"/>
+               <type type="dir"/>
+            </and>
+         </fileset>
+      </delete>
    </target>
 
    <target name="-build-setup">
@@ -232,7 +242,7 @@ Implementation-Vendor:  ${organisation}</echo>
       <mkdir dir="${dist.python.dir}"/>  
       <delete>
          <!--fileset dir="${dist.dir}" includes="${module.name}*.pyzip*"/-->
-         <fileset dir="${dist.python.dir}" includes="${module.name}*py.zip*"/>
+         <fileset dir="${dist.python.dir}" includes="${module.name}-*py.zip*"/>
       </delete>
       <property name="${jar.version.postfix}" value="" />
       <property name="jarfile.basename"      value="${module.name}${jar.version.postfix}.py.zip"/>
