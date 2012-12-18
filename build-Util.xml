@@ -62,10 +62,8 @@
        />
        
         <ac:propertyregex property="new.main.class.escaped" input="${new.main.class}" regexp="\\" replace="/"
-              casesensitive="true"/>
-       <!--replaceregexp file="${main.class.file}"  match="^run.main.class.*"  replace="run.main.class=${new.main.class}" byline="true"  /--> 
+              casesensitive="true" defaultValue="${new.main.class}"/>
        <echo file="${main.class.file}" message="run.main.class=${new.main.class.escaped}"/>
-       
    </target>
    
    
