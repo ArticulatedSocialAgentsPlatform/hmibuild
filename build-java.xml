@@ -77,13 +77,15 @@
     findbugsreport   Find potential Java bugs, produce an HTML findbugs report</echo> 
     </target>
    
-   
+   <!-- WORKAROUND for consistency with CPP version
    <target name="build" depends="clean, compile" description="clean, compile"/>  
- 
+   -->
+   <target name="build" depends="compile" description="compile"/>  
+   
    <target name="clean" depends="init" description="Removes the build directory">
         <delete dir="${build.dir}"/>
-        <delete dir="${dist.dir}"/>
-        <delete dir="${generatedsrc.dir}"/>
+        <delete dir="${generatedsrc.dir}"/>	
+	<delete dir="${dist.dir}"/>        
         <delete dir="${deps.dir}"/>
    </target>
 
