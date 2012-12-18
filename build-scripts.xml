@@ -57,10 +57,10 @@ Implementation-Vendor:  ${organisation}</echo>
 
    <target name="clean" description="Removes the deps and dist directories">
       <delete dir="${deps.dir}" failonerror="false"/>
-      <delete>
+      <delete failonerror="false">
          <fileset dir="${dist.dir}" includes="${module.name}-*.scripts.zip*"/>
       </delete>
-      <delete includeemptydirs="true">
+      <delete includeemptydirs="true" failonerror="false">
          <fileset dir="${dist.dir}"  >
             <and>
                <size value="0"/>

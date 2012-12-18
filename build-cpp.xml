@@ -88,10 +88,10 @@ Implementation-Vendor:  ${organisation}</echo>
       <delete dir="${deps.dir}" failonerror="false"/>
       <delete dir="${test.build.dir}" failonerror="false"/>
       <delete dir="${test.report.dir}" failonerror="false"/>
-      <delete>
+      <delete failonerror="false">
          <fileset dir="${dist.dir}" includes="${module.name}-*.cpp.zip*"/>
       </delete>
-      <delete includeemptydirs="true">
+      <delete includeemptydirs="true" failonerror="false">
          <fileset dir="${dist.dir}"  >
             <and>
                <size value="0"/>

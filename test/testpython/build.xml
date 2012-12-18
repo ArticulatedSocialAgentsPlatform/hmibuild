@@ -15,19 +15,19 @@
 	  <delete failonerror="false" file="manifest.mf"/>      
   </target>
 
-  <target name="antunittestCompilePython">
+  <target name="antunittestCompile">
     <antcall target="compile"/>
     <au:assertFileExists file="build/test.pyc"/>    
     <au:plainlistener/>
   </target>
   
-  <target name="antunittestDistPython">
+  <target name="antunittestDist">
     <antcall target="dist"/>
     <au:assertFileExists file="dist/testpython-0.1.py.zip"/> 
 	  <au:assertFileExists file="manifest.mf"/> 
   </target>
 
-  <target name="antunittestCleanPython">
+  <target name="antunittestCleanAfterDist">
     <antcall target="dist"/>
     <touch file="dist/noremove"/>
     <antcall target="clean"/>
@@ -35,9 +35,12 @@
     <au:assertFileExists file="dist/noremove"/>
   </target>
   
+  <target name="antunittestClean">
+    <antcall target="clean"/>    
+  </target>
+  
   <target name="antunittestResolvePython">
     <antcall target="Ivy.resolve"/>
-    <au:assertFileExists file="lib/protobuf-2.4.1.zip"/>    
-    <au:plainlistener/>
+    <au:assertFileExists file="lib/protobuf-2.4.1.zip"/>        
   </target>
 </project>

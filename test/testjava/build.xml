@@ -20,13 +20,17 @@
     <au:plainlistener/>
   </target>
   
-  <target name="antunittestDistJava">
+  <target name="antunittestDist">
     <antcall target="dist"/>
     <au:assertFileExists file="dist/testjava-0.1.jar"/> 
 	  <au:assertFileExists file="manifest.mf"/> 
   </target>
 
-  <target name="antunittestCleanJava">
+  <target name="antunittestClean">
+    <antcall target="clean"/>    
+  </target>
+  
+  <target name="antunittestCleanAfterDist">
     <antcall target="dist"/>
     <touch file="dist/noremove"/>
     <antcall target="clean"/>
@@ -34,7 +38,7 @@
     <au:assertFileExists file="dist/noremove"/>
   </target>
   
-  <target name="antunittestResolveJava">
+  <target name="antunittestResolve">
     <antcall target="Ivy.resolve"/>
     <au:assertFileExists file="lib/HmiUtil-1.25.jar"/>    
     <au:plainlistener/>

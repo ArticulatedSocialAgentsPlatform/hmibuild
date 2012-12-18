@@ -14,6 +14,10 @@
 	  <delete dir="dist"/>  	  
   </target>
 
+  <target name="antunittestClean">
+    <antcall target="clean"/>    
+  </target>
+  
   <!-- the actual test case -->
   <target name="antunittestCompileCpp">
 	  <antcall target="compile"/>
