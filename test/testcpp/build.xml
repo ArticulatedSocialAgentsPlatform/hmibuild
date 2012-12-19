@@ -7,11 +7,11 @@
 
   <!-- is called after the test, even if that caused an error -->
   <target name="tearDown">  
-	  <delete includeemptydirs="true">
+    <delete includeemptydirs="true" failonerror="false">
       <fileset dir="build" includes="**/*"/>
     </delete>
-	  <delete dir="privateprops"/>  
-	  <delete dir="dist"/>  	  
+	  <delete dir="privateprops" failonerror="false"/>
+	  <delete dir="dist" failonerror="false"/>
   </target>
 
   <target name="antunittestClean">
