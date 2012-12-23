@@ -14,7 +14,7 @@
    <property name="ivy.jar.dir"            location="${hmi.build.dir}/ivy"/>
    <property name="ivy.file"               value="ivy.xml" />
    <property name="test.ivy.file"          value="${test.dir}/ivy.xml" />
-   
+   <property name="ivycleanbeforeresolve" value="true"/>
    
  
    
@@ -75,7 +75,12 @@
   
    
    <target name="resolve" depends="init"  description="Resolve and retrieve all dependencies">    
-       <antcall target="ivyclean" />
+       <ac:if>    
+        <equals arg1="${ivycleanbeforeresolve}" arg2="true" />    
+        <ac:then>
+        <antcall target="ivyclean" />
+        </ac:then>
+       </ac:if>
        <antcall target="-resolve" />
        <!--antcall target="resolveresource"/-->  
    </target>
@@ -368,6 +373,7 @@
    
   
    <target name="devrelease"  depends="init" description="publishes a dev release, with Ivy &quot;beta&quot; status">
+      <antcall target="ivyclean" />      
       <antcall target="resolve">
          <param name="resolve.status" value="beta"/> <!-- overrides build.properties value -->
       </antcall>
@@ -399,7 +405,8 @@
    
    <target name="minorrelease"  depends="init" description="publishes a minor release, with Ivy &quot;release&quot; status">
       <property name="resolve.status" value="release"/>
-      <antcall target="resolve">
+      <antcall target="ivyclean" />
+      <antcall target="-resolve">
           <param name="resolve.status" value="release"/> <!-- overrides build.properties value -->
       </antcall>
       <antcall target="junit"/>
@@ -419,7 +426,8 @@
    
    
    <target name="majorrelease"  depends="init" description="publishes a major release, with Ivy &quot;release&quot; status">
-      <antcall target="resolve">
+      <antcall target="ivyclean" />
+      <antcall target="-resolve">
          <param name="resolve.status" value="release"/> <!-- overrides build.properties value -->
       </antcall>
       <antcall target="junit"/>
@@ -427,7 +435,7 @@
    </target>
    
    <target name="-majorrelease" depends="getmanifestversion">   
-      <antcall target="resolvelib"> 
+      <antcall target="-resolvelib"> 
          <param name="resolve.status" value="release"/> <!-- overrides build.properties value -->
       </antcall>  
       <antcall target="-newmanifest"> <param name="new.type" value="majorRelease"/> </antcall>
@@ -436,7 +444,8 @@
    </target>
    
    <target name="maintenancerelease"  depends="init" description="publishes a maintenance release version, with Ivy &quot;release&quot; status">
-      <antcall target="resolve">
+      <antcall target="ivyclean" />
+      <antcall target="-resolve">
         <param name="resolve.status" value="release"/> <!-- overrides build.properties value -->
       </antcall>
       <antcall target="junit"/>
@@ -568,7 +577,7 @@
          </and>
       <ac:then>
          <echo message="resolving resolve.list projects ..."/> 
-         <filelist id="resolve.project.dirs" dir="${shared.project.root}" files="${rebuild.list}" />
+         <filelist id="resolve.project.dirs" dir="${shared.project.root}" files="${rebuild.list}" />         
          <subant target="resolve" verbose="false" inheritall="false">
             <filelist refid="resolve.project.dirs"/>
          </subant>
