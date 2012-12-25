@@ -50,6 +50,7 @@ Implementation-Vendor:  ${organisation}</echo>
           
    <!-- Names of main project directories -->   
    <property name="src.dir"               value="src"      />
+   <property name="generatedsrc.dir"               value="generatedsrc"      />
    <property name="resource.dir"          value="resource" /> 
    <property name="lib.dir"               value="lib"      />
    <property name="lib.local.dir"         value="lib.local"      />
@@ -146,6 +147,11 @@ Implementation-Vendor:  ${organisation}</echo>
    <target name="-compilation" depends="-build-setup, -pre-compilation">
       <copy todir="${build.dir}">
           <fileset dir="${src.dir}">
+              <exclude name="**/*pyc" />
+              <exclude name="**/.*swp" />
+              <exclude name="${pyzip.excludes}" />
+      </fileset>
+       <fileset dir="${generatedsrc.dir}">
               <exclude name="**/*pyc" />
               <exclude name="**/.*swp" />
               <exclude name="${pyzip.excludes}" />
