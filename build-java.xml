@@ -394,7 +394,7 @@ Implementation-Vendor:  ${organisation}</echo>
       <mkdir dir="${build.test.results.dir}"/>
       <junit printsummary="false" 
            haltonfailure="false"
-           fork="yes"  forkmode="perTest"  timeout="1000000"
+           fork="yes"  forkmode="perTest"  timeout="2000000"
            errorProperty="test.failed"
            failureProperty="test.failed">
       
