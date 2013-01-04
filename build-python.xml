@@ -146,17 +146,25 @@ Implementation-Vendor:  ${organisation}</echo>
    </target>
    <target name="-compilation" depends="-build-setup, -pre-compilation">
       <copy todir="${build.dir}">
-          <fileset dir="${src.dir}">
+      <fileset dir="${src.dir}">
               <exclude name="**/*pyc" />
               <exclude name="**/.*swp" />
               <exclude name="${pyzip.excludes}" />
       </fileset>
+      </copy>
+
+      <ac:if>
+      <available file="${generatedsrc.dir}" type="dir" />
+      <ac:then>
+      <copy todir="${build.dir}">
        <fileset dir="${generatedsrc.dir}">
               <exclude name="**/*pyc" />
               <exclude name="**/.*swp" />
               <exclude name="${pyzip.excludes}" />
          </fileset>
       </copy>
+      </ac:then>
+      </ac:if>
       <py-compile dir="${build.dir}" pythonpath="${deps.python.dir}:${build.dir}" optimize="0"/>
       <!--if> <equals arg1="${run.py}" arg2="" /> <then>
          <echo message="Package did not specify a run script." />
