@@ -391,10 +391,9 @@ Implementation-Vendor:  ${organisation}</echo>
   
    <target name="-junit" depends="compile-tests" if="test.src.dir.available" >
       <delete dir="${build.test.results.dir}" failonerror="false" quiet="true"/>
-      <mkdir dir="${build.test.results.dir}"/>
-      <!-- removed: timeout="2000000" -->
+      <mkdir dir="${build.test.results.dir}"/>      
       <junit printsummary="false" 
-           haltonfailure="false"
+           haltonfailure="false" timeout="1500000"
            fork="yes"  forkmode="perTest"  
            errorProperty="test.failed"
            failureProperty="test.failed">
