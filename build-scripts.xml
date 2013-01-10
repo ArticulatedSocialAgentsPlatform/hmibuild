@@ -99,10 +99,9 @@ Implementation-Vendor:  ${organisation}</echo>
       <property name="${jar.version.postfix}" value="" />
       <property name="jarfile.basename"      value="${module.name}${jar.version.postfix}.scripts.zip"/>
       <zip destfile="${dist.scripts.dir}/${jarfile.basename}"
-        basedir="${zip.tmp.dir}"
-        includes="**/*"
-        excludes="${dist.excludes}"
-        />
+        >
+		<zipfileset dir="${zip.tmp.dir}" includes="**/*" excludes="${dist.excludes}" filemode="755" />
+      </zip>
       <echo message="Removing temporary root directory."/>
       <delete dir="${zip.tmp.dir}" failonerror="false"/>
   </target>
