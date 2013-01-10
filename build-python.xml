@@ -268,10 +268,9 @@ Implementation-Vendor:  ${organisation}</echo>
       />
       -->
       <zip destfile="${dist.python.dir}/${jarfile.basename}"
-           basedir="${build.dir}"
-           includes="**/*"
-           excludes="${dist.excludes}"
-      />
+      >
+         <zipfileset dir="${build.dir}" includes="**/*" excludes="${dist.excludes}" filemode="755" />
+      </zip>
       <!--copy todir="${dist.python.dir}">
          <fileset dir="${build.dir}">
          </fileset>
