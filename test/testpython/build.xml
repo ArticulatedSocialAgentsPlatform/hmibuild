@@ -41,6 +41,6 @@
   
   <target name="antunittestResolvePython">
     <antcall target="Ivy.resolve"/>
-    <au:assertFileExists file="lib/protobuf-2.4.1.zip"/>        
+    <au:assertFileExists file="lib/protobuf-2.4.1.zip"/>
   </target>
 </project>
