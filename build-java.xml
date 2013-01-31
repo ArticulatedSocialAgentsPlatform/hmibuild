@@ -297,7 +297,7 @@ Implementation-Vendor:  ${organisation}</echo>
        <property name="jar.version" value="-${specification.version}"/> <!- - set only if specification.version defined - ->
    </target-->
  
-   <target name="-jar" depends="createmanifest, compile" description="Creates a jar file containing the project's class files and resources">
+   <target name="-jar" depends="createmanifest, compile, delombok" description="Creates a jar file containing the project's class files and resources">
       <mkdir dir="${dist.dir}"/>  
       <delete>
          <fileset dir="${dist.dir}" includes="${module.name}-*.jar"/>
@@ -323,6 +323,9 @@ Implementation-Vendor:  ${organisation}</echo>
            </fileset>
            <fileset dir="${resource.dir}" erroronmissingdir="false">
               <patternset refid="jar.resources"/>
+           </fileset>
+           <fileset dir="${src.delombok.dir}">
+           <include name="**/*.java"/>
            </fileset>
       </jar>
    </target>
