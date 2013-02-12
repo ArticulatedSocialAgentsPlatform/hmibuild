@@ -67,7 +67,7 @@ def writeDotProject():
 
 def writeClassPath():
   root = ElementTree.Element("classpath")
-  if os.path.isdir(BASE_DIR+'/generatedsrc'):
+  if os.path.isdir(BASE_DIR+'/src'):
     cpEntry = ElementTree.SubElement(root,"classpathentry")
     cpEntry.attrib["kind"]="src"
     cpEntry.attrib["path"]="src"
