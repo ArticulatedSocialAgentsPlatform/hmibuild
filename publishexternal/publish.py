@@ -6,12 +6,16 @@ import paramiko
 import getpass
 import os
 
-def createXML(org, module, revision):
+def createXML(org, module, revision, filename):
   today = datetime.datetime.now()
   f = open(module+"-"+revision+".xml", "w")
   f.write('<ivy-module version="2.0">\n')
   f.write('<info organisation="' + org + '" module="'+ module + '" revision="'+revision+'" status="release" publication="'+str(today.year)+str(today.month).zfill(2)
   +str(today.day).zfill(2)+str(today.hour).zfill(2)+str(today.minute).zfill(2)+str(today.second).zfill(2)+'"/>\n')  
+  if filename.endswith('.zip'):
+     f.write("<publications>\n");
+     f.write('<artifact name="'+filename[:-4]+'" type="zip"/>\n');
+     f.write("</publications>\n");
   f.write('</ivy-module>\n')
   f.close()
 
@@ -70,5 +74,5 @@ key = paramiko.RSAKey.from_private_key_file(path)
 #if not key:
 #  password = getpass.getpass('Password for %s@%s: ' % (username, hostname))  
 
-createXML(args.org, args.module, args.version)
+createXML(args.org, args.module, args.version, getFileName(args.jar))
 publishAtScp(hostname, username, key, args.org, args.module, args.version, args.jar)
