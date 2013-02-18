@@ -7,7 +7,7 @@
   
    <typedef resource="com/puppycrawl/tools/checkstyle/antlib.xml" 
             uri="antlib:com.puppycrawl.tools.checkstyle" 
-            classpath= "${shared.ant.dir}/checkstyle/checkstyle-5.3-all.jar" 
+            classpath= "${shared.ant.dir}/checkstyle/checkstyle-5.6-all.jar"
    />                                     
    
    <typedef name="findbugs" 
