@@ -161,21 +161,10 @@
 
  <target name="checkstyle"  depends="init" description="check Java style">
       <!--cs:checkstyle config="${shared.ant.dir}/checkstyle/hmi_checks_lite.xml"--> 
-      <ac:if>
-      <available file="${test.src.dir}" type="dir" />
-     <ac:then>
-      
-      <cs:checkstyle config="${shared.ant.dir}/checkstyle/hmi_checks_verylite.xml"> 
-	      <fileset dir="${src.dir}" includes="**/*.java"/>
-	      <fileset dir="${test.src.dir}" includes="**/*.java"/>	      
+      <cs:checkstyle config="${shared.ant.dir}/checkstyle/hmi_checks_verylite.xml">
+	      <fileset dir="${src.dir}" includes="**/*.java" erroronmissingdir="false"/>
+	      <fileset dir="${test.src.dir}" includes="**/*.java" erroronmissingdir="false"/>
      </cs:checkstyle>
-     </ac:then>
-     <ac:else>
-     <cs:checkstyle config="${shared.ant.dir}/checkstyle/hmi_checks_verylite.xml"> 
-	      <fileset dir="${src.dir}" includes="**/*.java"/>	      
-     </cs:checkstyle>
-     </ac:else>
-     </ac:if>
  </target>   
  
  <target  depends="init" name="cpd">
@@ -210,25 +199,12 @@
  
  <target  depends="init" name="checkstylexml" description="check Java style">
       <!--cs:checkstyle config="${shared.ant.dir}/checkstyle/hmi_checks_lite.xml"--> 
-      <ac:if>
-      <available file="${test.src.dir}" type="dir" />
-     <ac:then>
-      <cs:checkstyle failOnViolation="false" config="${shared.ant.dir}/checkstyle/hmi_checks_verylite.xml"> 
-	      <fileset dir="${src.dir}" includes="**/*"/>	      
-         	  <fileset dir="${test.src.dir}" includes="**/*"/>
-	      	
-	      
-          <formatter type="xml" toFile="build/checkstyle_errors.xml"/>
-     </cs:checkstyle>
-     </ac:then>
-     <ac:else>
-     <cs:checkstyle failOnViolation="false" config="${shared.ant.dir}/checkstyle/hmi_checks_verylite.xml"> 
-	      <fileset dir="${src.dir}" includes="**/*"/>	      
-          <formatter type="xml" toFile="build/checkstyle_errors.xml"/>
-     </cs:checkstyle>
-     </ac:else>
-      </ac:if>      		
-     
+            <cs:checkstyle failOnViolation="false" config="${shared.ant.dir}/checkstyle/hmi_checks_verylite.xml">
+              <fileset dir="${src.dir}" includes="**/*" erroronmissingdir="false"/>
+              <fileset dir="${test.src.dir}" includes="**/*" erroronmissingdir="false"/>
+              <formatter type="xml" toFile="build/checkstyle_errors.xml"/>
+            </cs:checkstyle>
+
  </target>  
  
  <property name="findbugs.dir" value="${shared.ant.dir}/findbugs-2.0.0" />
