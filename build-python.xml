@@ -77,7 +77,8 @@ Implementation-Vendor:  ${organisation}</echo>
    <property name="resource.path"  value="resources" />
 
    <property name="extra.python.path" value="" />
- 
+   <property environment="env"/>
+   
    <available file="${src.dir}" property="src.dir.present"/> <!-- requires (?) ant 1.8 -->
   
    <target name="-help" description="Help for building and running projects">
@@ -165,7 +166,7 @@ Implementation-Vendor:  ${organisation}</echo>
       </copy>
       </ac:then>
       </ac:if>
-      <py-compile dir="${build.dir}" pythonpath="${deps.python.dir}:${build.dir}" optimize="0"/>
+      <py-compile dir="${build.dir}" pythonpath="${env.PYTHONPATH}:${deps.python.dir}:${build.dir}" optimize="0"/>
       <!--if> <equals arg1="${run.py}" arg2="" /> <then>
          <echo message="Package did not specify a run script." />
       </then> <else>
@@ -218,7 +219,7 @@ Implementation-Vendor:  ${organisation}</echo>
    </target-->
    <target name="run" depends="compile" description="Runs the main program for this project, compiles if necessary">   
       <fail message=":${line.separator}${line.separator}No main class defined. ${line.separator}Use 'ant main' to set a main class" unless="run.main.class"/> 
-      <py-run script="${build.dir}/${run.main.class}" pythonpath="${src.dir}:${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" optimize="0">
+      <py-run script="${build.dir}/${run.main.class}" pythonpath="${env.PYTHONPATH}:${src.dir}:${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" optimize="0">
       </py-run>
    </target>
 
@@ -355,11 +356,11 @@ Implementation-Vendor:  ${organisation}</echo>
               <exclude name="**/.*swp" />
          </fileset>
       </copy>
-	  <py-compile dir="${test.build.dir}" pythonpath="${deps.python.dir}:${test.build.dir}:${build.dir}" optimize="0"/>
+	  <py-compile dir="${test.build.dir}" pythonpath="${env.PYTHONPATH}:${deps.python.dir}:${test.build.dir}:${build.dir}" optimize="0"/>
     </target>
 
     <target name="-test" depends="compile-tests">
-       <py-test pythonpath="${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}:${extra.python.path}" dir="${test.build.dir}">
+       <py-test pythonpath="${env.PYTHONPATH}:${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}:${extra.python.path}" dir="${test.build.dir}">
           <fileset dir="${test.build.dir}">
              <include name="test*.py"/>
           </fileset>
@@ -387,7 +388,7 @@ Implementation-Vendor:  ${organisation}</echo>
    <target name="junitreport" depends="compile-tests" description="Run all tests and create an xunit compatible XML report" >
       <delete dir="${test.report.dir}" failonerror="false"/>
       <mkdir dir="${test.report.dir}"/>  
-      <py-run script="${shared.ant.dir}/nose/nosetests" pythonpath="${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" optimize="0">
+      <py-run script="${shared.ant.dir}/nose/nosetests" pythonpath="${env.PYTHONPATH}:${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" optimize="0">
          <arg value="--xunit-file=${test.report.dir}/report.xml"/>
          <arg value="--with-xunit"/>
          <arg value="--where=${test.build.dir}"/>
