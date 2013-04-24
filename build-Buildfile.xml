@@ -31,6 +31,7 @@
       <copy file="${shared.ant.dir}/build-${language}.xml" tofile="build-${language}.xml" overwrite="false"/>
       <copy file="${shared.ant.dir}/build-Util.xml" tofile="build-Util.xml" overwrite="false"/>
       <copy file="${shared.ant.dir}/build_frozen.xml" tofile="build.xml" overwrite="false"/>
+      <copy file="${shared.ant.dir}/ant-contrib-1.0b3.jar" tofile="ant-contrib-1.0b3.jar" overwrite="false"/>
       <replaceregexp file="build.xml" match="(&lt;project[ ]+name=&quot;)(.*?)&quot;"  replace="\1${ant.project.name}&quot;" byline="true" flags="g"   />
       <replaceregexp file="build-${language}.xml" match="(&lt;project[ ]+name=&quot;)(.*?)&quot;"  replace="\1${ant.project.name}&quot;" byline="true" flags="g"   />
       <replaceregexp file="build-Util.xml" match="(&lt;project[ ]+name=&quot;)(.*?)&quot;"  replace="\1${ant.project.name}&quot;" byline="true" flags="g"   />   

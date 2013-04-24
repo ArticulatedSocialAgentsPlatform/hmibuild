@@ -3,8 +3,19 @@
    <property name="language" value="java"/>
    <property name="build.impl" value="build-${language}.xml"/>
    <property name="shared.ant.dir" value="."/>    
+   
+    <typedef resource="net/sf/antcontrib/antlib.xml" 
+            uri="antlib:net.sf.antcontrib" 
+            classpath= "ant-contrib-1.0b3.jar" 
+   /> 
+   
    <import file="${build.impl}" />
-   <import file="build-Util.xml"/>   
+   <import file="build-Util.xml"/>
+   <target name="jar" depends="-jar" description="Creates a versioned jar"/> 
+   <target name="createmanifest"/>
+   
+   <!-- minimum required ant version -->
+   <property name="ant.version.required" value="1.8.0"/>
 </project>
 
   
