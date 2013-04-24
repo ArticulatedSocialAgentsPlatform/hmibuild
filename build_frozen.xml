@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JavaProjects" xmlns:ac="antlib:net.sf.antcontrib" >
+   <property name="language" value="java"/>
+   <property name="build.impl" value="build-${language}.xml"/>
+   <property name="shared.ant.dir" value="."/>    
+   <import file="${build.impl}" />
+   <import file="build-Util.xml"/>   
+</project>
+
+  
+
+
+
+
+  
+   
+
