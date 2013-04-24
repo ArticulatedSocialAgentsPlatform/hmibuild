@@ -37,7 +37,16 @@
        <copy file="${shared.template.dir}/build.properties-template" tofile="${properties.file}"/>
    </target>
  
-   
+   <target name="checkVersion">
+     <antversion property="version.running" />
+        <fail message="FATAL ERROR:  The running Ant version, ${version.running}, is too old, required version ${ant.version.required}.">
+        <condition>
+            <not>
+                <antversion atleast="${ant.version.required}" />
+            </not>
+        </condition>
+        </fail>
+   </target>
    <target name="init" depends="checkVersion">
       
    </target>

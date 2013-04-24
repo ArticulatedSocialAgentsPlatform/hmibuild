@@ -28,12 +28,12 @@
    <target name="freeze" depends="init" description="Replaces current local build file by standalone core build file">
       <fail message="Existing ${alternate.build.file} found" if="alternate.available"/>
       <move file="build.xml" tofile="${alternate.build.file}" failonerror="false" />
-      <copy file="${shared.ant.dir}/build-${language}.xml" tofile="build.xml" overwrite="false">
-         <!--filterset>
-            <filter token="MAIN_CLASS"         value="${run.main.class}" />
-         </filterset-->
-      </copy>
-      <replaceregexp file="build.xml" match="(&lt;project[ ]+name=&quot;)(.*?)&quot;"  replace="\1${ant.project.name}&quot;" byline="true" flags="g"   />   
+      <copy file="${shared.ant.dir}/build-${language}.xml" tofile="build-${language}.xml" overwrite="false"/>
+      <copy file="${shared.ant.dir}/build-Util.xml" tofile="build-Util.xml" overwrite="false"/>
+      <copy file="${shared.ant.dir}/build_frozen.xml" tofile="build.xml" overwrite="false"/>
+      <replaceregexp file="build.xml" match="(&lt;project[ ]+name=&quot;)(.*?)&quot;"  replace="\1${ant.project.name}&quot;" byline="true" flags="g"   />
+      <replaceregexp file="build-${language}.xml" match="(&lt;project[ ]+name=&quot;)(.*?)&quot;"  replace="\1${ant.project.name}&quot;" byline="true" flags="g"   />
+      <replaceregexp file="build-Util.xml" match="(&lt;project[ ]+name=&quot;)(.*?)&quot;"  replace="\1${ant.project.name}&quot;" byline="true" flags="g"   />   
    </target>
     
  

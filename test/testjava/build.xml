@@ -11,7 +11,7 @@
 	  <delete failonerror="false" dir="privateprops"/>  
 	  <delete failonerror="false" dir="lib"/>      
 	  <delete failonerror="false" dir="dist"/>      
-	  <delete failonerror="false" file="manifest.mf"/>      
+	  <delete failonerror="false" file="manifest.mf"/>	  
   </target>
 
   <target name="antunittestCompileJava">
@@ -23,7 +23,7 @@
   <target name="antunittestDist">
     <antcall target="dist"/>
     <au:assertFileExists file="dist/testjava-0.1.jar"/> 
-	  <au:assertFileExists file="manifest.mf"/> 
+    <au:assertFileExists file="manifest.mf"/> 
   </target>
 
   <target name="antunittestClean">
@@ -43,4 +43,15 @@
     <au:assertFileExists file="lib/HmiUtil-1.25.jar"/>    
     <au:plainlistener/>
   </target>
+  
+  <!-- doesn't work, removes this file...
+  <target name="antunittestFreeze">
+    <antcall target="freeze"/>
+    <au:assertFileExists file="build.alternate"/>
+    <au:assertFileExists file="build-Util.xml"/>
+    <au:assertFileExists file="build-java.xml"/> 
+    <antcall target="compile"/>
+    <move file="build.alternate" tofile="build.xml"/>
+  </target>
+  -->
 </project>
