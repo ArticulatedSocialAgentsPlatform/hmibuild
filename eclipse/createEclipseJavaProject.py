@@ -29,14 +29,18 @@ def getDependencies():
   with open(BASE_DIR+'/build.properties') as fp:
     properties = jprops.load_properties(fp)
     dependencies = ""
+    depprojectnames = set()
     if properties.has_key('rebuild.list'):
       dependencies = properties['rebuild.list']
       dependencies = dependencies.split(',');  
       dependencies = map(lambda x: x.strip(), dependencies)
-      dependencies = map(lambda x: x.replace('/java',''), dependencies)
       dependencies = filter(lambda x: len(x)>0, dependencies)
-      dependencies = map(lambda x: re.sub('^.*/','',x), dependencies)    
-    return dependencies
+      
+      for dep in dependencies:
+	tree = ElementTree.parse(SHARED_PATH+"/"+dep+'/build.xml')
+	projectElem = tree.getroot()
+	depprojectnames.add(projectElem.attrib['name'])
+    return depprojectnames
     
 def getResources():
   with open(BASE_DIR+'/build.properties') as fp:
