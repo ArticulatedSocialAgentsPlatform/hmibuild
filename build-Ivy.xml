@@ -73,7 +73,6 @@
       <antcall target="resolvelib"/> 
    </target>
   
-   
    <target name="resolve" depends="init"  description="Resolve and retrieve all dependencies">    
        <ac:if>    
         <equals arg1="${ivycleanbeforeresolve}" arg2="true" />    
@@ -213,11 +212,24 @@
    </target>  
    
    
+   <target name="-ivyreport" depends="init" description="Create an ivy report for the last resolve action">
+      <ivy:report todir="build"/>      
+   </target>
+   
+    <target name="-ivyxmlreport" depends="init" description="Create an ivy report for the last resolve action">      
+      <ivy:report todir="build" xml="true" xsl="false"/>
+   </target>
+   
    <target name="ivyreport" depends="init" description="Create an ivy report for the last resolve action">
-      <ivy:resolve log="quit"/>
-      <ivy:report/>
+      <ivy:resolve log="quit"/>      
+      <antcall target="-ivyreport"/>
    </target>
   
+  <target name="ivyxmlreport" depends="init" description="Create an ivy report for the last resolve action">
+      <ivy:resolve log="quit"/>
+      <antcall target="-ivyreport"/>
+   </target>
+   
   <available file="${test.src.dir}" property="test.src.dir.present"/>
  
  <target name="ivyinfo" depends="init">
