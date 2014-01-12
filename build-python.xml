@@ -386,7 +386,7 @@ Implementation-Vendor:  ${organisation}</echo>
          <arg value="--xunit-file=${test.report.dir}/report.xml"/>
          <arg value="--with-xunit"/>
          <arg value="--where=${test.build.dir}"/>
-         <arg value="nologcapture"/>
+         <arg value="--nologcapture"/>
       </py-run>     
    </target>
    
