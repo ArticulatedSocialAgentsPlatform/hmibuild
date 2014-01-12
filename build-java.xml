@@ -420,13 +420,13 @@ Implementation-Vendor:  ${organisation}</echo>
       
    </target>
    
-   <target name="junit" depends="-junit" description="Run all JUnit tests" >
+   <target name="junit" depends="-junit" description="Run all JUnit tests, create an XML report." >
       <fail if="test.failed">
          JUnit test(s) failed.
       </fail>
    </target>
    
-   <target name="junitnofail" depends="-junit" description="Run all JUnit tests, do not fail on test failure"/>      
+   <target name="junitnofail" depends="-junit" description="Run all JUnit tests, create an XML report, do not fail on test failure"/>      
    
    <target name="junitreport" depends="-junit" description="Run all JUnit tests and create an HTML report" if="test.src.dir.available">
       <delete dir="${test.report.dir}" failonerror="false"/>
@@ -436,10 +436,7 @@ Implementation-Vendor:  ${organisation}</echo>
             <include name="TEST-*.xml"/>
          </fileset>
          <report format="frames" todir="${test.report.dir}"/>
-      </junitreport>
-      <!--fail if="test.failed">
-         JUnit test(s) failed.
-      </fail-->
+      </junitreport>      
    </target>
    
    <property name="alternate.build.file" value="build.alternate"/>

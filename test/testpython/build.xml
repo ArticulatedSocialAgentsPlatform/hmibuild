@@ -43,4 +43,21 @@
     <antcall target="Ivy.resolve"/>
     <au:assertFileExists file="lib/protobuf-2.4.1.zip"/>
   </target>
+  
+  <target name="antunittestJunitFailingTest">
+    <antcall target="Ivy.resolve"/>
+	<antcall target="junit"/>
+	<!--
+	<au:expectfailure>
+		<antcall target="junit"/>
+	</au:expectfailure>
+	-->
+  </target>  
+  
+  <target name="antunittestJunitNofailFailingTest">
+	<antcall target="Ivy.resolve"/>
+    <antcall target="junitnofail"/>
+	<au:assertFileExists file="test/report/report.xml"/>
+  </target>  
+
 </project>

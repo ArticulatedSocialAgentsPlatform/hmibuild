@@ -7,7 +7,7 @@
 
   <!-- is called after the test, even if that caused an error -->
   <target name="tearDown">  
-	  <delete failonerror="false" dir="build"/>  
+	  <!--delete failonerror="false" dir="build"/-->  
 	  <delete failonerror="false" dir="privateprops"/>  
 	  <delete failonerror="false" dir="lib"/>      
 	  <delete failonerror="false" dir="dist"/>      
@@ -58,7 +58,13 @@
 	<antcall target="Ivy.resolve"/>
     <antcall target="junitreport"/>
 	<au:assertFileExists file="test/report/index.html"/>
-  </target>  
+  </target> 
+  
+  <target name="antunittestJunitNofailFailingTest">
+	<antcall target="Ivy.resolve"/>
+    <antcall target="junitnofail"/>
+	<au:assertFileExists file="build/test/results/TEST-UnitTest.xml"/>
+  </target> 
   
   <!-- doesn't work, removes this file...
   <target name="antunittestFreeze">

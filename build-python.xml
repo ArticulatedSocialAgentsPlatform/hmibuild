@@ -63,6 +63,7 @@ Implementation-Vendor:  ${organisation}</echo>
    <property name="deps.python.dir"       value="${deps.dir}/python"  />
    <!--property name="dist.file"             value="${dist.dir}/${module.name}.pyzip" /-->
    <property name="dist.file"             value="${dist.python.dir}/${module.name}.py.zip" />
+   <property name="build.test.results.dir" location="${build.dir}/test/results" />
    
    <property name="pyzip.excludes"        value=""  />
 
@@ -360,41 +361,64 @@ Implementation-Vendor:  ${organisation}</echo>
     </target>
 
     <target name="-test" depends="compile-tests">
-       <py-test pythonpath="${env.PYTHONPATH}:${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}:${extra.python.path}" dir="${test.build.dir}">
+       <py-test failonerror="false" pythonpath="${env.PYTHONPATH}:${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}:${extra.python.path}" dir="${test.build.dir}">
           <fileset dir="${test.build.dir}">
              <include name="test*.py"/>
           </fileset>
-       </py-test>
-       <!--py-test>
-          <fileset dir="testscripts2">
-             <include name="**/*Test.py"/>
-          </fileset>
-       </py-test-->
+       </py-test>      
     </target>
 
 
+   <!--
+   <target name="junit" description="Run all tests">
+      <py-test failonerror="true" pythonpath="${env.PYTHONPATH}:${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}:${extra.python.path}" dir="${test.build.dir}">
+          <fileset dir="${test.build.dir}">
+             <include name="test*.py"/>
+          </fileset>
+       </py-test>      
+   </target>
+   -->
    
-   <target name="junit" depends="-test" description="Run all tests">
-      <fail if="test.failed">
-         Some tests failed.
-      </fail>
+   <target name="junit" depends="compile-tests" description="Run all JUnit tests, create an XML report">
+      <delete dir="${test.report.dir}" failonerror="false"/>
+      <mkdir dir="${test.report.dir}"/>
+	  <py-run failonerror="true" script="${shared.ant.dir}/nose/nosetests" pythonpath="${env.PYTHONPATH}:${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" optimize="0">
+         <arg value="--xunit-file=${test.report.dir}/report.xml"/>
+         <arg value="--with-xunit"/>
+         <arg value="--where=${test.build.dir}"/>
+         <arg value="nologcapture"/>
+      </py-run>     
    </target>
    
+   <target name="junitnofail" depends="compile-tests" description="Run all JUnit tests, create an XML report, do not fail on test failure">      
+      <delete dir="${test.report.dir}" failonerror="false"/>
+      <mkdir dir="${test.report.dir}"/>
+	  <py-run failonerror="false" script="${shared.ant.dir}/nose/nosetests" pythonpath="${env.PYTHONPATH}:${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" optimize="0">
+         <arg value="--xunit-file=${test.report.dir}/report.xml"/>
+         <arg value="--with-xunit"/>
+         <arg value="--where=${test.build.dir}"/>
+         <arg value="--nologcapture"/>
+      </py-run>   
+	</target>
+	
    <!-- nofail version of junit -->
    <target name="-junit" depends="-test" description="Run all tests">
       
    </target>
    
+   <!--
    <target name="junitreport" depends="compile-tests" description="Run all tests and create an xunit compatible XML report" >
-      <delete dir="${test.report.dir}" failonerror="false"/>
-      <mkdir dir="${test.report.dir}"/>  
-      <py-run script="${shared.ant.dir}/nose/nosetests" pythonpath="${env.PYTHONPATH}:${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" optimize="0">
-         <arg value="--xunit-file=${test.report.dir}/report.xml"/>
-         <arg value="--with-xunit"/>
-         <arg value="--where=${test.build.dir}"/>
-         <arg value="--nologcapture"/>
-      </py-run>	
+      ...
+	  <delete dir="${build.test.results.dir}" failonerror="false"/>
+      <mkdir dir="${build.test.results.dir}"/>
+	  <junitreport todir="${build.test.results.dir}" >
+         <fileset dir=".">
+            <include name="${test.report.dir}/report.xml"/>
+         </fileset>
+         <report format="frames" todir="${test.report.dir}"/>
+      </junitreport> 
    </target>
+   -->
    
    <property name="alternate.build.file" value="build.alternate"/>
    <available property="alternate.available" file="${alternate.build.file}"/>
