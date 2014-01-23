@@ -75,4 +75,4 @@ key = paramiko.RSAKey.from_private_key_file(path)
 #  password = getpass.getpass('Password for %s@%s: ' % (username, hostname))  
 
 createXML(args.org, args.module, args.version, getFileName(args.jar))
-publishAtScp(hostname, '/var/www/ivyrepos/hmirepo/external/java/', username, key, args.org, args.module, args.version, args.jar)
+publishAtScp(hostname, '/var/www/ivyrepos/hmirepos/external/java/', username, key, args.org, args.module, args.version, args.jar)
