@@ -225,25 +225,51 @@
       </filesystem>
      
       <!-- NO URL BASED VERSION FOR PROJECTS REPO YET -->
-      
+     
+     <!--
      <sftp name="asap.sftp.publish" host="asap-project.ewi.utwente.nl" user="${publish.user.name}" keyFile="${user.keyfile}" >
          <ivy pattern="/asap-project/repository/${language}/${ivy.local.default.ivy.pattern}" />
          <artifact pattern="/asap-project/repository/${language}/${ivy.local.default.artifact.pattern}" />        
       </sftp>
+      -->
+      <sftp name="asap.sftp.publish" host="itchy" user="${publish.user.name}" keyFile="${user.keyfile}" >
+         <ivy pattern="/var/www/ivyrepos/asap-project/repository/${language}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="/var/www/ivyrepos/asap-project/repository/${language}/${ivy.local.default.artifact.pattern}" />        
+      </sftp>
+      
+      <!--
       <sftp name="asap.resource.sftp.publish" host="asap-project.ewi.utwente.nl" user="${publish.user.name}" keyFile="${user.keyfile}" >
          <ivy pattern="/asap-project/resource/${ivy.local.default.ivy.pattern}" />
          <artifact pattern="/asap-project/resource/${ivy.local.default.artifact.pattern}" />        
       </sftp> 
+      -->
+      <sftp name="asap.resource.sftp.publish" host="itchy" user="${publish.user.name}" keyFile="${user.keyfile}" >
+         <ivy pattern="/var/www/ivyrepos/asap-project/resource/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="/var/www/ivyrepos/asap-project/resource/${ivy.local.default.artifact.pattern}" />        
+      </sftp> 
       
+      <!--
       <sftp name="hmicore.sftp.publish" host="hmirepo.ewi.utwente.nl" user="${publish.user.name}" keyFile="${user.keyfile}" >
          <ivy pattern="/hmirepo/hmicore/${language}/${ivy.local.default.ivy.pattern}" />
          <artifact pattern="/hmirepo/hmicore/${language}/${ivy.local.default.artifact.pattern}" />        
       </sftp> 
+      -->      
+      <sftp name="hmicore.sftp.publish" host="itchy" user="${publish.user.name}" keyFile="${user.keyfile}" >
+	 <ivy pattern="/var/www/ivyrepos/hmirepo/hmicore/${language}/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="/var/www/ivyrepos/hmirepo/hmicore/${language}/${ivy.local.default.artifact.pattern}" />        
+      </sftp> 
+      
+      <!--
       <sftp name="resource.sftp.publish" host="hmirepo.ewi.utwente.nl" user="${publish.user.name}" keyFile="${user.keyfile}" >
          <ivy pattern="/hmirepo/resource/${ivy.local.default.ivy.pattern}" />
          <artifact pattern="/hmirepo/resource/${ivy.local.default.artifact.pattern}" />        
       </sftp> 
-
+      --> 
+      <sftp name="resource.sftp.publish" host="itchy" user="${publish.user.name}" keyFile="${user.keyfile}" >
+         <ivy pattern="/var/www/ivyrepos/hmirepo/resource/${ivy.local.default.ivy.pattern}" />
+         <artifact pattern="/var/www/ivyrepos/hmirepo/resource/${ivy.local.default.artifact.pattern}" />        
+      </sftp> 
+      
       <chain name="defaultchain" returnFirst="true">
     
          <resolver ref="${external.repository}"/>
