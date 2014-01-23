@@ -5,6 +5,7 @@ import argparse
 import paramiko
 import getpass
 import os
+import shutil
 
 def createXML(org, module, revision, filename):
   today = datetime.datetime.now()
@@ -39,12 +40,15 @@ def getFileName(path):
   splitpath = path.split('/')
   splitpath = splitpath[len(splitpath)-1].split('\\')
   return splitpath[len(splitpath)-1]
-      
+
+def publishLocal(directory, org, module, revision, jarfile):
+  os.makedirs(directory+org+'/'+module+'/'+revision+'/lib')
+  shutil.copyfile(module+"-"+revision+".xml",directory+org+'/'+module+'/'+revision+'/'+module+"-"+revision+".xml");
+  shutil.copyfile(jarfile, directory+org+'/'+module+'/'+revision+'/lib/'+getFileName(jarfile));
+  
 def publishAtScp(host, user, directory, key, org, module, revision, jarfile):
   transport = paramiko.Transport((host,22))
-  transport.connect(username=user, pkey=key)
-  #transport.connect(username=user, password=passw)
-  
+  transport.connect(username=user, pkey=key)  
   sftp = paramiko.SFTPClient.from_transport(transport)
   
   mkdirifnotexists(sftp,directory+org)
@@ -75,4 +79,9 @@ key = paramiko.RSAKey.from_private_key_file(path)
 #  password = getpass.getpass('Password for %s@%s: ' % (username, hostname))  
 
 createXML(args.org, args.module, args.version, getFileName(args.jar))
-publishAtScp(hostname, '/var/www/ivyrepos/hmirepos/external/java/', username, key, args.org, args.module, args.version, args.jar)
+print(hostname)
+
+if hostname == "local":	
+	publishLocal('/var/www/ivyrepos/hmirepos/external/java/', args.org, args.module, args.version, args.jar)	
+else:
+	publishAtScp(hostname, '/var/www/ivyrepos/hmirepos/external/java/', username, key, args.org, args.module, args.version, args.jar)
