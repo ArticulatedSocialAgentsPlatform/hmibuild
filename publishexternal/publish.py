@@ -40,19 +40,19 @@ def getFileName(path):
   splitpath = splitpath[len(splitpath)-1].split('\\')
   return splitpath[len(splitpath)-1]
       
-def publishAtScp(host, user, key, org, module, revision, jarfile):
+def publishAtScp(host, user, directory, key, org, module, revision, jarfile):
   transport = paramiko.Transport((host,22))
   transport.connect(username=user, pkey=key)
   #transport.connect(username=user, password=passw)
   
   sftp = paramiko.SFTPClient.from_transport(transport)
   
-  mkdirifnotexists(sftp,'/hmirepo/external/java/'+org)
-  mkdirifnotexists(sftp,'/hmirepo/external/java/'+org+'/'+module)
-  sftp.mkdir('/hmirepo/external/java/'+org+'/'+module+'/'+revision)
-  sftp.mkdir('/hmirepo/external/java/'+org+'/'+module+'/'+revision+'/lib')
-  sftp.put(module+"-"+revision+".xml",'/hmirepo/external/java/'+org+'/'+module+'/'+revision+'/'+module+"-"+revision+".xml")
-  sftp.put(jarfile,'/hmirepo/external/java/'+org+'/'+module+'/'+revision+'/lib/'+getFileName(jarfile))
+  mkdirifnotexists(sftp,directory+org)
+  mkdirifnotexists(sftp,directory+org+'/'+module)
+  sftp.mkdir(directory+org+'/'+module+'/'+revision)
+  sftp.mkdir(directory+org+'/'+module+'/'+revision+'/lib')
+  sftp.put(module+"-"+revision+".xml",directory+org+'/'+module+'/'+revision+'/'+module+"-"+revision+".xml")
+  sftp.put(jarfile,directory+org+'/'+module+'/'+revision+'/lib/'+getFileName(jarfile))
   sftp.close()
   transport.close()
 
@@ -75,4 +75,4 @@ key = paramiko.RSAKey.from_private_key_file(path)
 #  password = getpass.getpass('Password for %s@%s: ' % (username, hostname))  
 
 createXML(args.org, args.module, args.version, getFileName(args.jar))
-publishAtScp(hostname, username, key, args.org, args.module, args.version, args.jar)
+publishAtScp(hostname, '/var/www/ivyrepos/hmirepo/external/java/', username, key, args.org, args.module, args.version, args.jar)
