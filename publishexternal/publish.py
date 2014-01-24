@@ -82,6 +82,6 @@ createXML(args.org, args.module, args.version, getFileName(args.jar))
 print(hostname)
 
 if hostname == "local":	
-	publishLocal('/var/www/ivyrepos/hmirepos/external/java/', args.org, args.module, args.version, args.jar)	
+	publishLocal('/var/www/ivyrepos/hmirepo/external/java/', args.org, args.module, args.version, args.jar)	
 else:
-	publishAtScp(hostname, '/var/www/ivyrepos/hmirepos/external/java/', username, key, args.org, args.module, args.version, args.jar)
+	publishAtScp(hostname, '/var/www/ivyrepos/hmirepo/external/java/', username, key, args.org, args.module, args.version, args.jar)
