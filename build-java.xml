@@ -347,8 +347,8 @@ Implementation-Vendor:  ${organisation}</echo>
    
    
    <fileset dir="." id="test.lib.fileset">
-      <include name="${test.lib.dir}/**/*.jar"/>
-      <include name="${test.lib.local}/**/*.jar"/>
+      <include name="${test.lib.dir}/*.jar"/>
+      <include name="${test.lib.local}/*.jar"/>
    </fileset>
  
    <path id="javac-test-sourcepath">
