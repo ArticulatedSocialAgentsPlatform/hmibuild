@@ -22,7 +22,7 @@
 	  <delete failonerror="false" dir="lib"/>      
 	  <delete failonerror="false" dir="test/lib"/>
 	  <delete failonerror="false" file="manifest.mf"/>
-	  <!--delete failonerror="false" dir="test/report"/-->      
+	  <delete failonerror="false" dir="test/report"/>      
   </target>
 
   <target name="antunittestCompile">
@@ -66,8 +66,7 @@
     <echo message="test from ${basedir}"/>
     <antcall target="Ivy.resolve"/>	
     <antcall target="junitnofail"/>
-    <!-- disabled for now, does not work via unit tests started in other directory.. -->
-	<!--au:assertFileExists file="test/report/report.xml"/-->
+    <au:assertFileExists file="test/report/report.xml"/>
   </target>  
   
 </project>
