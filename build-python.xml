@@ -378,31 +378,38 @@ Implementation-Vendor:  ${organisation}</echo>
        </py-test>      
    </target>
    -->
+   <ac:propertyregex property="project.path"
+              input="${ant.file}"
+              regexp="build\.xml"
+              replace=""
+              global="true"
+	      override="true"
+   />
    
    <target name="junit" depends="compile-tests" description="Run all JUnit tests, create an XML report">
-      <delete dir="${test.report.dir}" failonerror="false"/>
-      <mkdir dir="${test.report.dir}"/>
-	  <py-run failonerror="true" script="${shared.ant.dir}/nose/nosetests" pythonpath="${env.PYTHONPATH}:${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" optimize="0">
-         <arg value="--xunit-file=${test.report.dir}/report.xml"/>
+      <delete dir="${project.path}${test.report.dir}" failonerror="false"/>
+      <mkdir dir="${project.path}${test.report.dir}"/>
+      <py-run failonerror="true" script="${shared.ant.dir}/nose/nosetests" pythonpath="${env.PYTHONPATH}:${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" optimize="0">
+         <arg value="--xunit-file=${project.path}${test.report.dir}/report.xml"/>
          <arg value="--with-xunit"/>
-         <arg value="--where=${test.build.dir}"/>
+         <arg value="--where=${project.path}${test.build.dir}"/>
          <arg value="--nologcapture"/>
       </py-run>     
    </target>
    
    <target name="junitnofail" depends="compile-tests" description="Run all JUnit tests, create an XML report, do not fail on test failure">      
-      <delete dir="${test.report.dir}" failonerror="false"/>
-      <mkdir dir="${test.report.dir}"/>
+      <delete dir="${project.path}${test.report.dir}" failonerror="false"/>
+      <mkdir dir="${project.path}${test.report.dir}"/>
 	  <py-run failonerror="false" script="${shared.ant.dir}/nose/nosetests" pythonpath="${env.PYTHONPATH}:${build.dir}:${deps.python.dir}:${test.build.dir}:${lib.dir}:${lib.local.dir}:${test.lib.dir}" optimize="0">
-         <arg value="--xunit-file=${test.report.dir}/report.xml"/>
+         <arg value="--xunit-file=${project.path}${test.report.dir}/report.xml"/>
          <arg value="--with-xunit"/>
-         <arg value="--where=${test.build.dir}"/>
+         <arg value="--where=${project.path}${test.build.dir}"/>
          <arg value="--nologcapture"/>
       </py-run>   
 	</target>
 	
    <!-- nofail version of junit -->
-   <target name="-junit" depends="-test" description="Run all tests">
+   <target name="-junit" depends="junitnofail" description="Run all tests">
       
    </target>
    
