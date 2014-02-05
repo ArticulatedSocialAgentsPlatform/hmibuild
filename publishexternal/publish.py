@@ -47,6 +47,7 @@ def publishLocal(directory, org, module, revision, jarfile):
   shutil.copyfile(jarfile, directory+org+'/'+module+'/'+revision+'/lib/'+getFileName(jarfile));
   
 def publishAtScp(host, user, directory, key, org, module, revision, jarfile):
+  ssh = paramiko.SSHClient()
   transport = paramiko.Transport((host,22))
   transport.connect(username=user, pkey=key)  
   sftp = paramiko.SFTPClient.from_transport(transport)
@@ -84,4 +85,4 @@ print(hostname)
 if hostname == "local":	
 	publishLocal('/var/www/ivyrepos/hmirepo/external/java/', args.org, args.module, args.version, args.jar)	
 else:
-	publishAtScp(hostname, '/var/www/ivyrepos/hmirepo/external/java/', username, key, args.org, args.module, args.version, args.jar)
+	publishAtScp(hostname, username, '/var/www/ivyrepos/hmirepo/external/java/', key, args.org, args.module, args.version, args.jar)
