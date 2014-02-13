@@ -113,6 +113,10 @@ Implementation-Vendor:  ${organisation}</echo>
 	   <cmake srcdir="${cmake.base.dir}"
 		   bindir="${build.dir}"
 		   buildtype="Debug">
+		   <generator name="Visual Studio 10" platform="windows" buildargs="ALL_BUILD.vcxproj">
+			  <variable name="CMAKE_INSTALL_PREFIX" type="PATH" value="../${zip.tmp.dir}" />
+		   </generator>
+		   <generator name="Unix Makefiles" />
 		   <!--variable name="CMAKE_INSTALL_PREFIX" type="FILEPATH" value="${cmake.install.prefix}" /-->
 		</cmake>
 	</target>
@@ -125,13 +129,33 @@ Implementation-Vendor:  ${organisation}</echo>
 		<mkdir dir="${dist.dir}"/>  
 		<mkdir dir="${dist.cpp.dir}"/>  
 	</target>
-	<target name="-jar-install-tmp">
+	
+	<target name="checkos">
+		<condition property="isWindows" value="true">
+			<os family="windows" />
+		</condition>
+		<condition property="isUnix" value="true">
+			<os family="unix" />
+		</condition>
+	</target>
+
+	<target name="if_windows" depends="checkos" if="isWindows">
+	   <property name="sw.root" value="c:\flag" />
+		<echo message="${sw.root}"/>
+	</target>
+	<target name="-jar-install-tmp-visualstudio" depends="checkos" if="isWindows" description="Temp install for Windows - uses msbuild">
+		<exec executable="msbuild" dir="${build.dir}">
+			<arg value="INSTALL.vcxproj"/>
+		</exec>
+	</target>
+	<target name="-jar-install-tmp-make" depends="checkos" if="isUnix" description="Temp install for Unix - uses make install">
 		<exec executable="make" dir="${build.dir}">
 			<arg value="install"/>
 			<arg value="DESTDIR=../${zip.tmp.dir}"/>
 		</exec>
 	</target>
-	<target name="-jar" depends="build,-jar-prepare-tmp,-jar-install-tmp" description="Installs libraries and headers to the dist dir">
+	<target name="-jar-install-tmp" depends="-jar-install-tmp-make,-jar-install-tmp-visualstudio" description="Installs libraries and headers to temp dir" />
+	<target name="-jar" depends="build,-jar-prepare-tmp,-jar-install-tmp" description="Packages to dist dir">
 		<echo message="Packaging temporary root to ZIP file."/>
 		<echo message="  Excluded patterns: ${dist.excludes}"/>
 		<delete>
@@ -150,13 +174,25 @@ Implementation-Vendor:  ${organisation}</echo>
    <target name="build-test" depends="jar" description="Build test cases. Requires fully-built library.">
 	   <cmake srcdir="${test.cmake.base.dir}"
 		  bindir="${test.build.dir}"
-		  buildtype="Debug" />
+		  buildtype="Debug">
+          <generator name="Visual Studio 10" platform="windows" buildargs="ALL_BUILD.vcxproj">
+			  <variable name="CMAKE_INSTALL_PREFIX" type="PATH" value="../../${dist.dir}" />
+          </generator>
+		  <generator name="Unix Makefiles" />
+	  </cmake>
+  </target>
+  <target name="-install-test-make" depends="checkos" if="isUnix">
 		<exec executable="make" dir="${test.build.dir}">
 			<arg value="install"/>
 			<arg value="DESTDIR=../../${dist.dir}"/>
 		</exec>
 	</target>
-	<target name="test" depends="build-test" description="Run test cases">
+  <target name="-install-test-vs" depends="checkos" if="isWindows">
+		<exec executable="msbuild" dir="${test.build.dir}">
+			<arg value="INSTALL.vcxproj"/>
+		</exec>
+	</target>
+	<target name="test" depends="build-test,-install-test-make,-install-test-vs" description="Run test cases">
 		<echo>FIXME: Doing nothing at the moment!</echo>
 	</target>
 
