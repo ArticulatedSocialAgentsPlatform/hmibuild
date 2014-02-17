@@ -97,6 +97,15 @@ Implementation-Vendor:  ${organisation}</echo>
     findbugs         Find potential Java bugs
     findbugsreport   Find potential Java bugs, produce an HTML findbugs report</echo> 
     </target>
+    
+    <target name="checkos">
+        <condition property="isWindows" value="true">
+            <os family="windows" />
+        </condition>
+        <condition property="isUnix" value="true">
+            <os family="unix" />
+        </condition>
+    </target>
    
    
    <target name="build" depends="clean, compile" description="clean, compile"/>  
