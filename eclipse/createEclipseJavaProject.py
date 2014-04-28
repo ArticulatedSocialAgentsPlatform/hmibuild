@@ -37,9 +37,9 @@ def getDependencies():
       dependencies = filter(lambda x: len(x)>0, dependencies)
       
       for dep in dependencies:
-	tree = ElementTree.parse(SHARED_PATH+"/"+dep+'/build.xml')
-	projectElem = tree.getroot()
-	depprojectnames.add(projectElem.attrib['name'])
+        tree = ElementTree.parse(SHARED_PATH+"/"+dep+'/build.xml')
+        projectElem = tree.getroot()
+        depprojectnames.add(projectElem.attrib['name'])
     return depprojectnames
     
 def getResources():
@@ -60,71 +60,102 @@ def getResources():
     return resources
     
 def writeDotProject():
-  tree = ElementTree.parse(BASE_DIR+'/build.xml')
-  projectElem = tree.getroot()
-  fdefaultProject = open(SHARED_PATH+'/hmibuild/eclipse/defaultproject','r')
-  content = fdefaultProject.read();
-  content = content.replace("$name$",projectElem.attrib['name']);
-  fproject = open(BASE_DIR+'/.project', 'w')
-  fproject.write(content)
-  fproject.close()
+  with open(BASE_DIR+'/build.properties') as fp:
+    properties = jprops.load_properties(fp)
+    if properties.has_key('build_target') and properties['build_target'] == 'android':
+      projectFile = 'defaultandroidproject'
+    else:
+      projectFile = 'defaultproject'
+    tree = ElementTree.parse(BASE_DIR+'/build.xml')
+    projectElem = tree.getroot()
+    fdefaultProject = open(SHARED_PATH+'/hmibuild/eclipse/'+projectFile,'r')
+    content = fdefaultProject.read();
+    content = content.replace("$name$",projectElem.attrib['name']);
+    fproject = open(BASE_DIR+'/.project', 'w')
+    fproject.write(content)
+    fproject.close()
 
 def writeClassPath():
-  root = ElementTree.Element("classpath")
-  if os.path.isdir(BASE_DIR+'/src'):
-    cpEntry = ElementTree.SubElement(root,"classpathentry")
-    cpEntry.attrib["kind"]="src"
-    cpEntry.attrib["path"]="src"
-
-  if os.path.isdir(BASE_DIR+'/generatedsrc'):
-    cpEntry = ElementTree.SubElement(root,"classpathentry")
-    cpEntry.attrib["kind"]="src"
-    cpEntry.attrib["path"]="generatedsrc"
-  
-  if os.path.isdir(BASE_DIR+'/test/src'):
-    cpEntry = ElementTree.SubElement(root,"classpathentry")
-    cpEntry.attrib["kind"]="src"
-    cpEntry.attrib["path"]="test/src"
-  
-  cpEntry = ElementTree.SubElement(root,"classpathentry")
-  cpEntry.attrib["kind"]="con"
-  cpEntry.attrib["path"]="org.eclipse.jdt.launching.JRE_CONTAINER"
-  
-  cpEntry = ElementTree.SubElement(root,"classpathentry")
-  cpEntry.attrib["kind"]="output"
-  cpEntry.attrib["path"]="build/classes"
-    
-  if os.path.isdir(BASE_DIR+'/resource'):
-    cpEntry = ElementTree.SubElement(root,"classpathentry")
-    cpEntry.attrib["kind"]="lib"
-    cpEntry.attrib["path"]="resource"
-  
-  if os.path.isdir(BASE_DIR+'/test/resource'):
-    cpEntry = ElementTree.SubElement(root,"classpathentry")
-    cpEntry.attrib["kind"]="lib"
-    cpEntry.attrib["path"]="test/resource"
-
-  dependencies = getDependencies()
-
-  for library in getLibraries():
-    if not SOURCE_SETUP or not(reduce(lambda x, y: x|library.startswith('lib/'+y+'-'), dependencies, False)):
+  with open(BASE_DIR+'/build.properties') as fp:
+    root = ElementTree.Element("classpath")
+    properties = jprops.load_properties(fp)
+    if properties.has_key('build_target') and properties['build_target'] == 'android':
       cpEntry = ElementTree.SubElement(root,"classpathentry")
-      cpEntry.attrib["kind"]="lib"
-      cpEntry.attrib["path"]=library
-  for resource in getResources():
-    cpEntry = ElementTree.SubElement(root,"classpathentry")
-    cpEntry.attrib["kind"]="lib"
-    cpEntry.attrib["path"]=resource
-  if SOURCE_SETUP:
-    for dependency in dependencies:
+      cpEntry.attrib["exported"]="true"
+      cpEntry.attrib["kind"]="con"
+      cpEntry.attrib["path"]="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"
+      
+      cpEntry = ElementTree.SubElement(root,"classpathentry")
+      cpEntry.attrib["exported"]="true"
+      cpEntry.attrib["kind"]="con"
+      cpEntry.attrib["path"]="com.android.ide.eclipse.adt.LIBRARIES"
+      
+      cpEntry = ElementTree.SubElement(root,"classpathentry")
+      cpEntry.attrib["exported"]="true"
+      cpEntry.attrib["kind"]="con"
+      cpEntry.attrib["path"]="com.android.ide.eclipse.adt.DEPENDENCIES"
+        
+    if os.path.isdir(BASE_DIR+'/src'):
       cpEntry = ElementTree.SubElement(root,"classpathentry")
       cpEntry.attrib["kind"]="src"
-      cpEntry.attrib["combineaccessrules"]="false"
-      cpEntry.attrib["path"]='/'+dependency
+      cpEntry.attrib["path"]="src"
 
-  fclasspath = open(BASE_DIR+'/.classpath','w')
-  fclasspath.write(prettify(root))
-  fclasspath.close()
+    if os.path.isdir(BASE_DIR+'/generatedsrc'):
+      cpEntry = ElementTree.SubElement(root,"classpathentry")
+      cpEntry.attrib["kind"]="src"
+      cpEntry.attrib["path"]="generatedsrc"
+    
+    if os.path.isdir(BASE_DIR+'/gen'):
+      cpEntry = ElementTree.SubElement(root,"classpathentry")
+      cpEntry.attrib["kind"]="src"
+      cpEntry.attrib["path"]="gen"
+  
+    if os.path.isdir(BASE_DIR+'/test/src'):
+      cpEntry = ElementTree.SubElement(root,"classpathentry")
+      cpEntry.attrib["kind"]="src"
+      cpEntry.attrib["path"]="test/src"
+  
+    cpEntry = ElementTree.SubElement(root,"classpathentry")
+    cpEntry.attrib["kind"]="con"
+    cpEntry.attrib["path"]="org.eclipse.jdt.launching.JRE_CONTAINER"
+  
+    cpEntry = ElementTree.SubElement(root,"classpathentry")
+    cpEntry.attrib["kind"]="output"
+    cpEntry.attrib["path"]="build/classes"
+    
+    if os.path.isdir(BASE_DIR+'/resource'):
+      cpEntry = ElementTree.SubElement(root,"classpathentry")
+      cpEntry.attrib["kind"]="lib"
+      cpEntry.attrib["path"]="resource"
+  
+    if os.path.isdir(BASE_DIR+'/test/resource'):
+      cpEntry = ElementTree.SubElement(root,"classpathentry")
+      cpEntry.attrib["kind"]="lib"
+      cpEntry.attrib["path"]="test/resource"
+
+    dependencies = getDependencies()
+
+    for library in getLibraries():
+      if not SOURCE_SETUP or not(reduce(lambda x, y: x|library.startswith('lib/'+y+'-'), dependencies, False)):
+        cpEntry = ElementTree.SubElement(root,"classpathentry")
+        if properties.has_key('build_target') and properties['build_target'] == 'android':
+          cpEntry.attrib["exported"]="true"
+        cpEntry.attrib["kind"]="lib"
+        cpEntry.attrib["path"]=library
+    for resource in getResources():
+      cpEntry = ElementTree.SubElement(root,"classpathentry")
+      cpEntry.attrib["kind"]="lib"
+      cpEntry.attrib["path"]=resource
+    if SOURCE_SETUP:
+      for dependency in dependencies:
+        cpEntry = ElementTree.SubElement(root,"classpathentry")
+        cpEntry.attrib["kind"]="src"
+        cpEntry.attrib["combineaccessrules"]="false"
+        cpEntry.attrib["path"]='/'+dependency
+
+    fclasspath = open(BASE_DIR+'/.classpath','w')
+    fclasspath.write(prettify(root))
+    fclasspath.close()
 
 #def main():    
 parser = argparse.ArgumentParser(description='Create eclipse project files from a HMI project.')
