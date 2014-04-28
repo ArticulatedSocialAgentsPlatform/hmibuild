@@ -133,6 +133,7 @@ def writeClassPath():
       cpEntry.attrib["kind"]="lib"
       cpEntry.attrib["path"]="test/resource"
 
+  if SOURCE_SETUP:
     dependencies = getDependencies()
 
     for library in getLibraries():
