@@ -22,4 +22,25 @@
    </py-run>
    </target>
    
+      <target name="eclipsesourceprojectlist"  depends=" -init.resolve.list, init" description="build eclipse project files for all projects found on rebuild.list">    
+      <ac:if>
+         <and>
+            <isset property="rebuild.list"/>
+            <not><equals arg1="${rebuild.list}" arg2="" /></not>
+         </and>
+      <ac:then>
+         <echo message="resolving resolve.list projects ..."/> 
+         <filelist id="resolve.project.dirs" dir="${shared.project.root}" files="${rebuild.list}" />         
+         <subant target="eclipsesourceproject" verbose="false" inheritall="false">
+            <filelist refid="resolve.project.dirs"/>
+         </subant>
+      </ac:then>
+      <ac:else>
+         <echo message="  --- No resolve.list/rebuild.list projects ---"/> 
+      </ac:else>
+      </ac:if>
+     
+      <antcall target="eclipsesourceproject"/>
+    </target>
+   
  </project>
