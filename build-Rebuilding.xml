@@ -40,7 +40,8 @@
   
  
     <target name="getalphas"  depends="init" description="Copy alpha versions for rebuild list"> 
-       <ac:for  param="projectdir" list="${rebuild.list}" trim="true" keepgoing="true">
+       <mkdir dir="${lib.dir}"/>
+	   <ac:for  param="projectdir" list="${rebuild.list}" trim="true" keepgoing="true">
          <sequential>
             <!--echo message="ctes param=@{projectdir}"/-->    
             <ac:if> 
