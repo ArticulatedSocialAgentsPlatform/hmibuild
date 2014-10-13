@@ -178,7 +178,7 @@
    <target name="run" depends="compile" description="Runs the main program for this project, compiles if necessary">   
       <fail message=":${line.separator}${line.separator}No main class defined. ${line.separator}Use 'ant main' to set a main class" unless="run.main.class"/> 
       <java classname="${run.main.class}" fork="${run.fork}" spawn="${run.spawn}" >      
-             
+          <sysproperty key="java.awt.headless" value="${headless}"/>
           <classpath refid="run-classpath"/>
 	  <jvmarg line="${run.jvmargs}"/>
           <arg line="${run.argline}"/>
@@ -239,7 +239,8 @@
    <property name="javadoc.link"          value="http://java.sun.com/javase/6/docs/api/"/>
    <property name="javadoc.linksource"    value="yes"/>
    <property name="javadoc.packages"      value="*"/>
-   
+   <property name="headless"     value=""/>
+
    <target name="-pre-doc" depends="delombok">      
    </target>
    
