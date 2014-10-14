@@ -43,7 +43,7 @@
   <target name="antunittestResolve">
     <antcall target="Ivy.resolve"/>
     <au:assertFileExists file="lib/HmiUtil-1.25.jar"/>    
-	<au:assertFileExists file="test/lib/junit-dep-4.10.jar"/>    
+	<au:assertFileExists file="test/lib/junit-*.jar"/>    
     <au:plainlistener/>
   </target>
   
