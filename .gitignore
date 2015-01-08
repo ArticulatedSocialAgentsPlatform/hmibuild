@@ -1,11 +1,9 @@
 *.pyc
-/**/*.pyc
-/**/*.*~
 *.*~
 .*.sw?
 /test/*/dist
 /test/*/lib
-/test/*/privateprops
+privateprops
 *.class
 *~
 test/reports
