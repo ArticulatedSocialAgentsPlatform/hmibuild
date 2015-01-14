@@ -133,8 +133,8 @@ def writeClassPath():
       cpEntry.attrib["kind"]="lib"
       cpEntry.attrib["path"]="test/resource"
 
-  if SOURCE_SETUP:
-    dependencies = getDependencies()
+    if SOURCE_SETUP:
+      dependencies = getDependencies()
 
     for library in getLibraries():
       if not SOURCE_SETUP or not(reduce(lambda x, y: x|library.startswith('lib/'+y+'-'), dependencies, False)):

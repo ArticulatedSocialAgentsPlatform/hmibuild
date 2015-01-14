@@ -88,7 +88,7 @@
    </target>
 
    <target name="delombok" depends="init">
-   <taskdef classname="lombok.delombok.ant.DelombokTask" classpath="${ant.file.JavaProjects}/../lombok-0.11.6.jar" name="delombok" />
+   <taskdef classname="lombok.delombok.ant.DelombokTask" classpath="${ant.file.JavaProjects}/../lombok-1.14.8.jar" name="delombok" />
 	<mkdir dir="build/src-delomboked" />
 	<delombok verbose="true" encoding="UTF-8" to="${src.delombok.dir}" from="${src.dir}" />
    </target>
