@@ -38,7 +38,7 @@
    <property name="javac.include"         value="**/*.java"/>
    <property name="javac.exclude"         value=""/>
    <property name="javac.deprecation"     value="true"/>
-   <property name="javac.version"         value="1.7"/>
+   <property name="javac.version"         value="1.8"/>
    <property name="javac.source"          value="${javac.version}"/>
    <property name="javac.target"          value="${javac.version}"/>
    <property name="javac.compilerargs"    value=""/>      
