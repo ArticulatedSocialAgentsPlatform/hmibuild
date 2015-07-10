@@ -64,6 +64,7 @@ parser.add_argument('--basedir', action="store", required=False, default='.')
 parser.add_argument('--sharedresource', action="store", required=True)
 parser.add_argument('--asapsharedresource', action="store", required=True)
 parser.add_argument('--language', action="store", required=False)
+parser.add_argument('--mains', action="store", required=False)
 args = parser.parse_args()
 SHARED_PATH = args.sharedroot
 SOURCE_SETUP = args.sourcesetup

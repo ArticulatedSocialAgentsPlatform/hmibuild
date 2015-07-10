@@ -37,9 +37,7 @@ def getDependencies():
       dependencies = filter(lambda x: len(x)>0, dependencies)
       
       for dep in dependencies:
-        tree = ElementTree.parse(SHARED_PATH+"/"+dep+'/build.xml')
-        projectElem = tree.getroot()
-        depprojectnames.add(projectElem.attrib['name'])
+        depprojectnames.add(getProjectNameFromDir(SHARED_PATH+"/"+dep))
     return depprojectnames
     
 def getResources():
@@ -58,7 +56,15 @@ def getResources():
     resources = filter(lambda x: len(x)>0, resources)
     resources = set(resources)
     return resources
-    
+
+def getProjectNameFromDir(dir):
+   tree = ElementTree.parse(dir+'/build.xml')
+   projectElem = tree.getroot()
+   return projectElem.attrib['name']
+
+def getProjectName():
+    return getProjectNameFromDir(BASE_DIR)
+
 def writeDotProject():
   with open(BASE_DIR+'/build.properties') as fp:
     properties = jprops.load_properties(fp)
@@ -66,11 +72,9 @@ def writeDotProject():
       projectFile = 'defaultandroidproject'
     else:
       projectFile = 'defaultproject'
-    tree = ElementTree.parse(BASE_DIR+'/build.xml')
-    projectElem = tree.getroot()
     fdefaultProject = open(SHARED_PATH+'/hmibuild/eclipse/'+projectFile,'r')
     content = fdefaultProject.read();
-    content = content.replace("$name$",projectElem.attrib['name']);
+    content = content.replace("$name$", getProjectName());
     fproject = open(BASE_DIR+'/.project', 'w')
     fproject.write(content)
     fproject.close()
@@ -158,6 +162,50 @@ def writeClassPath():
     fclasspath.write(prettify(root))
     fclasspath.close()
 
+def writeLaunchConfig(main):
+  if len(main)==0:
+    return
+  print("writing launch config for "+main)
+  shortName = main.split('.')[-1]
+  dir = BASE_DIR+'/.settings'
+  if not os.path.exists(dir):
+    os.makedirs(dir)   
+
+  jvmargs =""
+  with open(BASE_DIR+'/build.properties') as fp:
+    root = ElementTree.Element("classpath")
+    properties = jprops.load_properties(fp)
+    if properties.has_key('run.jvmargs'):
+      jvmargs = properties['run.jvmargs']
+      
+  root = ElementTree.Element("launchConfiguration")
+  root.attrib["type"]="org.eclipse.jdt.launching.localJavaApplication"
+  listAttribute = ElementTree.SubElement(root,"listAttribute")
+  listAttribute.attrib["key"]="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS"
+  listEntry = ElementTree.SubElement(listAttribute,"listEntry")
+  listEntry.attrib["value"]='/'+getProjectName()+'/src/'+main.replace('.','/')+'.java'
+
+  listAttribute = ElementTree.SubElement(root,"listAttribute")
+  listAttribute.attrib["key"]="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES"
+  listEntry = ElementTree.SubElement(listAttribute,"listEntry")
+  listEntry.attrib["value"]="1"
+  stringAttribute=ElementTree.SubElement(root,"stringAttribute")
+  stringAttribute.attrib["key"]="org.eclipse.jdt.launching.MAIN_TYPE"
+  stringAttribute.attrib["value"]=main
+  stringAttribute=ElementTree.SubElement(root,"stringAttribute")
+  stringAttribute.attrib["key"]="org.eclipse.jdt.launching.PROJECT_ATTR"
+  stringAttribute.attrib["value"]=shortName
+  stringAttribute=ElementTree.SubElement(root,"stringAttribute")
+  stringAttribute.attrib["key"]="org.eclipse.jdt.launching.VM_ARGUMENTS"
+  stringAttribute.attrib["value"]=jvmargs+' -Djava.library.path=lib'
+  
+  with open(dir+'/'+shortName+'.launch','w') as fp:
+    fp.write(prettify(root))    
+
+def writeLaunchConfigs():
+  for main in MAINS.split(','):
+    writeLaunchConfig(main)
+
 #def main():    
 parser = argparse.ArgumentParser(description='Create eclipse project files from a HMI project.')
 parser.add_argument('--sourcesetup', action="store_true", default=False)
@@ -166,14 +214,16 @@ parser.add_argument('--basedir', action="store", required=False, default='.')
 parser.add_argument('--sharedresource', action="store", required=True)
 parser.add_argument('--asapsharedresource', action="store", required=True)
 parser.add_argument('--language', action="store", required=False)
+parser.add_argument('--mains', action="store", required=False)
 args = parser.parse_args()
 SHARED_PATH = args.sharedroot
 SOURCE_SETUP = args.sourcesetup
 SHARED_RES = args.sharedresource
 ASAPSHARED_RES = args.asapsharedresource
 BASE_DIR = args.basedir
+MAINS = args.mains
 writeDotProject()
 writeClassPath()
-
+writeLaunchConfigs()
 #if __name__ == "__main__":
 #    main()
