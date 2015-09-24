@@ -263,7 +263,7 @@
    
    
    
-   <target name="-pub"  depends="clean, versioned.jar"> <!-- do the actual ivy publishing part of a release -->
+   <target name="-pub"  depends="versioned.jar"> <!-- do the actual ivy publishing part of a release -->
       <!--ivy:resolve transitive="false" log="quiet"/-->
       <property name="specification.version" value="0.0"/> <!-- fallback -->
       <property name="distdir"               location="${dist.dir}" />
@@ -385,7 +385,7 @@
   
    
   
-   <target name="devrelease"  depends="init" description="publishes a dev release, with Ivy &quot;beta&quot; status">
+   <target name="devrelease"  depends="init,clean" description="publishes a dev release, with Ivy &quot;beta&quot; status">
       <antcall target="ivyclean" />      
       <antcall target="resolve">
          <param name="resolve.status" value="beta"/> <!-- overrides build.properties value -->
