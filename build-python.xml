@@ -107,6 +107,8 @@ Implementation-Vendor:  ${organisation}</echo>
         </condition>
     </target>
    
+   <target name="-pre-doc">      
+   </target>
    
    <target name="build" depends="clean, compile" description="clean, compile"/>  
  
