@@ -11,7 +11,7 @@
    />                                     
    
    <typedef name="findbugs" 
-      classpath= "${shared.ant.dir}/findbugs-2.0.3/lib/findbugs-ant.jar"
+      classpath= "${shared.ant.dir}/findbugs-3.0.1/lib/findbugs-ant.jar"
       classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
    />
   
@@ -207,7 +207,7 @@
 
  </target>  
  
- <property name="findbugs.dir" value="${shared.ant.dir}/findbugs-2.0.3" />
+ <property name="findbugs.dir" value="${shared.ant.dir}/findbugs-3.0.1" />
  
 
 
