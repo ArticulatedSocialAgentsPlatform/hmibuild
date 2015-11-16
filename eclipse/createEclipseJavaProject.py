@@ -194,7 +194,7 @@ def writeLaunchConfig(main):
   stringAttribute.attrib["value"]=main
   stringAttribute=ElementTree.SubElement(root,"stringAttribute")
   stringAttribute.attrib["key"]="org.eclipse.jdt.launching.PROJECT_ATTR"
-  stringAttribute.attrib["value"]=shortName
+  stringAttribute.attrib["value"]=getProjectName()
   stringAttribute=ElementTree.SubElement(root,"stringAttribute")
   stringAttribute.attrib["key"]="org.eclipse.jdt.launching.VM_ARGUMENTS"
   stringAttribute.attrib["value"]=jvmargs+' -Djava.library.path=lib'
