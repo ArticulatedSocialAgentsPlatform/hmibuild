@@ -40,16 +40,15 @@ Implementation-Vendor:  ${organisation}</echo>
    <property name="dist.dir"              value="dist"  />
    <property name="dist.dir.absolute"     value="dist"  />
    <property name="dist.cpp.dir"          value="${dist.dir}"/>
-   <property name="zip.tmp.dir"          value="zip_root.tmp" />
+   <property name="zip.tmp.dir"           value="zip_root.tmp" />
    
-   <property name="dist.excludes"              value=""  />
+   <property name="dist.excludes"         value=""  />
    
-   <property name="test.cmake.base.dir"        value="test"      />
-   <property name="test.src.dir"               value="test/src"      />
-   <property name="test.build.dir"             value="test/build"    />
-   
-   <!--property name="cmake.install.prefix"          value=""    / -->
-
+   <property name="test.cmake.base.dir"   value="test"      />
+   <property name="test.src.dir"          value="test/src"      />
+   <property name="test.build.dir"        value="test/build"    />
+   <!-- Default: don't run a unit test binary -->
+   <property name="test.binary"           value=""  />
 
    <!-- Read build properties. Redundant when called from HmiShared/ant/build.xml, but needed for standalone versions -->
    <property name="properties.file" value="build.properties"/>
@@ -169,39 +168,76 @@ Implementation-Vendor:  ${organisation}</echo>
 		  >
 			<zipfileset dir="${zip.tmp.dir}" includes="**/*" excludes="${dist.excludes}" filemode="755" />
 	  </zip>
-		<echo message="Removing temporary root directory."/>
-		<delete dir="${zip.tmp.dir}" failonerror="false"/>
+	  <echo message="Removing temporary root directory."/>
+	  <delete dir="${zip.tmp.dir}" failonerror="false"/>
   </target>
 
-   <target name="build-test" depends="jar" description="Build test cases. Requires fully-built library.">
-	   <cmake srcdir="${test.cmake.base.dir}"
-		  bindir="${test.build.dir}"
-		  buildtype="Debug">
-          <generator name="Visual Studio 10" platform="windows" buildargs="ALL_BUILD.vcxproj">
-			  <variable name="CMAKE_INSTALL_PREFIX" type="PATH" value="../../${dist.dir}" />
-          </generator>
-		  <generator name="Unix Makefiles" />
-	  </cmake>
-  </target>
-  <target name="-install-test-make" depends="checkos" if="isUnix">
+  
+	<target name="-check-test-binary-set">
+		<condition property="test.binary.set">
+			<not>
+				<equals arg1="${test.binary}" arg2=""/>
+			</not>
+		</condition>
+		<condition property="test.binary.set.unix">
+			<and>
+				<os family="unix" />
+				<not>
+					<equals arg1="${test.binary}" arg2=""/>
+				</not>
+			</and>
+		</condition>
+		<condition property="test.binary.set.windows">
+			<and>
+				<os family="windows" />
+				<not>
+					<equals arg1="${test.binary}" arg2=""/>
+				</not>
+			</and>
+		</condition>
+	</target>
+	<target name="-write-no-test-present" unless="test.binary.set">
+		<echo message="Skipping cpp unit test since $${test.binary} was not set." />
+	</target>
+	<target name="build-test" if="test.binary.set" depends="jar" description="Build test cases. Requires fully-built library.">
+		<cmake srcdir="${test.cmake.base.dir}"
+			bindir="${test.build.dir}"
+			buildtype="Debug">
+			<generator name="Visual Studio 10" platform="windows" buildargs="ALL_BUILD.vcxproj">
+				<variable name="CMAKE_INSTALL_PREFIX" type="PATH" value="../../${dist.dir}" />
+			</generator>
+			<generator name="Unix Makefiles" />
+		</cmake>
+	</target>
+	<target name="-install-test-make" depends="checkos" if="test.binary.set.unix">
 		<exec executable="make" dir="${test.build.dir}">
 			<arg value="install"/>
 			<arg value="DESTDIR=../../${dist.dir}"/>
 		</exec>
 	</target>
-  <target name="-install-test-vs" depends="checkos" if="isWindows">
+	<target name="-install-test-vs" depends="checkos" if="test.binary.set.windows">
 		<exec executable="msbuild" dir="${test.build.dir}">
 			<arg value="INSTALL.vcxproj"/>
 		</exec>
 	</target>
-	<target name="test" depends="build-test,-install-test-make,-install-test-vs" description="Run test cases">
-		<echo>FIXME: Doing nothing at the moment!</echo>
+	<target name="-install-test" depends="-install-test-make,-install-test-vs" if="test.binary.set">
 	</target>
-
-            
-   <target name="compile-tests" depends="compile">
-      
-   </target>
+	<target name="-run-test" if="test.binary.set" description="Actually run test cases">
+		<echo message="Running unit test binary ${test.binary} in directory ${dist.dir}/bin" />
+		<exec executable="./${test.binary}" dir="${dist.dir}/bin" resultproperty="test.exit.code">
+			<env key="LD_LIBRARY_PATH" value="${deps.dir}/lib"/>
+			<env key="DYLD_LIBRARY_PATH" value="${deps.dir}/lib"/>
+		</exec>
+		<fail message="Unit test binary reported errors!">
+			<condition>
+				<isfailure code="${test.exit.code}"/>
+			</condition>
+		</fail>
+	</target>
+	<target name="test" depends="-check-test-binary-set,build-test,-install-test,-write-no-test-present,-run-test" description="Run test cases">
+	</target>
+	<target name="compile-tests" depends="compile">
+	</target>
 
   <target name="-findmain">
     <echo message="Not implemented." />
