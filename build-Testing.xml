@@ -214,7 +214,7 @@
   <target name="findbugsreport" depends="init, compile" description="find bugs, produce an HTML report">
     <findbugs home="${findbugs.dir}"
               output="html"              
-              outputFile="${test.dir}/findbugs.html" jvmargs="-Xmx512M"
+              outputFile="${test.dir}/findbugs.html" 
               reportLevel="high"
               >
       <!--auxClasspath path="${basedir}/lib/Regex.jar" /-->
@@ -227,7 +227,7 @@
 	<target name="findbugsxml" depends="init, compile" description="find bugs, produce an XML report">
     <findbugs home="${findbugs.dir}"
               output="xml"
-              outputFile="${test.dir}/findbugs.xml" jvmargs="-Xmx512M"              
+              outputFile="${test.dir}/findbugs.xml" 
               >
       <!--auxClasspath path="${basedir}/lib/Regex.jar" /-->
       <sourcePath path="${src.dir}" />
@@ -238,7 +238,7 @@
   
   <target name="findbugs" depends="init, compile" description="find bugs">
     <findbugs home="${findbugs.dir}"
-              output="text" jvmargs="-Xmx512M"
+              output="text" 
               reportLevel="high"
               >
       <!--auxClasspath path="${basedir}/lib/Regex.jar" /-->
