@@ -66,7 +66,7 @@
    <property name="shared.resources" value="${shared.project.root}/${shared.resources.dir.name}"/>
    
    <!-- asap.resources is a place that includes items like the Humanoid resources for asap-->
-   <property name="asap.resources.dir.name" value="asapresource"/>
+   <property name="asap.resources.dir.name" value="AsapResource"/>
    <property name="asap.resources" value="${shared.project.root}/${asap.resources.dir.name}"/>
    
     <!-- hmi.shared.project.dir is a place that includes items like the hmi repository. (as well as the HMI source code) -->
