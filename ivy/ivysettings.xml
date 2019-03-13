@@ -30,12 +30,7 @@
    <property name="ivy.localos.default.artifact.pattern"    value="[organisation]/[module]/${os}/[revision]/lib/[artifact]-[revision].[ext]" override="true"/>
    <property name="ivy.localos.norevision.artifact.pattern" value="[organisation]/[module]/${os}/[revision]/lib/[artifact].[ext]" override="true"/>
    
-   
    <property name="maven2.default.artifact.pattern"         value="[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" override="true"/>
-   <property name="maven2.root1" value="http://www.ibiblio.org/maven2/"/>
-   <property name="maven2.root2" value="http://repository.jboss.org/maven2/"/> 
-   <!--property name="maven.pattern" value="[organisation]/[module]/[revision]/[module]-[revision].[ext]"/--> 
- 
    
    <property name="user" value="zwiers"/>
    <property name="password" value="xyz"/>
@@ -268,8 +263,24 @@
       <sftp name="resource.sftp.publish" host="itchy" user="${publish.user.name}" keyFile="${user.keyfile}" >
          <ivy pattern="/var/www/ivyrepos/hmirepo/resource/${ivy.local.default.ivy.pattern}" />
          <artifact pattern="/var/www/ivyrepos/hmirepo/resource/${ivy.local.default.artifact.pattern}" />        
-      </sftp> 
-      
+      </sftp>
+
+      <ibiblio name="maven.org"
+         root="http://central.maven.org/maven2/"
+         pattern="${maven2.default.artifact.pattern}"
+         cache="remotecache"
+         m2compatible="true" />
+       <ibiblio name="apache.org"
+         root="http://repo.maven.apache.org/maven2/"
+         pattern="${maven2.default.artifact.pattern}"
+         cache="remotecache"
+         m2compatible="true" />
+	  <ibiblio name="uk.maven.org"
+         root="http://uk.maven.org/maven2/"
+         pattern="${maven2.default.artifact.pattern}"
+         cache="remotecache"
+         m2compatible="true" />
+
       <chain name="defaultchain" returnFirst="true">
     
          <resolver ref="${external.repository}"/>
@@ -293,13 +304,14 @@
          <resolver ref="${projects.repository}"/>
          <resolver ref="${projects.repository.os}"/>      
          
-	 <resolver ref="${resource.repository}"/>
-	 <resolver ref="${asap.resource.repository}"/>
-         
-      </chain>       
-      
-       
-   
+         <resolver ref="${resource.repository}"/>
+         <resolver ref="${asap.resource.repository}"/>
+
+         <resolver ref="maven.org"/>
+         <resolver ref="apache.org"/>
+         <resolver ref="uk.maven.org"/>
+		 
+      </chain>
        
       <!--sftp name="remote" user="${user}" userPassword="${password}" host="${remote.host}">  
          <ivy pattern="ivyremote/${ivy.local.default.ivy.pattern}" />  
