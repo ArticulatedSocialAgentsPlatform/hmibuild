@@ -117,14 +117,14 @@
    
    <!-- The base URL of similar, url based, repositories: -->
    <!--property name="hmi.repository.url.base"             value="http://hmirepo.ewi.utwente.nl"/-->
-   <property name="hmi.repository.url.base"             value="http://itchy.techfak.uni-bielefeld.de/ivyrepos/hmirepo"/>
+   <property name="hmi.repository.url.base"             value="http://things.ewi.utwente.nl/asap/repository/hmirepo"/>
    
    <!-- Master switch for using either "filesystem" or (web based) "url" resolvers: -->
    <property name="repository.mode"                     value="url"/>         <!-- either "filesystem" or "url" -->
    <!--property name="repository.mode"                     value="filesystem"/-->         <!-- either "filesystem" or "url" -->
    
    <!--property name="asap.repository.url.base"             value="http://asap-project.ewi.utwente.nl/repo"/-->
-   <property name="asap.repository.url.base"             value="http://itchy.techfak.uni-bielefeld.de/ivyrepos/asap-project"/>
+   <property name="asap.repository.url.base"             value="http://things.ewi.utwente.nl/asap/repository/asap-project"/>
    
    <!-- EXTERNAL REPO -->
    <!-- Mode switch, for overriding "repository.mode" for "external" repository: --> 
