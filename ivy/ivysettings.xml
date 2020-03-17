@@ -267,17 +267,17 @@
       </sftp>
 
       <ibiblio name="maven.org"
-         root="http://central.maven.org/maven2/"
+         root="https://central.maven.org/maven2/"
          pattern="${maven2.default.artifact.pattern}"
          cache="remotecache"
          m2compatible="true" />
        <ibiblio name="apache.org"
-         root="http://repo.maven.apache.org/maven2/"
+         root="https://repo.maven.apache.org/maven2/"
          pattern="${maven2.default.artifact.pattern}"
          cache="remotecache"
          m2compatible="true" />
 	  <ibiblio name="uk.maven.org"
-         root="http://uk.maven.org/maven2/"
+         root="https://uk.maven.org/maven2/"
          pattern="${maven2.default.artifact.pattern}"
          cache="remotecache"
          m2compatible="true" />
