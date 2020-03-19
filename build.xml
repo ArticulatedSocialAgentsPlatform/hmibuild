@@ -54,39 +54,46 @@
     <target name="tu" >
        <echo message="user.home= ${user.home} publish.user.name=${publish.user.name} user.name=${user.name} private key location = ${user.keyfile} userprops=${user.properties.file.available}"/>
     </target>
+	
+	<!-- Here we configure the root of our repository when in filesystem mode. 
+	By default this is relative to the root of our ant hmibuild installation. 
+	However this can be overwritten through commandline or by changing the parameters below, so that you can place your local copy of the repository somewhere else.
+	e.g.: -Drepository.mode=filesystem -Drepository.filesystem.root=C:/dev/repository -Dpublish.resolver=hmicore.filesystem.repository -->
+   <property name="repository.filesystem.root" value="${shared.project.root}/repository"/> <!-- Relative path -->
+   <!--property name="filesystem.root" value="C:/dev/repository"/--> <!-- Absolute path -->
    
-   <!-- Next we define a number of "shared" places:-->
+   <!-- Next we define a number of "shared" places. Paths that refer to the repository can be absolute or relative, others can only be relative (e.g. the resource dirs) -->
+   
    <!-- shared.project.dir is a place that includes items like the shared repository -->
    <property name="projects.dir.name" value="Projects"/>
-   <property name="projects.dir" value="${shared.project.root}/${projects.dir.name}"/>
+   <property name="projects.dir" value="${repository.filesystem.root}/${projects.dir.name}"/>
    <property name="projects.repository" value="${projects.dir}/repository"/>
+   
+    <!-- hmi.shared.project.dir is a place that includes items like the hmi repository. (as well as the HMI source code) -->
+   <property name="hmi.shared.dir.name" value="hmirepo"/>
+   <property name="hmi.shared.dir" value="${repository.filesystem.root}/${hmi.shared.dir.name}"/>
+   
+   <property name="soa.shared.dir.name" value="soashared"/>
+   <property name="soa.shared.dir" value="${repository.filesystem.root}/${soa.shared.dir.name}"/>
+   
+   <property name="asap.shared.dir.name" value="asap-project"/>
+   <property name="asap.shared.dir" value="${repository.filesystem.root}/${asap.shared.dir.name}"/>
+  
+   <!-- asap.resources is a place that includes items like the Humanoid resources for asap-->
+   <property name="asap.resources.dir.name" value="AsapResource"/>
+   <property name="asap.resources" value="${shared.project.root}/${asap.resources.dir.name}"/>
    
    <!-- shared.resources is a place that includes items like the Humanoid resources -->
    <property name="shared.resources.dir.name" value="HmiResource"/>
    <property name="shared.resources" value="${shared.project.root}/${shared.resources.dir.name}"/>
    
-   <!-- asap.resources is a place that includes items like the Humanoid resources for asap-->
-   <property name="asap.resources.dir.name" value="AsapResource"/>
-   <property name="asap.resources" value="${shared.project.root}/${asap.resources.dir.name}"/>
-   
-    <!-- hmi.shared.project.dir is a place that includes items like the hmi repository. (as well as the HMI source code) -->
-   <property name="hmi.shared.dir.name" value="HmiShared"/>
-   <property name="hmi.shared.dir" value="${shared.project.root}/${hmi.shared.dir.name}"/>
-   
-   <property name="soa.shared.dir.name" value="soashared"/>
-   <property name="soa.shared.dir" value="${shared.project.root}/${soa.shared.dir.name}"/>
-   
    <property name="hmi.build.dir.name" value="hmibuild"/>
    <property name="hmi.build.dir" value="${shared.project.root}/${hmi.build.dir.name}"/>
-   
-   
-   <property name="asap.shared.dir.name" value="asapshared"/>
-   <property name="asap.shared.dir" value="${shared.project.root}/${asap.shared.dir.name}"/>
-  
    
    <!-- shared.ant.dir is the place where this build file resides, and acts as the anchor for other build files, templates, ivy directories-->
    <property name="shared.ant.dir" value="${shared.project.root}/${relative.shared.ant.dir}"/>
    <property name="shared.template.dir" value="${shared.ant.dir}/template"/>
+   
    
    <!-- if ant.project name is not set explicitly, we derive it from the project directory -->
    <ac:propertyregex property="ant.project.name"
@@ -111,17 +118,17 @@
    <!-- SETTINGS FOR THE IVY REPOSITORIES  -->
    <!-- GLOBAL SETTINGS: -->
    <!-- The root of several (hmi) filesystem based repositories: -->
-   <property name="hmi.repository.filesystem.root"      value="${hmi.shared.dir}/repository"/>
-   <property name="asap.repository.filesystem.root"      value="${asap.shared.dir}/repository"/>
-   <property name="soa.repository.filesystem.root"      value="${soa.shared.dir}/repository"/>
+   <property name="hmi.repository.filesystem.root"      value="${hmi.shared.dir}"/>
+   <property name="asap.repository.filesystem.root"      value="${asap.shared.dir}"/>
+   <property name="soa.repository.filesystem.root"      value="${soa.shared.dir}"/>
    
    <!-- The base URL of similar, url based, repositories: -->
    <!--property name="hmi.repository.url.base"             value="http://hmirepo.ewi.utwente.nl"/-->
    <property name="hmi.repository.url.base"             value="http://things.ewi.utwente.nl/asap/repository/hmirepo"/>
    
    <!-- Master switch for using either "filesystem" or (web based) "url" resolvers: -->
+   <!--property name="repository.mode"                     value="url"/-->         <!-- either "filesystem" or "url" -->
    <property name="repository.mode"                     value="url"/>         <!-- either "filesystem" or "url" -->
-   <!--property name="repository.mode"                     value="filesystem"/-->         <!-- either "filesystem" or "url" -->
    
    <!--property name="asap.repository.url.base"             value="http://asap-project.ewi.utwente.nl/repo"/-->
    <property name="asap.repository.url.base"             value="http://things.ewi.utwente.nl/asap/repository/asap-project"/>
@@ -150,6 +157,7 @@
    <!-- Mode switch, for overriding "repository.mode" for "resource" repository: --> 
    <property name="resource.repository.mode"             value="${repository.mode}"/> <!-- either "filesystem" or "url" -->
    <!-- The property used within the ant/ivy/ivysettings.xml file: -->
+   <!-- NOTE: this seems to be legacy, might not actually be used anymore. Most recent seems to be the resource repo defined below -->
    <property name="resource.repository"                  value="resource.${resource.repository.mode}.repository"/>
    <property name="asap.resource.repository"             value="asap.resource.${resource.repository.mode}.repository"/>
    
